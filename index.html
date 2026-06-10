@@ -1673,8 +1673,12 @@ function togglePerm(userId, perm, val){
   if(!u)return;
   if(!u.perms)u.perms={};
   u.perms[perm]=val;
-  // Mettre à jour currentUser si c'est lui
-  if(currentUser&&currentUser.id===userId){currentUser.perms=JSON.parse(JSON.stringify(u.perms));}
+  if(currentUser&&currentUser.id===userId){
+    currentUser.perms=JSON.parse(JSON.stringify(u.perms));
+    const navDevis=document.getElementById('nav-devis');
+    if(navDevis){if(currentUser.role==='admin'||currentUser.perms.accessDevis)navDevis.classList.remove('hidden');else navDevis.classList.add('hidden');}
+    if(currentPage==='home')document.getElementById('main').innerHTML=renderHome();
+  }
   saveUsers().then(()=>toast('Permission mise à jour'));
 }
 
@@ -2198,16 +2202,16 @@ ${filesPages}
 function renderStorageCard(){
   const DB_LIMIT_MB=1024;
   const FILE_LIMIT_MB=5120;
-  const totalBytes=new Blob([JSON.stringify(fiches),JSON.stringify(machines),JSON.stringify(USERS)]).size;
-  let filesBytes=0;
-  fiches.forEach(f=>(f.files||[]).forEach(fl=>{if(fl.data)filesBytes+=fl.data.length*0.75;}));
+  // Données Firestore: exclure les URLs Storage pour mesure exacte
+  const fichesSansUrls=fiches.map(f=>({...f,files:(f.files||[]).map(fl=>({name:fl.name,type:fl.type}))}));
+  const totalBytes=new Blob([JSON.stringify(fichesSansUrls),JSON.stringify(machines),JSON.stringify(USERS)]).size;
   const toMB=b=>(b/1024/1024).toFixed(2);
   const totalMB=parseFloat(toMB(totalBytes));
-  const filesMB=parseFloat(toMB(filesBytes));
   const dbPct=Math.min(100,(totalMB/DB_LIMIT_MB*100)).toFixed(1);
-  const filePct=Math.min(100,(filesMB/FILE_LIMIT_MB*100)).toFixed(1);
-  const barColor=p=>p>80?'#e74c3c':p>50?'#f39c12':'#2ecc71';
+  // Fichiers Storage: on compte uniquement, taille réelle non accessible côté client
   const totalFiles=fiches.reduce((a,f)=>a+(f.files||[]).length,0);
+  const storageFiles=fiches.reduce((a,f)=>a+(f.files||[]).filter(fl=>fl.url&&fl.url.includes('firebasestorage')).length,0);
+  const barColor=p=>p>80?'#e74c3c':p>50?'#f39c12':'#2ecc71';
   return '<div class="section-title">☁️ Stockage Cloud</div>'
     +'<div style="margin-bottom:14px">'
       +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'
@@ -2219,16 +2223,7 @@ function renderStorageCard(){
       +'</div>'
       +'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+dbPct+'% utilisé</div>'
     +'</div>'
-    +'<div style="margin-bottom:14px">'
-      +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'
-        +'<span style="color:var(--text2)">Fichiers joints (images / PDF)</span>'
-        +'<span style="font-weight:600">'+filesMB+' MB <span style="color:var(--text2);font-weight:400">/ '+FILE_LIMIT_MB+' MB</span></span>'
-      +'</div>'
-      +'<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden">'
-        +'<div style="height:100%;width:'+filePct+'%;background:'+barColor(parseFloat(filePct))+';border-radius:5px;transition:width .4s"></div>'
-      +'</div>'
-      +'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+filePct+'% utilisé</div>'
-    +'</div>'
+    +'<div style="margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'+'<span style="color:var(--text2)">Fichiers joints (Firebase Storage)</span>'+'<span style="font-weight:600">'+storageFiles+' fichier'+(storageFiles>1?'s':'')+' <span style="color:var(--text2);font-weight:400">/ 5 GB gratuits</span></span>'+'</div>'+'<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden">'+'<div style="height:100%;width:'+(Math.min(100,storageFiles))+'%;background:#2ecc71;border-radius:5px;transition:width .4s"></div>'+'</div>'+'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+totalFiles+' fichier'+(totalFiles!==1?'s':'')+' stockés</div>'+'</div>'
     +'<div class="info-grid" style="margin-bottom:10px">'
       +'<div><div class="info-label">Fiches</div><div class="info-val">'+fiches.length+'</div></div>'
       +'<div><div class="info-label">Machines</div><div class="info-val">'+machines.length+'</div></div>'
