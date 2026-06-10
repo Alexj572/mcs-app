@@ -298,7 +298,7 @@ main{flex:1;padding:24px 20px;max-width:1200px;margin:0 auto;width:100%}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadString, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { getStorage, ref, uploadString, getDownloadURL, deleteObject, listAll, getMetadata } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA7t38KW16PTzwrdNeWVPIK4i0N_7EqlWI",
@@ -327,6 +327,8 @@ window.fbRef = ref;
 window.fbUploadString = uploadString;
 window.fbGetDownloadURL = getDownloadURL;
 window.fbDeleteObject = deleteObject;
+window.fbListAll = listAll;
+window.fbGetMetadata = getMetadata;
 
 window.firebaseReady = true;
 document.dispatchEvent(new Event('firebaseReady'));
@@ -523,6 +525,27 @@ const DEFAULT_USERS=[
    perms:{createFiche:true,editFiche:true,deleteFiche:false,exportData:false}}
 ];
 let USERS=JSON.parse(JSON.stringify(DEFAULT_USERS));
+let cloudStorageBytes=null; // null = pas encore calculé
+async function calcStorageSize(){
+  if(!window.storage||!window.fbListAll)return;
+  try{
+    let total=0;
+    const rootRef=window.fbRef(window.storage,'fiches');
+    const res=await window.fbListAll(rootRef);
+    // Parcourir les sous-dossiers (un par fiche)
+    for(const folderRef of res.prefixes){
+      const sub=await window.fbListAll(folderRef);
+      for(const item of sub.items){
+        try{const md=await window.fbGetMetadata(item);total+=md.size||0;}catch(e){}
+      }
+    }
+    // Fichiers à la racine
+    for(const item of res.items){
+      try{const md=await window.fbGetMetadata(item);total+=md.size||0;}catch(e){}
+    }
+    cloudStorageBytes=total;
+  }catch(e){console.warn('calcStorageSize',e);cloudStorageBytes=null;}
+}
 function canDo(perm){if(!currentUser)return false;if(currentUser.role==='admin')return true;return !!(currentUser.perms&&currentUser.perms[perm]);}
 
 // ── FIREBASE USERS CRUD ───────────────────────────────
@@ -2208,9 +2231,10 @@ function renderStorageCard(){
   const toMB=b=>(b/1024/1024).toFixed(2);
   const totalMB=parseFloat(toMB(totalBytes));
   const dbPct=Math.min(100,(totalMB/DB_LIMIT_MB*100)).toFixed(1);
-  // Fichiers Storage: on compte uniquement, taille réelle non accessible côté client
+  // Fichiers: total tous types confondus
   const totalFiles=fiches.reduce((a,f)=>a+(f.files||[]).length,0);
   const storageFiles=fiches.reduce((a,f)=>a+(f.files||[]).filter(fl=>fl.url&&fl.url.includes('firebasestorage')).length,0);
+  const localFiles=totalFiles-storageFiles;
   const barColor=p=>p>80?'#e74c3c':p>50?'#f39c12':'#2ecc71';
   return '<div class="section-title">☁️ Stockage Cloud</div>'
     +'<div style="margin-bottom:14px">'
@@ -2223,7 +2247,7 @@ function renderStorageCard(){
       +'</div>'
       +'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+dbPct+'% utilisé</div>'
     +'</div>'
-    +'<div style="margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'+'<span style="color:var(--text2)">Fichiers joints (Firebase Storage)</span>'+'<span style="font-weight:600">'+storageFiles+' fichier'+(storageFiles>1?'s':'')+' <span style="color:var(--text2);font-weight:400">/ 5 GB gratuits</span></span>'+'</div>'+'<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden">'+'<div style="height:100%;width:'+(Math.min(100,storageFiles))+'%;background:#2ecc71;border-radius:5px;transition:width .4s"></div>'+'</div>'+'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+totalFiles+' fichier'+(totalFiles!==1?'s':'')+' stockés</div>'+'</div>'
+    +'<div style="margin-bottom:14px">'+'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'+'<span style="color:var(--text2)">Fichiers joints (Firebase Storage)</span>'+'<span style="font-weight:600">'+(cloudStorageBytes!==null?(cloudStorageBytes/1024/1024).toFixed(1)+' MB':totalFiles+' fichiers')+' <span style="color:var(--text2);font-weight:400">/ 5 GB</span></span>'+'</div>'+'<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden">'+'<div style="height:100%;width:'+(cloudStorageBytes!==null?Math.min(100,cloudStorageBytes/1024/1024/5120*100).toFixed(2):0)+'%;background:#2ecc71;border-radius:5px;transition:width .4s"></div>'+'</div>'+'<div style="font-size:11px;color:var(--text2);margin-top:3px">'+(cloudStorageBytes!==null?((cloudStorageBytes/1024/1024/5120*100).toFixed(2)+'% utilisé · '+totalFiles+' fichiers'):'Appuyez sur Actualiser pour calculer la taille')+'</div>'+'</div>'
     +'<div class="info-grid" style="margin-bottom:10px">'
       +'<div><div class="info-label">Fiches</div><div class="info-val">'+fiches.length+'</div></div>'
       +'<div><div class="info-label">Machines</div><div class="info-val">'+machines.length+'</div></div>'
@@ -2272,6 +2296,7 @@ async function importData(file){
 async function refreshData(silent=false){
   if(!silent) toast('Actualisation en cours...');
   await loadAllData();
+  if(currentPage==='settings'){await calcStorageSize();}
   const page=currentPage;
   if(['home','fiches','fiche-view','stats'].includes(page)){
     goTo(page,currentFilter);
