@@ -732,6 +732,8 @@ async function doLogin(){
   }
   const u=document.getElementById('login-user').value.trim();
   const p=document.getElementById('login-pass').value;
+  // Recharger les users depuis Firebase pour avoir les permissions à jour
+  await svUsers_load();
   const found=USERS.find(x=>x.id===u&&x.pass===p);
   if(!found){toast('Identifiants incorrects','error');return}
   currentUser=JSON.parse(JSON.stringify(found)); // copie pour éviter mutation
