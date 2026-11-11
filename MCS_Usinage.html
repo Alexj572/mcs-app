@@ -400,7 +400,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 11</p>
+<p class="ver">Aide à l'usinage · version 12</p>
 <div id="pr"></div>
 <div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
   <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
@@ -450,10 +450,10 @@ const GG=[['1/16',28,7.723,.214,.107,.282,6.8],['1/8',28,9.728,.214,.107,.282,8.
 // ISO 7-1 : [désignation, TPI, d au plan de jauge, longueur de jauge, longueur utile, foret]
 const RR=[['1/16',28,7.723,4.0,6.5,6.4],['1/8',28,9.728,4.0,6.5,8.4],['1/4',19,13.157,6.0,9.7,11.2],['3/8',19,16.662,6.4,10.1,14.75],['1/2',14,20.955,8.2,13.2,18.25],['3/4',14,26.441,9.5,14.5,23.75],['1',11,33.249,10.4,16.8,30.0],['1.1/4',11,41.910,12.7,19.1,38.5],['1.1/2',11,47.803,12.7,19.1,44.5],['2',11,59.614,15.9,23.4,56.0],['2.1/2',11,75.184,17.5,26.7,0],['3',11,87.884,20.6,29.8,0],['4',11,113.030,25.4,35.8,0]];
 // ASME B1.20.1 (pouces) : [désignation, TPI, D, E0, L1, L2, foret mm]
-const NPT=[['1/16',27,.3125,.27118,.16,.2611,6.3],['1/8',27,.405,.36351,.1615,.2639,8.7],['1/4',18,.54,.47739,.2278,.4018,11.1],['3/8',18,.675,.61201,.24,.4078,14.7],['1/2',14,.84,.75843,.32,.5337,18.3],['3/4',14,1.05,.96768,.339,.5457,23.4],['1',11.5,1.315,1.21363,.4,.6828,29.4],['1.1/4',11.5,1.66,1.55713,.42,.7068,38.1],['1.1/2',11.5,1.9,1.79609,.42,.7235,44.1],['2',11.5,2.375,2.26902,.436,.7565,56.4],['2.1/2',8,2.875,2.71953,.682,1.1375,66.7],['3',8,3.5,3.34062,.766,1.2,82.6],['3.1/2',8,4.0,3.8375,.821,1.25,95.3],['4',8,4.5,4.33438,.844,1.3,108.0],['5',8,5.563,5.39073,.937,1.4063,134.9],['6',8,6.625,6.44609,.958,1.5125,161.9]];
+const NPT=[['1/16',27,.3125,.27118,.16,.2611,6.3],['1/8',27,.405,.36351,.1615,.2639,8.7],['1/4',18,.54,.47739,.2278,.4018,11.1],['3/8',18,.675,.61201,.24,.4078,14.7],['1/2',14,.84,.75843,.32,.5337,18.3],['3/4',14,1.05,.96768,.339,.5457,23.4],['1',11.5,1.315,1.21363,.4,.6828,29.4],['1.1/4',11.5,1.66,1.55713,.42,.7068,38.1],['1.1/2',11.5,1.9,1.79609,.42,.7235,44.1],['2',11.5,2.375,2.26902,.436,.7565,56.4],['2.1/2',8,2.875,2.71953,.682,1.1375,66.7],['3',8,3.5,3.34062,.766,1.2,82.6],['3.1/2',8,4.0,3.8375,.821,1.25,0],['4',8,4.5,4.33438,.844,1.3,0],['5',8,5.563,5.39073,.937,1.4063,0],['6',8,6.625,6.44609,.958,1.5125,0]];
 // DIN 103 : [d, pas] ; tolérances 4h sur d et 4H sur D1 (µm)
 const TRP={8:[1.5],9:[2,1.5],10:[2,1.5],11:[3,2],12:[3,2],14:[3,2],16:[4,2],18:[4,2],20:[4,2],22:[5,3,8],24:[5,3,8],26:[5,3,8],28:[5,3,8],30:[6,3,10],32:[6,3,10],34:[6,3,10],36:[6,3,10],38:[7,3,10],40:[7,3,10],42:[7,3,10],44:[7,3,12],46:[8,3,12],48:[8,3,12],50:[8,3,12],52:[8,3,12],55:[9,3,14],60:[9,3,14],65:[10,4,16],70:[10,4,16],75:[10,4,16],80:[10,4,16],90:[12,4,18],100:[12,4,20]};
-const TRd={1.5:150,2:180,3:236,4:300,5:335,6:375,7:425,8:450,9:500,10:530,12:600,14:670,16:710,18:750,20:800}, TRD1={1.5:190,2:236,3:315,4:375,5:450,6:500,7:560,8:630,9:670,10:710,12:800,14:900,16:1000,18:1120,20:1180};
+const TRd={1.5:150,2:180,3:236,4:300,5:335,6:375,7:425,8:450,9:500,10:530,12:600,14:670,16:710,18:800,20:850}, TRD1={1.5:190,2:236,3:315,4:375,5:450,6:500,7:560,8:630,9:670,10:710,12:800,14:900,16:1000,18:1120,20:1180};
 // DIN 405 : [d, filets au pouce]
 const RD=[[8,10],[10,10],[12,10],[14,8],[16,8],[18,8],[20,8],[22,8],[24,8],[26,8],[28,8],[30,8],[32,8],[36,8],[40,6],[44,6],[48,6],[52,6],[55,6],[60,6],[65,6],[70,6],[80,6],[90,6],[100,6]];
 // DIN 40430 : [désignation, d, TPI, d1]
@@ -488,7 +488,7 @@ function cyl(o,ext){
     r.rep=[['d','Ø extérieur nominal',f3(o.d)],['d2','Ø sur flancs nominal',f3(o.d2)],[o.rl,'Ø à fond de filet nominal',f3(d3)],['P','Pas',f3(o.P)],['h','Profondeur de filet',f3(o.he)]];
     r.ctrl=[['Ø extérieur après filetage',win?rng(hi-win,hi):f3(o.d)+' (nominal)'],['Bague ENTRE','sur toute la longueur'],['Bague N\'ENTRE PAS','2 filets maxi = '+f2(2*o.P)]];
     r.gauge=['CONTRÔLE À LA BAGUE','ENTRE : toute la longueur · N\'ENTRE PAS : 2 filets maxi ('+f2(2*o.P)+' mm)'];
-    r.cnote=o.top?'Plaquette arasante : le Ø extérieur mesuré après filetage suit le Ø sur flancs. La tolérance affichée est donc celle des flancs, plus serrée que celle du Ø extérieur seul. Contrôle final à la bague.':'Contrôle final à la bague ou avec l\'écrou.';
+    r.cnote=!win?'Pas de tolérance chiffrée pour ce filetage : contrôle final à la bague.':o.top?'Plaquette arasante : le Ø extérieur mesuré après filetage suit le Ø sur flancs. La tolérance affichée est donc celle des flancs, plus serrée que celle du Ø extérieur seul. Contrôle final à la bague.':'Contrôle final à la bague ou avec l\'écrou.';
   }else{
     const lo=o.D1, win=o.top?(t.TD2||t.TD1):t.TD1, aim=win?lo+win/2:lo;
     r.depth=o.hi; r.x0=aim; r.dir=1; r.prof=o.pi; r.tol=win?[lo,lo+win]:null; r.pr=(o.d2-o.D1)/2/o.hi;
@@ -500,7 +500,7 @@ function cyl(o,ext){
     r.ctrl=[['Ø d\'alésage après filetage',win?rng(lo,lo+win):f3(lo)+' (nominal)'],['Tampon ENTRE','sur toute la longueur'],['Tampon N\'ENTRE PAS','2 filets maxi = '+f2(2*o.P)]];
     r.gauge=['CONTRÔLE AU TAMPON','ENTRE : toute la longueur · N\'ENTRE PAS : 2 filets maxi ('+f2(2*o.P)+' mm)'];
     if(o.drill>0) r.ctrl.push(['Foret si taraudage','Ø '+f2(o.drill)]);
-    r.cnote=o.top?'Plaquette arasante : le Ø d\'alésage mesuré après filetage suit le Ø sur flancs. Contrôle final au tampon.':'Contrôle final au tampon ou avec la vis.';
+    r.cnote=!win?'Pas de tolérance chiffrée pour ce filetage : contrôle final au tampon.':o.top?'Plaquette arasante : le Ø d\'alésage mesuré après filetage suit le Ø sur flancs. Contrôle final au tampon.':'Contrôle final au tampon ou avec la vis.';
   }
   r.top=o.top;
   if(!o.tol) r.note='Pas de tolérance normalisée renseignée pour ce filetage : cotes nominales.';
@@ -509,42 +509,44 @@ function cyl(o,ext){
 
 /* ---------- Calcul d'une fiche ---------- */
 const VERIF={m:[1,'Tolérances 6g / 6H contrôlées par les formules ISO 965.'],g:[1,'Diamètres et tolérances contrôlés contre une table ISO 228-1.'],
-  npt:[0,'Ø sur flancs et longueur L2 contrôlés par les formules ASME B1.20.1. Engagement à la main L1 et foret non recoupés avec une table.'],
-  r:[0,'Longueurs de jauge, longueurs utiles et tolérances d\'entrée bague / tampon non recoupées avec la norme ISO 7-1.'],
-  bsw:[0,'Tolérances calculées par les formules BS 84, non recoupées avec une table.'],bsf:[0,'Tolérances calculées par les formules BS 84, non recoupées avec une table.'],
-  tr:[0,'Diamètres et jeu au fond contrôlés (ISO 2904). Tolérances 4h / 4H non recoupées avec une table.'],acme:[0,'Cotes et tolérances calculées par formule, non recoupées avec une table.'],
-  rd:[0,'Cotes nominales DIN 405, non recoupées avec une table, sans tolérance.'],pg:[0,'Cotes nominales DIN 40430, non recoupées avec une table, sans tolérance.'],sp:[0,'Filetage hors série : cotes et tolérances calculées par formule, non recoupées avec une table.']};
+  npt:[1,'Ø sur flancs E0, engagement à la main L1 et longueur L2 recoupés sur trois tables ASME B1.20.1. Forets dans les plages d\'un fabricant de tarauds jusqu\'à 3" ; pas de foret donné au-delà, les sources ne concordent pas.'],
+  r:[1,'Ø au plan de jauge, longueurs de jauge, tolérances d\'entrée bague / tampon et longueurs utiles recoupés sur deux tables ISO 7-1. Pas de foret donné : les fabricants ne donnent pas la même valeur.'],
+  bsw:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance ni de foret affichés : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],bsf:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance ni de foret affichés : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],
+  tr:[1,'Diamètres et jeu au fond contrôlés (ISO 2904). Tolérances 4h / 4H recoupées sur deux éditions de l\'ISO 2903.'],acme:[1,'Limites 2G recoupées sur une table publiée et sur les règles de tolérance de l\'ASME B1.5.'],
+  rd:[1,'Ø nominaux de la vis et de l\'écrou recoupés sur deux tables DIN 405. Pas de tolérance affichée (DIN 405-2 non reprise) : contrôle à la bague ou au tampon.'],pg:[1,'Ø extérieur et Ø du noyau recoupés sur trois tables DIN 40430. Pas de tolérance affichée : contrôle à la bague ou au tampon.'],sp:[1,'Filetage hors série : cotes et tolérances calculées avec les formules de la norme (ISO 965 en métrique, ASME B1.1 en pouce), les mêmes que pour les tailles normalisées. En 55°, pas de tolérance affichée.']};
 function calc(fam,i,pasSel,ext,sp){ const r=calc0(fam,i,pasSel,ext,sp); if(!r)return r;
-  let v=VERIF[fam]; if(fam==='un'){const s=pasSel.split('|')[1]; v=s==='UNC'||s==='UNF'?[1,'Tolérances 2A / 2B calculées selon ASME B1.1, recoupées sur les tailles courantes.']:[0,'Tolérances calculées selon ASME B1.1, non recoupées avec une table pour cette série.'];}
-  r.vok=v[0]; r.verif=v[1]+(r.top?' Choix d\'atelier à valider : tolérance du haut du filet reprise de celle des flancs (plaquette arasante), surépaisseur de '+f2(CFG.sur)+' avant filetage.':'');
+  let v=VERIF[fam]; if(fam==='un'){const s=pasSel.split('|')[1]; v=s==='UNC'||s==='UNF'?[1,'Tolérances 2A / 2B calculées selon ASME B1.1, recoupées sur les tailles courantes.']:[1,'Limites 2A / 2B recoupées sur une table ASME B1.1 (UNEF, UNS, 8UN). Ø d\'alésage arrondi au millième de pouce comme la norme.'];}
+  r.vok=v[0]; r.verif=v[1]+(r.top&&r.tol?' Choix d\'atelier à valider : tolérance du haut du filet reprise de celle des flancs (plaquette arasante), surépaisseur de '+f2(CFG.sur)+' avant filetage.':'');
   return r; }
 function calc0(fam,i,pasSel,ext,sp){
   if(fam==='m'){ const d=+i,P=+pasSel,gros=COARSE[d]===P;
     return cyl(v60('M'+d+(gros?'':' × '+P),'Métrique ISO, pas '+(gros?'gros':'fin')+' · tolérance '+(ext?'6g':'6H')+' (ISO 965)',d,P,null,mTol(d,P),dr(d-P)),ext); }
-  if(fam==='un'){ const q=pasSel.split('|'),tpi=+q[0],D=frac(i),p=1/tpi;
-    return cyl(v60(pn(i)+' – '+tpi+' '+q[1],'Unifié pouce · classe '+(ext?'2A':'2B')+' (ASME B1.1) · valeurs en mm',D*K,p*K,tpi,unTol(D,p,q[1]==='UNC'||q[1]==='UNF'||tpi===8?D:9*p),Math.round((D-p)*K*10)/10),ext); }
+  if(fam==='un'){ const q=pasSel.split('|'),tpi=+q[0],D=frac(i),p=1/tpi,cf=q[1]==='UNC'||q[1]==='UNF';
+    const o=v60(pn(i)+' – '+tpi+' '+q[1],'Unifié pouce · classe '+(ext?'2A':'2B')+' (ASME B1.1) · valeurs en mm',D*K,p*K,tpi,unTol(D,p,cf||tpi===8?D:9*p),Math.round((D-p)*K*10)/10);
+    if(!cf&&D>=.138){ const d1=D-1.082532*p,mn=Math.round(d1*1000)/1000,mx=Math.floor((d1+o.tol.TD1/K)*1000+1e-7)/1000; o.D1=mn*K; o.tol.TD1=(mx-mn)*K; } // ASME : mineur écrou au millième de pouce
+    return cyl(o,ext); }
   if(fam==='bsw'||fam==='bsf'){ const L=(fam==='bsw'?BSW:BSF)[i],D=frac(L[0]),p=1/L[1];
-    return cyl(v55(pn(L[0])+' – '+L[1]+' '+fam.toUpperCase(),'Whitworth 55° (BS 84) · classe moyenne · valeurs en mm',D*K,p*K,L[1],bsTol(D,p),dr((D-1.1*p)*K)),ext); }
+    return cyl(v55(pn(L[0])+' – '+L[1]+' '+fam.toUpperCase(),'Whitworth 55° (BS 84) · valeurs en mm',D*K,p*K,L[1],null,null),ext); }
   if(fam==='g'){ const L=GG[i];
     return cyl(v55('G '+L[0].replace('.',' ')+(ext?' A':''),'BSP cylindrique, Whitworth 55° (ISO 228-1)'+(ext?' · classe A':''),L[2],K/L[1],L[1],{es:0,Td:L[3],Td2:L[4],TD2:L[4],TD1:L[5]},L[6]),ext); }
   if(fam==='tr'){ const d=+i,P=+pasSel,ac=P<2?.15:P<=5?.25:P<=12?.5:1,h=.5*P+ac;
     return cyl({nom:'Tr '+d+' × '+P,sub:'Trapézoïdal 30° (DIN 103) · jeu au fond ac = '+ac+' mm · 4h / 4H sur le haut du filet',P,tpi:null,ang:30,pe:'tr',pi:'tr',d,d2:d-.5*P,he:h,hi:h,D1:d-P,Dint:d+2*ac,rl:'d3',tol:{Td:TRd[P]/1000,TD1:TRD1[P]/1000}},ext); }
   if(fam==='acme'){ const L=ACME[i],D=frac(L[0])*K,P=K/L[1],c=(L[1]>10?.005:.01)*K,h=.5*P+c;
-    return cyl({nom:pn(L[0])+' – '+L[1]+' ACME',sub:'Trapézoïdal 29° usage général (ASME B1.5) · classe 2G · valeurs en mm',P,tpi:L[1],ang:29,pe:'acme',pi:'acme',d:D,d2:D-.5*P,he:h,hi:h,D1:D-P,Dint:D+2*c,rl:'d1',tol:{Td:.05*P,TD1:.05*P}},ext); }
+    return cyl({nom:pn(L[0])+' – '+L[1]+' ACME',sub:'Trapézoïdal 29° usage général (ASME B1.5) · classe 2G · valeurs en mm',P,tpi:L[1],ang:29,pe:'acme',pi:'acme',d:D,d2:D-.5*P,he:h,hi:h,D1:D-P,Dint:D+2*c,rl:'d1',tol:{Td:Math.max(.05*P,.005*K),TD1:Math.max(.05*P,.005*K)}},ext); }
   if(fam==='rd'){ const d=RD[i][0],P=K/RD[i][1];
     return cyl({nom:'Rd '+d+' × 1/'+RD[i][1],sub:'Filet rond 30° (DIN 405) · '+RD[i][1]+' filets au pouce',P,tpi:RD[i][1],ang:30,pe:'rd',pi:'rd',d,d2:d-.5*P,he:.5*P,hi:.5*P,D1:d-.9*P,Dint:d+.1*P,rl:'d3',tol:null},ext); }
   if(fam==='pg'){ const L=PG[i],P=K/L[2],h=(L[1]-L[3])/2;
     return cyl({nom:'Pg '+L[0],sub:'Presse-étoupe 80° (DIN 40430) · '+L[2]+' filets au pouce',P,tpi:L[2],ang:80,pe:'pg',pi:'pg',d:L[1],d2:L[1]-h,he:h,hi:h,D1:L[3],Dint:L[1],rl:'d1',tol:null,top:0},ext); }
   if(fam==='sp'){ const d=+sp.d, tpi=sp.u==='tpi'?+sp.p:null, P=tpi?K/tpi:+sp.p;
     if(!(d>0&&P>0&&P<d/2)) return null;
-    if(sp.a==='55') return cyl(v55('Ø '+f3(d)+' – '+(tpi?tpi+' filets':'pas '+P)+' · 55°','Whitworth 55° hors série · tolérance calculée selon BS 84 classe moyenne',d,P,tpi,bsTol(d/K,P/K),dr(d-1.1*P)),ext);
+    if(sp.a==='55') return cyl(v55('Ø '+f3(d)+' – '+(tpi?tpi+' filets':'pas '+P)+' · 55°','Whitworth 55° hors série · sans tolérance chiffrée',d,P,tpi,null,null),ext);
     const mt=!tpi&&mTol(d,P)&&mTol(d,P).Td2?mTol(d,P):null;
     return cyl(v60(tpi?'Ø '+f3(d)+' – '+tpi+' filets · 60°':'M'+d+' × '+P+' spécial',mt?'Métrique hors série · tolérance '+(ext?'6g':'6H')+' (ISO 965)':'60° hors série · tolérance calculée selon ASME B1.1 classe '+(ext?'2A':'2B'),d,P,tpi,mt||unTol(d/K,P/K,9*P/K),dr(d-P)),ext); }
   // coniques
   const r={ext,con:1,ctrl:[],note:''}; let P,h,E0,E1,L1,L2,D,drill,tpi,cap=null;
   if(fam==='npt'){ const L=NPT[i]; tpi=L[1]; P=K/tpi; h=.8*P; D=L[2]*K; E0=L[3]*K; L1=L[4]*K; L2=L[5]*K; E1=E0+L1/16; drill=L[6]; cap=D;
     r.nom=L[0].replace('.',' ')+'" – '+tpi+' NPT'; r.sub='Conique 60°, conicité 1:16 (ASME B1.20.1) · mêmes cotes de base en NPTF · valeurs en mm'; r.ang=60; r.prof='npt';
-  }else{ const L=RR[i]; tpi=L[1]; P=K/tpi; h=.6403*P; L1=L[3]; L2=L[4]; D=L[2]; E1=D-h; E0=E1-L1/16; drill=L[5];
+  }else{ const L=RR[i]; tpi=L[1]; P=K/tpi; h=.6403*P; L1=L[3]; L2=L[4]; D=L[2]; E1=D-h; E0=E1-L1/16; drill=null;
     r.nom=(ext?'R ':'Rc ')+L[0].replace('.',' '); r.sub='BSPT conique, Whitworth 55°, conicité 1:16 (ISO 7-1)'; r.ang=55; r.prof='w55'; }
   const top0=ext?E0+h:E1-h;
   Object.assign(r,{P,tpi,depth:h,pr:.5,L:L2,L1,x0:top0,dir:ext?-1:1,cone:{top0,ext,cap:ext?cap:null,Ldef:L2}});
@@ -1079,7 +1081,7 @@ function renderCla(){
   document.querySelectorAll('#kaFit button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===sk.fit)); $('kaD').value=sk.d;
   const d=+sk.d, L=CLA.find(x=>d>x[0]&&d<=x[1])||(d===6?CLA[0]:null);
   $('kaErr').hidden=!!L; $('kaOut').hidden=!L; if(!L){curCla=null;return}
-  const b=L[2],h=L[3],t1=L[4],t2=L[5],F=CFIT[sk.fit]||CFIT.n,td=b<=6?.1:b<=32?.2:.3,ws=devH(F[1],F[2],b),wh=devH(F[3],F[4],b),vok=d<=44;
+  const b=L[2],h=L[3],t1=L[4],t2=L[5],F=CFIT[sk.fit]||CFIT.n,td=b<=6?.1:b<=32?.2:.3,ws=devH(F[1],F[2],b),wh=devH(F[3],F[4],b),vok=true;
   const tile=(a,v,i,k)=>'<div class="val'+(k?' k':'')+'"><b>'+a+'</b><span>'+v+'</span><i>'+i+'</i></div>';
   curCla={d,b,h}; $('kaT').textContent='Arbre Ø '+d+' — clavette '+b+' × '+h; $('kaS').textContent='Clavette parallèle DIN 6885 · ajustement '+F[0].toLowerCase()+' : '+F[5];
   $('kaVals').innerHTML=tile('Clavette',b+' × '+h,'largeur × hauteur, DIN 6885',1)
@@ -1094,7 +1096,7 @@ function renderCla(){
    +'<rect x="'+(-bw)+'" y="'+yh+'" width="'+2*bw+'" height="'+(-r*.9-yh)+'" style="fill:var(--surf)"/><rect x="'+(-bw)+'" y="'+yt+'" width="'+2*bw+'" height="'+h*k+'" style="fill:var(--gold);stroke:var(--surf)" stroke-width="1.5"/>'
    +'<line x1="-120" y1="0" x2="120" y2="0" style="stroke:var(--onpri)" stroke-dasharray="14 3 2 3" stroke-width=".8" opacity=".7"/><line x1="0" y1="-60" x2="0" y2="120" style="stroke:var(--onpri)" stroke-dasharray="14 3 2 3" stroke-width=".8" opacity=".7"/>'
    +'<text x="0" y="30" class="gl" text-anchor="middle" style="fill:var(--onpri)">ARBRE Ø '+d+'</text><text x="0" y="122" class="gl" text-anchor="middle" style="fill:var(--onpri)">MOYEU</text><text x="'+(bw+8)+'" y="'+(yt+h*k/2+5)+'" class="gl" style="fill:var(--onpri)">'+b+' × '+h+'</text></svg>';
-  $('kaVerif').className='verif'+(vok?'':' ko'); $('kaVerif').innerHTML='<b>'+(vok?'Valeurs contrôlées':'À confirmer sur le plan')+'</b>Dimensions b × h, t1 et t2 recoupées sur '+(vok?'trois':'deux')+' tables publiées. '+(vok?'Tolérance de profondeur recoupée sur deux tables.':'Tolérance de profondeur (+'+td+' mm) non recoupée au-dessus de Ø 44.')+' Largeurs de rainure calculées selon ISO 286.';
+  $('kaVerif').className='verif'; $('kaVerif').innerHTML='<b>Valeurs contrôlées</b>Dimensions b × h, t1 et t2 recoupées sur trois tables publiées. Tolérances de profondeur recoupées sur deux tables (+0.1 jusqu\'à 6 × 6, +0.2 jusqu\'à 32 × 18, +0.3 au-delà). Largeurs de rainure calculées selon ISO 286.';
   try{localStorage.setItem('mcs-cla',JSON.stringify(sk))}catch(e){}
 }
 $('kaFit').innerHTML=Object.keys(CFIT).map(k=>'<button type="button" data-v="'+k+'">'+CFIT[k][0]+'<small>arbre '+CFIT[k][1]+CFIT[k][2]+' · moyeu '+CFIT[k][3]+CFIT[k][4]+'</small></button>').join('');
@@ -1200,7 +1202,7 @@ function find(q){
   if(m=l.match(/^pg\s*(\d+(?:[.,]\d+)?)$/)){const j=idx(PG,dec(m[1]),'Pg');return j.err?j:F('pg',j)}
   if(m=l.match(/^rd\s*(\d+)/)){const j=RD.findIndex(t=>t[0]===+m[1]);return j<0?{err:'Rd '+m[1]+' absent de la table.'}:F('rd',j)}
   if(/npt/.test(l)){const n=nf(l.replace(/nptf?/,'')),j=idx(NPT,n,'NPT');return j.err?j:F('npt',j)}
-  if(m=l.match(/\b(bsw|bsf|acme)\b/)){const n=nf(l.replace(m[1],'')),j=idx(LIST[m[1]],n,m[1].toUpperCase());return j.err?j:F(m[1],j)}
+  if(m=l.match(/\b(bsw|bsf|acme)\b/)){const n=nf(l.replace(m[1],'').trim().replace(/\s*[-x×]\s*\d+(\.\d+)?\s*$/,'')),j=idx(LIST[m[1]],n,m[1].toUpperCase());return j.err?j:F(m[1],j)}
   if(m=l.match(/^(?:bsp\s*|g\s*)([\d ./]+)"?$/)){const j=idx(GG,nf(m[1]),'G');return j.err?j:F('g',j)}
   if(m=l.match(/^(?:bspt\s*|r(c)?\s*)([\d ./]+)"?$/)){const j=idx(RR,nf(m[2]),'R');return j.err?j:F('r',j,null,m[1]?'int':/bspt/.test(l)?cote:'ext')}
   if(m=l.match(/^(#\d+|n°\s*\d+|[\d ./]+?)"?\s*(?:-\s*(\d+))?\s*(unc|unf|unef|uns|un)?$/)){ if(!m[2]&&!m[3])return null;
