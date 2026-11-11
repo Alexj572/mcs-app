@@ -9,9 +9,9 @@
 <style>
 /* Fiche d'atelier : choix en haut, valeurs machine en gros, dessin normalisé sur papier blanc, puis passes et contrôle. */
 :root{
-  --bg:#dfe4ec; --bgg:none; --surf:#eef1f5; --ink:#131b2e; --mut:#46516a; --line:#b3bdcd;
+  --bg:#cfd6e1; --bgg:none; --surf:#eef1f5; --ink:#131b2e; --mut:#46516a; --line:#b3bdcd;
   --pri:#2952b3; --pri2:#3561c4; --onpri:#ffffff; --soft:#d5dce7; --red:#c0281e; --hole:#2952b3; --shaft:#c0281e; --gold:#b88a10; --shadow:0 2px 12px rgba(20,35,70,.12);
-  --fline:#717d92; --paper:#f6f5f0; --goldt:#7a5800; --op1:.92; --op2:.95; --zbb:#eef1f5; --zbl:#717d92; --zbi:#131b2e; color-scheme:light;
+  --fline:#677389; --paper:#ffffff; --goldt:#7a5800; --op1:.92; --op2:.95; --zbb:#eef1f5; --zbl:#717d92; --zbi:#131b2e; color-scheme:light;
   --head:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
   --body:'Barlow','Segoe UI',Arial,sans-serif;
   --mono:'DM Mono',Consolas,'Courier New',monospace;
@@ -96,8 +96,11 @@ select,input{width:100%;min-height:46px;font-family:var(--mono);font-size:1.1rem
 #zv{position:fixed;inset:0;z-index:60;background:var(--paper);overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #zc{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 #zc svg{display:block;width:1188px;height:840px}
-#zb{position:absolute;right:max(8px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px}
-#zb button{width:46px;height:46px;border-radius:10px;border:1px solid var(--zbl);background:var(--zbb);color:var(--zbi);font-size:1.35rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+#zb{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:center;align-items:center;gap:10px;padding:8px max(10px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));pointer-events:none}
+#zb button{pointer-events:auto;width:48px;height:48px;border-radius:12px;border:1px solid var(--zbl);background:var(--zbb);color:var(--zbi);font-size:1.35rem;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18);opacity:.84}
+#zb button:hover,#zb button:focus-visible{opacity:1} #zX{margin-left:14px}
+@media (orientation:landscape) and (max-height:560px){#zb{left:auto;top:0;flex-direction:column;padding:max(8px,env(safe-area-inset-top,0px)) max(8px,env(safe-area-inset-right,0px)) max(8px,env(safe-area-inset-bottom,0px)) 8px} #zX{margin-left:0;margin-top:14px}}
+.paper svg [stroke="#fff"],#zc svg [stroke="#fff"]{stroke:var(--paper)} .gbox.paper svg{max-height:none}
 @media(max-width:640px){
   body{font-size:15px}
   .emb .wrap{padding-left:8px;padding-right:8px}
@@ -289,7 +292,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <p class="card" id="kaErr" hidden>La table DIN 6885 couvre les arbres de Ø 6 à Ø 200 mm.</p>
   <section class="card" id="kaOut">
     <p class="fiche-t" id="kaT"></p><p class="fiche-s" id="kaS"></p>
-    <div class="viz"><div class="vals" id="kaVals" style="align-content:start"></div><div><div class="gbox" id="kaPic"></div><p class="note" style="text-align:center">Coupe de l'arbre dans son moyeu, clavette en haut.</p></div></div>
+    <div class="viz"><div class="vals" id="kaVals" style="align-content:start"></div><div><div class="gbox paper" id="kaPic"></div><p class="note" style="text-align:center">Coupe de l'arbre dans son moyeu, clavette en haut.</p></div></div>
     <p class="verif" id="kaVerif"></p>
     <p class="note">La longueur de la clavette dépend du couple à passer : elle n'est pas donnée ici, elle vient du plan.</p>
   </section>
@@ -304,7 +307,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
       <div><span class="lab">Forme</span><div class="seg" id="gForm"></div></div>
     </div>
     <p class="note" id="gErr" hidden></p>
-    <div class="viz" id="gOut" style="margin-top:12px"><div class="vals" id="gVals" style="align-content:start"></div><div class="gbox" id="gPic"></div></div>
+    <div class="viz" id="gOut" style="margin-top:12px"><div class="vals" id="gVals" style="align-content:start"></div><div class="gbox paper" id="gPic"></div></div>
     <p class="verif"><b>Valeurs de la norme</b>Tableaux de la DIN 76-1 (filetages métriques ISO). Ø de gorge toléré h13 en extérieur (h12 jusqu'à Ø 3), H13 en intérieur, calculé selon ISO 286.</p>
   </section>
   <section class="card">
@@ -315,7 +318,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
       <div><span class="lab">Sollicitation</span><div class="seg" id="eSol"><button type="button" data-v="n">Normale</button><button type="button" data-v="f">Fatigue élevée</button></div></div>
     </div>
     <p class="note" id="eErr" hidden></p>
-    <div class="viz" id="eOut" style="margin-top:12px"><div class="vals" id="eVals" style="align-content:start"></div><div class="gbox" id="ePic"></div></div>
+    <div class="viz" id="eOut" style="margin-top:12px"><div class="vals" id="eVals" style="align-content:start"></div><div class="gbox paper" id="ePic"></div></div>
     <p class="verif"><b>Valeurs contrôlées</b>Formes E et F : rayon, profondeurs et largeur recoupés sur deux tables publiées (la forme E sur trois). Formes G et H : rayon et profondeurs recoupés sur deux tables, la largeur n'est pas donnée car elle n'est qu'approchée dans la norme. Tolérances : DIN 509, tableau 1.</p>
   </section>
   <section class="card">
@@ -324,7 +327,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
       <div style="flex:2 1 300px"><span class="lab">Forme</span><div class="seg" id="nForm"><button type="button" data-v="A">A<small>sans protection</small></button><button type="button" data-v="B">B<small>avec chanfrein de protection</small></button><button type="button" data-v="D">D<small>taraudé, bout d'arbre</small></button></div></div>
       <div><label class="lab" for="nSize">Taille</label><select id="nSize"></select></div>
     </div>
-    <div class="viz" style="margin-top:12px"><div class="vals" id="nVals" style="align-content:start"></div><div class="gbox" id="nPic"></div></div>
+    <div class="viz" style="margin-top:12px"><div class="vals" id="nVals" style="align-content:start"></div><div class="gbox paper" id="nPic"></div></div>
     <p class="verif"><b>Valeurs contrôlées</b>Formes A et B recoupées sur trois tables publiées (DIN 332-1, ISO 866 et ISO 2540). Forme D recoupée sur deux à trois tables (DIN 332-2). La forme R, les tailles B 1.25, 5 et 8 et le centre taraudé M3 ne sont pas repris : pas de deuxième table concordante.</p>
   </section>
 </main>
@@ -406,7 +409,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 14</p>
+<p class="ver">Aide à l'usinage · version 15</p>
 <div id="pr"></div>
 <div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
   <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
@@ -979,7 +982,7 @@ function renderTol(){
   // --- graphique des zones de tolérance ---
   const W=640,H=320,y0=160,M=Math.max(Math.abs(ES),Math.abs(EI),Math.abs(es),Math.abs(ei),1),s=118/M,Y=v=>y0-v*s;
   const bar=(x,lo,hi,c,n)=>{const h=Math.max(3,Y(lo)-Y(hi));return `<g class="grow"><rect x="${x}" y="${Y(hi).toFixed(1)}" width="150" height="${h.toFixed(1)}" rx="5" style="fill:var(--${c})" opacity=".9"/><rect x="${x}" y="${Y(hi).toFixed(1)}" width="150" height="${h.toFixed(1)}" rx="5" style="fill:none;stroke:var(--${c})" stroke-width="2"/></g>
-    <text x="${x+75}" y="${(Y(hi)-8).toFixed(1)}" class="gv" text-anchor="middle">${um(hi)}</text><text x="${x+75}" y="${(Y(lo)+18).toFixed(1)}" class="gv" text-anchor="middle">${um(lo)}</text>
+    <text x="${x+75}" y="${(Y(hi)-8).toFixed(1)}" class="gv" text-anchor="middle">${um(hi)}</text><text x="${x+75}" y="${Math.min(Y(lo)+18,H-30).toFixed(1)}" class="gv" text-anchor="middle">${um(lo)}</text>
     <text x="${x+75}" y="${H-8}" class="gl" text-anchor="middle" style="fill:var(--${c})">${n}</text>`};
   $('tZones').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Zones de tolérance de l'alésage et de l'arbre par rapport à la cote nominale">
     <line x1="60" y1="${y0}" x2="${W-20}" y2="${y0}" style="stroke:var(--ink)" stroke-width="1.5"/><text x="${W-22}" y="${y0-7}" class="gs" text-anchor="end">ligne zéro · Ø ${mm(D)}</text>
@@ -992,7 +995,7 @@ function renderTol(){
     <line x1="320" y1="48" x2="320" y2="94" style="stroke:var(--ink)" stroke-width="1.5"/><text x="320" y="40" class="gs" text-anchor="middle">0</text>
     <text x="60" y="40" class="gl" style="fill:var(--shaft)">SERRAGE</text><text x="580" y="40" class="gl" text-anchor="end" style="fill:var(--hole)">JEU</text>
     <rect class="grow" x="${Math.min(a,b).toFixed(1)}" y="58" width="${Math.max(6,Math.abs(b-a)).toFixed(1)}" height="26" rx="13" style="fill:var(--gold)"/>
-    <text x="${Math.max(70,Math.min(a,570)).toFixed(1)}" y="112" class="gv" text-anchor="middle">${um(jmin)}</text><text x="${Math.max(70,Math.min(b,570)).toFixed(1)}" y="134" class="gv" text-anchor="middle">${um(jmax)}</text>
+    <text x="${Math.max(70,Math.min(a,570)).toFixed(1)}" y="104" class="gv" text-anchor="middle">${um(jmin)}</text><text x="${Math.max(70,Math.min(b,570)).toFixed(1)}" y="124" class="gv" text-anchor="middle">${um(jmax)}</text>
     <text x="320" y="146" class="gs" text-anchor="middle">écart alésage − arbre, en µm</text></svg>`;
   // --- illustration arbre dans alésage ---
   const jm=(jmin+jmax)/2, gp=Math.max(-9,Math.min(16,jm/G*22)), rs=70, rb=rs+gp;
@@ -1017,16 +1020,19 @@ fillTol(); renderTol();
 /* ---------- Plan agrandi : glisser, pincer, molette ---------- */
 (()=>{ const zv=$('zv'), zc=$('zc'), P=new Map(); let Z={s:1,x:0,y:0}, moved=0;
   const ap=()=>{zc.style.transform='translate('+Z.x+'px,'+Z.y+'px) scale('+Z.s+')'};
-  const fit=()=>{const w=zv.clientWidth,h=zv.clientHeight,s=Math.min(w/1188,h/840);Z={s,x:(w-1188*s)/2,y:(h-840*s)/2};ap()};
+  let VW=1188,VH=840; // taille nominale du dessin ouvert ; la barre d'outils est retirée de la zone utile
+  const area=()=>{const w=zv.clientWidth,h=zv.clientHeight,b=$('zb').getBoundingClientRect(),v=b.height>b.width;return v?{w:w-b.width,h,cx:(w-b.width)/2,cy:h/2}:{w,h:h-b.height,cx:w/2,cy:(h-b.height)/2}};
+  const fit=()=>{const a=area(),s=Math.min(a.w/VW,a.h/VH)*.98;Z={s,x:a.cx-VW*s/2,y:a.cy-VH*s/2};ap()};
   const zoom=(f,cx,cy)=>{const s=Math.max(.15,Math.min(14,Z.s*f));f=s/Z.s;Z.x=cx-(cx-Z.x)*f;Z.y=cy-(cy-Z.y)*f;Z.s=s;ap()};
   const mid=()=>{const a=[...P.values()];return a.length<2?null:{x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2,d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}};
-  const open=p=>{const s=p&&p.querySelector('svg');if(!s||!zv.hidden)return;zc.innerHTML=s.outerHTML;zv.hidden=false;fit()};
+  const open=p=>{const s=p&&p.querySelector('svg');if(!s||!zv.hidden)return;zc.innerHTML=s.outerHTML;const v=s.viewBox&&s.viewBox.baseVal,w0=v&&v.width||1188,h0=v&&v.height||840,q=Math.min(1188/w0,840/h0);
+    VW=w0*q;VH=h0*q;zc.firstChild.style.width=VW+'px';zc.firstChild.style.height=VH+'px';zv.hidden=false;fit()};
   document.querySelectorAll('.paper').forEach(p=>{p.addEventListener('click',()=>open(p));
     p.addEventListener('touchstart',e=>{if(e.touches.length>1){e.preventDefault();open(p)}},{passive:false});
     p.addEventListener('gesturestart',e=>{e.preventDefault();open(p)})});
   if(!window.claude)document.querySelectorAll('.prBtn').forEach(b=>{b.hidden=false;b.addEventListener('click',()=>{const s=b.closest('section').querySelector('.paper svg');if(!s)return;$('pr').className='';$('pr').innerHTML=s.outerHTML;setTimeout(()=>window.print(),50)})});
   const close=()=>{zv.hidden=true;zc.innerHTML='';P.clear()};
-  $('zX').onclick=close; $('zF').onclick=fit; $('zP').onclick=()=>zoom(1.5,zv.clientWidth/2,zv.clientHeight/2); $('zM').onclick=()=>zoom(1/1.5,zv.clientWidth/2,zv.clientHeight/2);
+  $('zX').onclick=close; $('zF').onclick=fit; $('zP').onclick=()=>{const a=area();zoom(1.5,a.cx,a.cy)}; $('zM').onclick=()=>{const a=area();zoom(1/1.5,a.cx,a.cy)};
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!zv.hidden)close()});
   zv.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;P.set(e.pointerId,{x:e.clientX,y:e.clientY});try{zv.setPointerCapture(e.pointerId)}catch(x){}});
   zv.addEventListener('pointermove',e=>{const o=P.get(e.pointerId);if(!o)return;const m0=mid();P.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -1065,7 +1071,7 @@ function renderK(){const o=c[c.m],t=c.m==='t',ok=o.D>0&&o.Vc>0&&o.mx>0;$('kErr')
   let p='';for(let i=1;i<=160;i++){const d=xm*i/160;p+=(i===1?'M':'L')+X(d).toFixed(1)+' '+Y(Math.min(o.mx,1000*o.Vc/(Math.PI*d))).toFixed(1)}
   let g='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Vitesse de broche selon le diamètre">';
   for(let i=0;i<=4;i++){const d=xm*i/4;g+='<line x1="'+X(d)+'" y1="'+tp+'" x2="'+X(d)+'" y2="'+(H-b)+'" stroke="var(--line)"/><text class="gs" x="'+X(d)+'" y="'+(H-b+16)+'" text-anchor="middle">'+(d<20?d.toFixed(1):Math.round(d))+'</text>'}
-  [0,.5,1].forEach(k=>{g+='<line x1="'+l+'" y1="'+Y(o.mx*k)+'" x2="'+(W-r)+'" y2="'+Y(o.mx*k)+'" stroke="var(--line)"'+(k===1?' stroke-dasharray="6 4" style="stroke:var(--red)"':'')+'/><text class="gs" x="'+(l-6)+'" y="'+(Y(o.mx*k)+4)+'" text-anchor="end">'+Math.round(o.mx*k)+'</text>'});
+  [0,.5,1].forEach(k=>{g+='<line x1="'+l+'" y1="'+Y(o.mx*k)+'" x2="'+(W-r)+'" y2="'+Y(o.mx*k)+'" stroke="var(--line)"'+(k===1?' stroke-dasharray="6 4" style="stroke:var(--red)"':'')+'/><text class="gs" x="'+(l-6)+'" y="'+(Y(o.mx*k)+(k?4:-3))+'" text-anchor="end">'+Math.round(o.mx*k)+'</text>'});
   g+='<text class="gs" x="'+(W-r)+'" y="'+(Y(o.mx)-5)+'" text-anchor="end" style="fill:var(--red)">maxi broche</text><text class="gs" x="'+(W-r)+'" y="'+(H-4)+'" text-anchor="end">Ø (mm)</text><text class="gs" x="4" y="12">tr/min</text>';
   g+='<path d="'+p+'" fill="none" style="stroke:var(--pri2)" stroke-width="3" stroke-linejoin="round"/>';
   const px=X(o.D),py=Y(N),rt=px>W-170;g+='<line x1="'+px+'" y1="'+py+'" x2="'+px+'" y2="'+(H-b)+'" style="stroke:var(--gold)" stroke-dasharray="3 3"/><circle cx="'+px+'" cy="'+py+'" r="7" style="fill:var(--gold);stroke:var(--surf)" stroke-width="2"/><text class="gv" '+INK+' x="'+(px+(rt?-12:12))+'" y="'+(py+(cap?20:-8))+'" text-anchor="'+(rt?'end':'start')+'">Ø'+o.D+' → '+Math.round(N)+'</text></svg>';
@@ -1083,7 +1089,7 @@ function renderS(){press($('sR'),c.sr);const r=c.sr,f=c.sf,ok=f>0&&f<2*r;$('sErr
   $('sPic').innerHTML='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Profil laissé par la plaquette"><path d="'+p+'" style="fill:var(--soft);stroke:var(--ink)" stroke-width="2" stroke-linejoin="round"/>'
    +'<circle cx="'+(x0+pt*3.5)+'" cy="'+(y0+dp-62)+'" r="62" fill="none" style="stroke:var(--red)" stroke-dasharray="5 4" stroke-width="1.5"/><text class="gs" x="'+(x0+pt*3.5)+'" y="'+(y0-8)+'" text-anchor="middle" style="fill:var(--red)">bec r '+r+'</text>'
    +'<line x1="'+ax+'" y1="'+(y0-6)+'" x2="'+ax+'" y2="'+(y0-30)+'" style="stroke:var(--mut)"/><line x1="'+bx+'" y1="'+(y0-6)+'" x2="'+bx+'" y2="'+(y0-30)+'" style="stroke:var(--mut)"/><line x1="'+ax+'" y1="'+(y0-24)+'" x2="'+bx+'" y2="'+(y0-24)+'" style="stroke:var(--ink)" stroke-width="1.5"/><text class="gv" '+INK+' x="'+(ax+pt/2)+'" y="'+(y0-30)+'" text-anchor="middle">f = '+f+'</text>'
-   +'<line x1="'+(ex-10)+'" y1="'+y0+'" x2="'+(ex+10)+'" y2="'+y0+'" style="stroke:var(--mut)"/><line x1="'+(ex-10)+'" y1="'+(y0+dp)+'" x2="'+(ex+10)+'" y2="'+(y0+dp)+'" style="stroke:var(--mut)"/><line x1="'+ex+'" y1="'+y0+'" x2="'+ex+'" y2="'+(y0+dp)+'" style="stroke:var(--ink)" stroke-width="1.5"/><text class="gv" '+INK+' x="'+(ex+12)+'" y="'+(y0-12)+'" text-anchor="end">Rt = '+Rt.toFixed(2)+' µm</text>'
+   +'<line x1="'+(ex-10)+'" y1="'+y0+'" x2="'+(ex+10)+'" y2="'+y0+'" style="stroke:var(--mut)"/><line x1="'+(ex-10)+'" y1="'+(y0+dp)+'" x2="'+(ex+10)+'" y2="'+(y0+dp)+'" style="stroke:var(--mut)"/><line x1="'+ex+'" y1="'+y0+'" x2="'+ex+'" y2="'+(y0+dp)+'" style="stroke:var(--ink)" stroke-width="1.5"/><text class="gv" '+INK+' x="'+(W-4)+'" y="'+(y0-30)+'" text-anchor="end">Rt = '+Rt.toFixed(2)+' µm</text>'
    +'<text class="gs" x="'+x0+'" y="165">Schéma : hauteur des crêtes exagérée.</text></svg>'}
 
 /* méplats et polygones */
@@ -1097,7 +1103,7 @@ function renderP(){const n=c.pn,D=c.pD,s=c.pS,R=D/2;press($('pN'),n);$('pSl').te
   const k=105/R,pts=[];for(let t=0;t<360;t+=1){const th=t*Math.PI/180;let rr=R;for(let i=0;i<n;i++){const cs=Math.cos(th-i*2*Math.PI/n);if(cs>1e-6)rr=Math.min(rr,a/cs)}pts.push((rr*k*Math.cos(th)).toFixed(1)+','+(-rr*k*Math.sin(th)).toFixed(1))}
   const xl=(n===1?-R:-a)*k,xr=a*k,yd=128;
   $('pPic').innerHTML='<svg viewBox="-160 -135 320 300" role="img" aria-label="Section de la pièce"><circle r="'+(R*k)+'" fill="none" style="stroke:var(--mut)" stroke-dasharray="5 4"/><polygon points="'+pts.join(' ')+'" style="fill:var(--soft);stroke:var(--ink)" stroke-width="2" stroke-linejoin="round"/>'
-   +'<line x1="-125" y1="0" x2="125" y2="0" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3" stroke-width=".8"/><line x1="0" y1="-125" x2="0" y2="125" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3" stroke-width=".8"/>'
+   +'<line x1="-125" y1="0" x2="125" y2="0" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3" stroke-width=".8"/><line x1="0" y1="-110" x2="0" y2="125" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3" stroke-width=".8"/>'
    +'<line x1="'+xr+'" y1="'+(-w*k/2)+'" x2="'+xr+'" y2="'+(w*k/2)+'" style="stroke:var(--red)" stroke-width="4"/>'
    +'<line x1="'+xl+'" y1="20" x2="'+xl+'" y2="'+(yd+6)+'" style="stroke:var(--mut)" stroke-width=".8"/><line x1="'+xr+'" y1="20" x2="'+xr+'" y2="'+(yd+6)+'" style="stroke:var(--mut)" stroke-width=".8"/><line x1="'+xl+'" y1="'+yd+'" x2="'+xr+'" y2="'+yd+'" style="stroke:var(--ink)" stroke-width="1.5"/>'
    +'<text class="gv" '+INK+' x="'+((xl+xr)/2)+'" y="'+(yd+20)+'" text-anchor="middle">'+f2(s)+'</text><text class="gs" x="0" y="-118" text-anchor="middle">Ø '+f2(D)+' tourné</text></svg>'}
@@ -1137,6 +1143,232 @@ function showMod(m){mod=m;$('modFil').hidden=m!=='fil';$('modCC').hidden=m!=='cc
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(b)showMod(b.dataset.m)}; showMod(mod);
 
 
+/* ---------- Schémas de détail (clavettes, dégagements, centres) : conventions des plans A4 ----------
+   Trait fort 2 : contours vus. Trait fin .8 : cotes, attaches, hachures, cassures, repères. Axe en trait mixte fin.
+   Textes 15 gras (cotes) et 12.5 (annotations), en Arial comme les plans. Chaque texte et chaque trait est enregistré :
+   un texte ne se pose ni sur un autre texte, ni sur un trait, ni dans une hachure (sauf libellé à fond masqué). */
+function SK(W,H,id){
+  const ink='#111',FI=.8,FO=2,S=15,s=12.5,f=v=>(+v).toFixed(1),B=[],L=[],PG=[],Q=[],o={h:'',w:'',f:'',k:'',t:''};
+  const pts=P=>P.map((p,i)=>(i?'L':'M')+f(p[0])+','+f(p[1])).join(' ');
+  const reg=P=>{for(let i=1;i<P.length;i++)L.push([P[i-1][0],P[i-1][1],P[i][0],P[i][1]])};
+  const bx=(x,y,t,a,sz,b,rot)=>{const w=DK.tw(t,sz,b)*1.04,as=.9*sz,de=.24*sz,x0=a==='start'?0:a==='end'?-w:-w/2;return rot?[x-as,y-x0-w,x+de,y-x0]:[x+x0,y-as,x+x0+w,y+de]};
+  const sh=(q,bb,p)=>{let t0=0,t1=1;const dx=q[2]-q[0],dy=q[3]-q[1];
+    for(const [a,c] of [[-dx,q[0]-bb[0]+p],[dx,bb[2]+p-q[0]],[-dy,q[1]-bb[1]+p],[dy,bb[3]+p-q[1]]]){
+      if(!a){if(c<0)return false}else{const r=c/a;if(a<0){if(r>t1)return false;if(r>t0)t0=r}else{if(r<t0)return false;if(r<t1)t1=r}}}return true};
+  const inP=(x,y,P)=>{let c=false;for(let i=0,j=P.length-1;i<P.length;j=i++){const a=P[i],b=P[j];if((a[1]>y)!==(b[1]>y)&&x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0])c=!c}return c};
+  const inZ=(x,y)=>PG.some(G=>G.filter(P=>inP(x,y,P)).length%2===1);
+  const free=(bb,p,z)=>{if(bb[0]<2||bb[1]<2||bb[2]>W-2||bb[3]>H-2)return false;
+    if(B.some(q=>q[0]-p<bb[2]&&q[2]+p>bb[0]&&q[1]-p<bb[3]&&q[3]+p>bb[1]))return false;
+    if(L.some(q=>sh(q,bb,p)))return false;
+    return !!z||![[bb[0],bb[1]],[bb[2],bb[1]],[bb[0],bb[3]],[bb[2],bb[3]],[(bb[0]+bb[2])/2,(bb[1]+bb[3])/2]].some(c=>inZ(c[0],c[1]))};
+  const segOK=(q,p)=>!B.some(bb=>sh(q,bb,p));
+  const K={S,s,f,warn:[],
+    fo:P=>{reg(P);o.k+=`<path d="${pts(P)}" fill="none" stroke="${ink}" stroke-width="${FO}" stroke-linejoin="round" stroke-linecap="round"/>`},
+    fi:(P,ex)=>{reg(P);o.f+=`<path d="${pts(P)}" fill="none" stroke="${ink}" stroke-width="${FI}"${ex?' '+ex:''}/>`},
+    ax:(x1,y1,x2,y2)=>K.fi([[x1,y1],[x2,y2]],'stroke-dasharray="14,3,2,3"'),
+    // zone coupée : un ou plusieurs contours (règle pair-impair) ; n = 1 (45°), 2 (−45°), 3 (45° serré)
+    hatch:(G,n)=>{PG.push(G);o.h+=`<path d="${G.map(P=>pts(P)+' Z').join(' ')}" fill="url(#${id}${n||1})" fill-rule="evenodd" stroke="none"/>`},
+    // ligne d'attache ; halo couleur papier quand elle traverse une hachure
+    ext:(x1,y1,x2,y2,halo)=>{if(halo)o.w+=`<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" stroke="#fff" stroke-width="4"/>`;K.fi([[x1,y1],[x2,y2]])},
+    ar:(x,y,ux,uy)=>{const n=Math.hypot(ux,uy);ux/=n;uy/=n;const a=x-8*ux,b=y-8*uy;
+      o.k+=`<path d="M${f(x)},${f(y)} L${f(a-1.6*uy)},${f(b+1.6*ux)} L${f(a+1.6*uy)},${f(b-1.6*ux)}Z" fill="${ink}"/>`},
+    dot:(x,y)=>{o.k+=`<circle cx="${f(x)}" cy="${f(y)}" r="1.8" fill="${ink}"/>`},
+    tx:(x,y,t,a,sz,b,rot,mask)=>{sz=sz||S;a=a||'middle';const bb=bx(x,y,t,a,sz,b,rot);B.push(bb);
+      if(mask)o.t+=`<rect x="${f(bb[0]-2)}" y="${f(bb[1]-1.5)}" width="${f(bb[2]-bb[0]+4)}" height="${f(bb[3]-bb[1]+3)}" fill="#fff"/>`;
+      o.t+=`<text x="${f(x)}" y="${f(y)}" text-anchor="${a}" font-size="${sz}"${b?' font-weight="700"':''}${rot?` transform="rotate(-90 ${f(x)} ${f(y)})"`:''} fill="${ink}">${esc(t)}</text>`;return bb},
+    // c = [{x,y,a,r}] : première position libre ; z = libellé autorisé sur hachure (fond masqué)
+    pick:(c,t,sz,b,z,p)=>{sz=sz||S;let v=c.find(q=>free(bx(q.x,q.y,t,q.a||'middle',sz,b,q.r),p==null?2:p,z));if(!v){v=c[0];K.warn.push(t)}
+      return K.tx(v.x,v.y,t,v.a,sz,b,v.r,z)},
+    later:fn=>Q.push(fn),
+    // cote horizontale : flèches dedans si la place le permet ; texte au-dessus, au milieu ou dehors sur un prolongement
+    dimH:(xa,xb,y,t,pref)=>{if(xa>xb)[xa,xb]=[xb,xa];const ins=xb-xa>=26;
+      if(ins){K.fi([[xa,y],[xb,y]]);K.ar(xa,y,-1,0);K.ar(xb,y,1,0)}else{K.fi([[xa-14,y],[xb+14,y]]);K.ar(xa,y,1,0);K.ar(xb,y,-1,0)}
+      Q.push(()=>{const w=DK.tw(t,S,1),lo=ins?xa:xa-14,hi=ins?xb:xb+14,c=[];if(xb-xa>=w+8)c.push({x:(xa+xb)/2,y:y-5,a:'middle'});
+        const Lc={x:lo-3,y:y-5,a:'end',e:[lo-w-6,lo]},Rc={x:hi+3,y:y-5,a:'start',e:[hi,hi+w+6]};(pref==='r'?[Rc,Lc]:[Lc,Rc]).forEach(v=>c.push(v));
+        let v=c.find(q=>free(bx(q.x,q.y,t,q.a,S,1),1.2)&&(!q.e||segOK([q.e[0],y,q.e[1],y],1)));if(!v){v=c[0];K.warn.push(t)}
+        if(v.e)K.fi([[v.e[0],y],[v.e[1],y]]);K.tx(v.x,v.y,t,v.a,S,1)})},
+    // cote verticale : texte le long de la ligne (rot) ou horizontal à côté (side 'l' / 'r') ; yl = positions de repli
+    dimV:(x,ya,yb,t,side,rot,yl)=>{if(ya>yb)[ya,yb]=[yb,ya];const ins=yb-ya>=26;
+      if(ins){K.fi([[x,ya],[x,yb]]);K.ar(x,ya,0,-1);K.ar(x,yb,0,1)}else{K.fi([[x,ya-14],[x,yb+14]]);K.ar(x,ya,0,1);K.ar(x,yb,0,-1)}
+      Q.push(()=>{const m=(ya+yb)/2,c=[],lo=ins?ya:ya-14,hi=ins?yb:yb+14;
+        if(rot){const xx=side==='r'?x+5+.74*S:x-5,w=DK.tw(t,S,1)*1.04;[m].concat(yl||[]).forEach(y=>c.push({x:xx,y,a:'middle',r:1}));
+          // repli : texte au-delà de l'extrémité, sur le prolongement de la ligne de cote, hachure interrompue
+          c.push({x:xx,y:hi+8+w/2,a:'middle',r:1,z:1,e:[hi,hi+12+w]},{x:xx,y:lo-8-w/2,a:'middle',r:1,z:1,e:[lo-12-w,lo]})}
+        else{const sx=v=>v==='l'?{d:-7,a:'end'}:{d:7,a:'start'},o1=sx(side),o2=sx(side==='l'?'r':'l');
+          [o1,o2].forEach(o=>c.push({x:x+o.d,y:m+4.5,a:o.a}));(yl||[]).forEach(y=>[o1,o2].forEach(o=>c.push({x:x+o.d,y,a:o.a})));
+          [o1,o2].forEach(o=>c.push({x:x+o.d,y:hi+2,a:o.a},{x:x+o.d,y:lo+8,a:o.a},{x:x+o.d,y:hi+16,a:o.a},{x:x+o.d,y:hi+30,a:o.a}))}
+        const v=c.find(q=>free(bx(q.x,q.y,t,q.a,S,1,q.r),1.2,q.z));if(!v)K.warn.push(t);const u=v||c[0];if(u.e)K.ext(x,u.e[0],x,u.e[1],1);K.tx(u.x,u.y,t,u.a,S,1,u.r,u.z)})},
+    // demi-cote de diamètre (vue en demi-coupe) : une flèche, la ligne dépasse l'axe
+    half:(x,y0,y1,t,yl)=>{K.fi([[x,y0],[x,y1]]);K.ar(x,y0,0,y0<y1?-1:1);
+      Q.push(()=>{const m=(y0+y1)/2,c=[m].concat(yl||[]).map(y=>({x:x-5,y,a:'middle',r:1})).concat([m].concat(yl||[]).map(y=>({x:x+5+.74*S,y,a:'middle',r:1})));
+        const v=c.find(q=>free(bx(q.x,q.y,t,q.a,S,1,1),1.2));if(!v)K.warn.push(t);const u=v||c[0];K.tx(u.x,u.y,t,u.a,S,1,1)})},
+    // ligne de repère : flèche (ou point dans une matière) sur l'objet, épaulement horizontal, texte au bout
+    lead:(px,py,c,t,sz,b,dot)=>Q.push(()=>{sz=sz||s;const geo=q=>{const sd=q.a==='end'?-1:1,ex=q.x,ey=q.y;return {seg:[[px,py],[ex,ey],[ex+sd*8,ey]],tx:[ex+sd*11,ey+.36*sz,q.a]}};
+      let v=c.find(q=>{const g=geo(q),bb=bx(g.tx[0],g.tx[1],t,g.tx[2],sz,b);return free(bb,2)&&segOK([g.seg[0][0],g.seg[0][1],g.seg[1][0],g.seg[1][1]],2)&&segOK([g.seg[1][0],g.seg[1][1],g.seg[2][0],g.seg[2][1]],2)});
+      if(!v){v=c[0];K.warn.push(t)}const g=geo(v);K.fi(g.seg);if(dot)K.dot(px,py);else K.ar(px,py,px-v.x,py-v.y);K.tx(g.tx[0],g.tx[1],t,g.tx[2],sz,b)}),
+    // cote angulaire : arc centré (cx,cy), angles en degrés (y vers le bas) ; flèches dehors si l'arc est court
+    ang:(cx,cy,R,a0,a1,t,c)=>{const d=Math.PI/180,P=(a)=>[cx+R*Math.cos(a*d),cy+R*Math.sin(a*d)],arc=(u,v)=>Array.from({length:13},(_,i)=>P(u+(v-u)*i/12));
+      if(a0>a1)[a0,a1]=[a1,a0];const ln=R*(a1-a0)*d;
+      if(ln>=18){K.fi(arc(a0,a1));const p0=P(a0),p1=P(a1),q0=P(a0+1),q1=P(a1-1);K.ar(p0[0],p0[1],p0[0]-q0[0],p0[1]-q0[1]);K.ar(p1[0],p1[1],p1[0]-q1[0],p1[1]-q1[1])}
+      else{const e=14/R/d;K.fi(arc(a0-e,a1+e));const p0=P(a0),p1=P(a1),q0=P(a0-1),q1=P(a1+1);K.ar(p0[0],p0[1],p0[0]-q0[0],p0[1]-q0[1]);K.ar(p1[0],p1[1],p1[0]-q1[0],p1[1]-q1[1])}
+      Q.push(()=>K.pick(c,t,s,0))},
+    // ligne de cassure (trait fin ondulé), nombre entier d'ondes : les extrémités tombent juste
+    wv:(x1,y1,x2,y2)=>{const Ln=Math.hypot(x2-x1,y2-y1),n=Math.max(1,Math.round(Ln/14)),m=n*8,nx=-(y2-y1)/Ln,ny=(x2-x1)/Ln;
+      return Array.from({length:m+1},(_,i)=>{const u=i/m,a=2.2*Math.sin(2*Math.PI*n*u);return [x1+(x2-x1)*u+nx*a,y1+(y2-y1)*u+ny*a]})},
+    svg:aria=>{Q.splice(0).forEach(fn=>fn());try{(window.__skw=window.__skw||{})[id]=K.warn.slice()}catch(e){}
+      const P=(n,a,sp,c)=>`<pattern id="${id}${n}" patternUnits="userSpaceOnUse" width="${sp}" height="${sp}" patternTransform="rotate(${a})"><rect width="${sp}" height="${sp}" fill="#fff"/><line x1="0" y1="0" x2="0" y2="${sp}" stroke="${c}" stroke-width=".8"/></pattern>`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" font-family="Arial,Helvetica,sans-serif" role="img" aria-label="${esc(aria)}"><defs>${P(1,45,7,'#444')}${P(2,-45,7,'#444')}${P(3,45,3.5,'#222')}</defs>${o.h}${o.w}${o.f}${o.k}${o.t}</svg>`}};
+  return K;
+}
+const skN=v=>String(+(+v).toFixed(2)), skArc=(cx,cy,r,a0,a1,n)=>Array.from({length:n+1},(_,i)=>{const a=(a0+(a1-a0)*i/n)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)]});
+
+/* Clavette DIN 6885 : coupe transversale (arbre, moyeu, clavette) et détail A de la rainure */
+function claPic(d,b,h,t1,t2){
+  const W=400,R=64,Ro=92,cx=158,cy=100,k=R/(d/2),bw=b*k/2;
+  const ys=cy-R,yb=ys+t1*k,yt=yb-h*k;let yh=ys-t2*k;const ex1=yt-yh<2.5;if(ex1)yh=yt-2.5;
+  const kd=Math.min(120/(t1+t2),80/b),b2=b*kd/2,xc=200,xl=xc-b2-42,xr=xc+b2+42,Rd=d/2*kd,yT=238;
+  let yh2=yT+22,ys2=yh2+t2*kd,yb2=ys2+t1*kd,yt2=yb2-h*kd;const ex2=yt2-yh2<3;if(ex2){yt2=yh2+3;yb2=yt2+h*kd;ys2=yb2-t1*kd}
+  const yB=yb2+24,Ht=yB+(ex1||ex2?56:40),K=SK(W,Ht,'ka');
+  const C=(r,a0,a1,n)=>Array.from({length:n+1},(_,i)=>{const a=a0+(a1-a0)*i/n;return [cx+r*Math.sin(a),cy-r*Math.cos(a)]});
+  // ---- coupe ----
+  const p0=Math.asin(bw/R),yk=cy-R*Math.cos(p0),arcS=C(R,p0,2*Math.PI-p0,96),outer=C(Ro,0,2*Math.PI,120);
+  const shaft=arcS.concat([[cx-bw,yb],[cx+bw,yb]]),bore=arcS.concat([[cx-bw,yh],[cx+bw,yh]]),key=[[cx-bw,yt],[cx+bw,yt],[cx+bw,yb],[cx-bw,yb]];
+  K.hatch([outer,bore],2);K.hatch([shaft],1);K.hatch([key],3);
+  K.ax(cx-Ro-8,cy,cx+Ro+8,cy);K.ax(cx,cy-Ro-6,cx,cy+Ro+8);
+  K.fo(outer);K.fo(shaft.concat([shaft[0]]));K.fo([[cx-bw,yk],[cx-bw,yh],[cx+bw,yh],[cx+bw,yk]]);K.fo(key.concat([key[0]]));
+  const rc=Math.max(bw,(yb-yh)/2)+8,ccy=(yh+yb)/2;K.fi(C(rc,0,2*Math.PI,60).map(p=>[p[0],p[1]-cy+ccy]));
+  const xL2=52,xL3=22;
+  K.ext(cx-bw-2,yb,xL2-4,yb,1);K.ext(cx-bw-2,yh,xL3-4,yh,1);K.ext(cx-3,cy+R,xL3-4,cy+R,1);
+  K.dimV(xL2,yb,cy+R,'d − t1 = '+skN(d-t1),'l',1);K.dimV(xL3,yh,cy+R,'d + t2 = '+skN(d+t2),'l',1);
+  K.later(()=>{const c=[];[4,8,14,22,30].forEach(e=>[-20,-40,-10,-60,0,10,-80,20,200,180,220,160].forEach(a=>{const t=a*Math.PI/180,r=rc+e;c.push({x:cx+r*Math.cos(t),y:ccy+r*Math.sin(t)+5,a:Math.cos(t)>.3?'start':Math.cos(t)<-.3?'end':'middle'})}));K.pick(c,'A',K.S,1,1,1)});
+  K.lead(cx+R*.4,cy+R*.42,[{x:cx+Ro+14,y:cy+26,a:'start'},{x:cx+Ro+14,y:cy+8,a:'start'}],'ARBRE Ø '+skN(d),K.s,0,1);
+  K.lead(cx+78*Math.sin(2.3),cy-78*Math.cos(2.3),[{x:cx+Ro+14,y:cy+70,a:'start'},{x:cx+Ro+14,y:cy+86,a:'start'}],'MOYEU',K.s,0,1);
+  // ---- détail A ----
+  const nL=Math.max(1,Math.round((yB-yT)/14)),nT=Math.max(1,Math.round((xr-xl)/14));
+  const Lx=(x0,y)=>x0+2.2*Math.sin(2*Math.PI*nL*(y-yT)/(yB-yT)),Ty=(y0,x)=>y0+2.2*Math.sin(2*Math.PI*nT*(x-xl)/(xr-xl));
+  const arc=x=>ys2+Rd-Math.sqrt(Rd*Rd-(x-xc)*(x-xc)),sm=(a,b,n,fn)=>Array.from({length:n+1},(_,i)=>fn(a+(b-a)*i/n));
+  const xaL=Lx(xl,arc(xl)),xaR=Lx(xr,arc(xr));
+  const aL=sm(xaL,xc-b2,24,x=>[x,arc(x)]),aR=sm(xc+b2,xaR,24,x=>[x,arc(x)]);
+  const sh2=aL.concat([[xc-b2,yb2],[xc+b2,yb2]],aR,sm(arc(xaR),yB,30,y=>[Lx(xr,y),y]),sm(xr,xl,40,x=>[x,Ty(yB,x)]),sm(yB,arc(xaL),30,y=>[Lx(xl,y),y]));
+  const hu2=aL.concat([[xc-b2,yh2],[xc+b2,yh2]],aR,sm(arc(xaR),yT,20,y=>[Lx(xr,y),y]),sm(xr,xl,40,x=>[x,Ty(yT,x)]),sm(yT,arc(xaL),20,y=>[Lx(xl,y),y]));
+  const ky2=[[xc-b2,yt2],[xc+b2,yt2],[xc+b2,yb2],[xc-b2,yb2]];
+  K.hatch([hu2],2);K.hatch([sh2],1);K.hatch([ky2],3);
+  K.fi(sm(yT,yB,60,y=>[Lx(xl,y),y]));K.fi(sm(yT,yB,60,y=>[Lx(xr,y),y]));K.fi(sm(xl,xr,40,x=>[x,Ty(yT,x)]));K.fi(sm(xl,xr,40,x=>[x,Ty(yB,x)]));
+  K.ax(xc,yT-4,xc,yB+7);
+  K.fo(aL.concat([[xc-b2,yb2],[xc+b2,yb2]],aR));K.fo([[xc-b2,arc(xc-b2)],[xc-b2,yh2],[xc+b2,yh2],[xc+b2,arc(xc+b2)]]);K.fo(ky2.concat([ky2[0]]));
+  K.ext(xc-b2,yh2-2,xc-b2,yT-18,1);K.ext(xc+b2,yh2-2,xc+b2,yT-18,1);K.dimH(xc-b2,xc+b2,yT-14,'b = '+skN(b));
+  const xLh=xl-14,xR=xr+14;
+  K.ext(xc-b2-2,yt2,xLh-4,yt2,1);K.ext(xc-b2-2,yb2,xLh-4,yb2,1);K.dimV(xLh,yt2,yb2,'h = '+skN(h),'l',0);
+  [yh2,ys2,yb2].forEach(y=>K.ext(xc+b2+2,y,xR+4,y,1));K.dimV(xR,yh2,ys2,'t2 = '+skN(t2),'r',0,[yh2-6]);K.dimV(xR,ys2,yb2,'t1 = '+skN(t1),'r',0,[yb2+16]);
+  K.tx(xc,yB+28,'DÉTAIL A','middle',K.S,1);
+  if(ex1||ex2)K.tx(xc,yB+46,'jeu en tête agrandi pour être visible','middle',K.s,0);
+  return K.svg('Coupe de l\'arbre, du moyeu et de la clavette, avec le détail de la rainure');
+}
+
+/* Dégagement de filetage DIN 76-1 : extérieur en vue (demi-vue au-dessus de l'axe), intérieur en demi-coupe */
+function d76Pic(ext,d,p,R,c,lab){
+  const g1=R[c?2:1],g2=R[c?4:3],r=R[5],x=R[0],k=40/p,rr=r*k,W=420,T15=Math.tan(Math.PI/12),T30=Math.tan(Math.PI/6),dg=ext?d-x:d+x;
+  if(ext){
+    const xs=300,yS=84,yd=114,ydg=yd+x/2*k,ym=yd+.6134*p*k,yA=ydg+100,Ht=yA+14,xa=xs-g2*k,xb=xs-g1*k,K=SK(W,Ht,'g7');
+    const pr=[[20,yd],[xa,yd]].concat(skArc(xb+T15*rr,ydg-rr,rr,120,90,8),skArc(xs-rr,ydg-rr,rr,90,0,12),[[xs,yS],[405,yS]]);
+    K.ax(12,yA,412,yA);K.fi(K.wv(20,yd,20,yA+6));K.fi(K.wv(405,yS,405,yA+6));
+    K.fi([[20,ym],[xa+(ym-yd)/T30,ym]]);K.fo(pr);
+    K.ext(xa,yd-3,xa,yS-44);K.ext(xb,ydg-4,xb,yS-20);K.ext(xs,yS-3,xs,yS-44);K.fi([[xa,yd],[xa+36,yd]]);
+    K.dimH(xb,xs,yS-16,'g1 ≥ '+f2(g1),'r');K.dimH(xa,xs,yS-40,'g2 ≤ '+f2(g2),'r');
+    K.ang(xa,yd,36,0,30,'30°',[{x:xa+20,y:yd-6},{x:xa-8,y:yd-6,a:'end'},{x:xa+36,y:yd+13,a:'start'}]);
+    const xt=20+(xa-20)/2;K.half(xt,yd,yA+8,lab,[(ym+yA)/2,(ym+yA)/2+8]);
+    K.half(xb+(xs-xb)*.42,ydg,yA+8,'Ø '+f2(dg));
+    const a=Math.PI/4,px=xs-rr+rr*Math.cos(a),py=ydg-rr+rr*Math.sin(a);
+    K.lead(px,py,[{x:xs+24,y:ydg+28,a:'start'},{x:xs+24,y:ydg+48,a:'start'},{x:xs+40,y:ydg+12,a:'start'}],'r = '+skN(r),K.s,0);
+    K.later(()=>K.pick([{x:362,y:yS+22},{x:362,y:yS+44},{x:362,y:yA-10}],'épaulement',K.s,0));
+    K.later(()=>K.pick([{x:30,y:yA-6,a:'start'},{x:30,y:yA+14,a:'start'}],'axe',K.s,0));
+    return K.svg('Dégagement de filetage extérieur DIN 76');
+  }
+  const xf=300,ydg=80,yT=ydg-34,yM=ydg+x/2*k,yb=yM+.5413*p*k,yP=yb+26,yA=yb+96,y1=yA+28,y2=yA+52,Ht=y2+12,xa=xf-g2*k,xb=xf-g1*k,K=SK(W,Ht,'g7');
+  const pr=[[20,yb],[xa,yb]].concat(skArc(xb+T15*rr,ydg+rr,rr,240,270,8),skArc(xf-rr,ydg+rr,rr,270,360,12),[[xf,yP],[405,yP]]);
+  const mat=K.wv(20,yT,405,yT).concat(K.wv(405,yT,405,yP).slice(1),pr.slice().reverse().slice(1),K.wv(20,yb,20,yT).slice(1));
+  K.hatch([mat],1);K.ax(12,yA,412,yA);
+  K.fi(K.wv(20,yT,405,yT));K.fi(K.wv(405,yT,405,yP));K.fi(K.wv(20,yb,20,yT));
+  const xM=xa+(yb-yM)/T30;K.fi([[20,yM],[xM,yM]]);K.fo(pr);
+  K.ext(xb,ydg+4,xb,y1+4);K.ext(xa,yb+3,xa,y2+4);K.ext(xf,yP+3,xf,y2+4);K.fi([[xa,yb],[xa+36,yb]]);
+  K.dimH(xb,xf,y1,'g1 ≥ '+f2(g1),'r');K.dimH(xa,xf,y2,'g2 ≤ '+f2(g2),'r');
+  K.ang(xa,yb,36,-30,0,'30°',[{x:xa+18,y:yb+16},{x:xa-8,y:yb+16,a:'end'},{x:xa+18,y:yb+32}]);
+  const xt=20+(xa-20)/2;K.ext(xt,yM+1,xt,yb,1);K.half(xt,yM,yA+8,lab,[(yb+yA)/2,(yb+yA)/2+6]);
+  K.half(xb+(xf-xb)*.3,ydg,yA+8,'Ø '+f2(dg));
+  const a=-Math.PI/4,px=xf-rr+rr*Math.cos(a),py=ydg+rr+rr*Math.sin(a);
+  K.lead(px,py,[{x:xf-12,y:ydg+44,a:'end'},{x:xf-12,y:ydg+30,a:'end'},{x:xf-12,y:ydg+60,a:'end'},{x:xf-12,y:ydg+76,a:'end'},{x:xf-30,y:ydg+44,a:'end'},{x:xf-30,y:yb+12,a:'end'},{x:xf-24,y:yA-12,a:'end'}],'r = '+skN(r),K.s,0);
+  K.later(()=>K.pick([{x:416,y:yA-6,a:'end'},{x:416,y:yA+14,a:'end'}],'axe',K.s,0));
+  return K.svg('Dégagement de filetage intérieur DIN 76');
+}
+
+/* Dégagement d'épaulement DIN 509 formes E, F, G, H : vue au-dessus de l'axe, portée à gauche, épaulement à droite */
+function d509Pic(F,D,L){
+  const r=L[2],t1=L[3],f=L[4],t2=F==='E'?0:L[5],W=420,dg=Math.PI/180,T15=Math.tan(15*dg),k=f?150/f:60/r;
+  const cu=t2-r,cv=t1-r,P=[];let u0;
+  if(f){u0=-f;P.push([u0,0],[u0+t1/T15,t1])}else{const pu=cu-r*Math.sin(15*dg),pv=cv+r*Math.cos(15*dg);u0=pu-pv/T15;P.push([u0,0])}
+  const fa=8,aS=f?90:105,aE=F==='E'?0:F==='G'?-Math.acos((r-t2)/r)/dg:-fa;for(let i=0;i<=24;i++){const a=(aS+(aE-aS)*i/24)*dg;P.push([cu+r*Math.cos(a),cv+r*Math.sin(a)])}
+  let vF=cv;if(F==='G')vF=P[P.length-1][1];else if(F!=='E'){const T=P[P.length-1],sl=T[0]/Math.sin(fa*dg);vF=T[1]-sl*Math.cos(fa*dg);P.push([0,vF])}
+  const xf=290,yd1=40-vF*k,X=u=>xf+u*k,Y=v=>yd1+v*k,yF=Y(vF),yfd=yF-12,yS=yF-34,yA=Y(t1)+74,Ht=yA+14,xa=X(u0),K=SK(W,Ht,'e5');
+  K.ax(12,yA,412,yA);K.fi(K.wv(20,yd1,20,yA+6));K.fi(K.wv(405,yS,405,yA+6));
+  K.fo([[20,yd1]].concat(P.map(q=>[X(q[0]),Y(q[1])]),[[xf,yS],[405,yS]]));
+  const xt=f?X((u0+t1/T15+cu)/2):X(cu);
+  K.fi([[xa,yd1],[Math.max(xt+10,xa+36),yd1]]);
+  K.dimV(xt,yd1,Y(t1),'t1 = '+skN(t1),'r',0);
+  if(f){K.ext(xa,yd1-3,xa,yfd-4);K.dimH(xa,xf,yfd,'f = '+skN(f))}
+  if(t2){const yc=Y(cv);K.ext(xf,yF+3,xf,yc+4);K.dimH(xf,X(t2),yc,'t2 = '+skN(t2),'l')}
+  K.ang(xa,yd1,30,0,15,'15°',[{x:xa+24,y:yd1-6},{x:xa-6,y:yd1-6,a:'end'},{x:xa+24,y:yd1-22}]);
+  if(F==='F'||F==='H')K.ang(xf,yF,30,82,90,'8°',[{x:xf-8,y:yF+30,a:'end'},{x:xf-8,y:yF+16,a:'end'},{x:xf+14,y:yF-8,a:'start'}]);
+  const a=45*dg,px=X(cu+r*Math.cos(a)),py=Y(cv+r*Math.sin(a));
+  K.lead(px,py,[{x:px+26,y:py+26,a:'start'},{x:px+26,y:py+44,a:'start'},{x:px+44,y:py+14,a:'start'}],'r = '+skN(r),K.s,0);
+  K.later(()=>K.pick([{x:(20+xa)/2,y:yd1+28},{x:(20+xa)/2,y:yd1+48}],'portée Ø '+skN(D),K.s,0));
+  K.later(()=>K.pick([{x:365,y:yS+24},{x:365,y:yS+44},{x:365,y:yA-10}],'épaulement',K.s,0));
+  K.later(()=>K.pick([{x:30,y:yA-6,a:'start'},{x:30,y:yA+14,a:'start'}],'axe',K.s,0));
+  return K.svg('Dégagement d\'épaulement DIN 509 forme '+F);
+}
+
+/* Centres DIN 332 : coupe longitudinale du bout d'arbre, face à gauche */
+function cenPic(form,r,bB){
+  const W=420,x0=100,xR=405;
+  if(form!=='D'){
+    const d1=r[0],d2=r[1],t=bB?bB[2]:r[2],d3=bB?bB[0]:0,b=bB?bB[1]:0,k=130/(bB?d3:d2),h1=d1*k/2,h2=d2*k/2,h3=d3*k/2,hE=bB?h3:h2;
+    const cy=bB?128:108,Hp=hE+24,yt=cy+Hp+30,Ht=yt+10,K=SK(W,Ht,'nc');
+    const xc=x0+b*k,xe=xc+(h2-h1)*Math.sqrt(3),xt=x0+Math.max(t*k,xe-x0+30),xp=xt+h1*.6;
+    const up=(bB?[[x0,cy-h3],[xc,cy-h2]]:[[x0,cy-h2]]).concat([[xe,cy-h1],[xt,cy-h1],[xp,cy]]),lo=up.slice(0,-1).reverse().map(q=>[q[0],2*cy-q[1]]),hole=up.concat(lo);
+    const mat=[[x0,cy-Hp]].concat(K.wv(x0,cy-Hp,xR,cy-Hp).slice(1),K.wv(xR,cy-Hp,xR,cy+Hp).slice(1),K.wv(xR,cy+Hp,x0,cy+Hp).slice(1),hole.slice().reverse());
+    K.hatch([mat],1);
+    K.fi(K.wv(x0,cy-Hp,xR,cy-Hp));K.fi(K.wv(xR,cy-Hp,xR,cy+Hp));K.fi(K.wv(xR,cy+Hp,x0,cy+Hp));
+    K.ax(x0-10,cy,xp+18,cy);
+    K.fo([[x0,cy-Hp]].concat(up,lo,[[x0,cy+Hp]]));
+    (bB?[xc]:[]).concat([xe]).forEach((x,i)=>{const hh=bB&&!i?h2:h1;K.fo([[x,cy-hh],[x,cy+hh]])});K.fo([[xt,cy-h1],[xt,cy+h1]]);
+    const xd2=bB?xc:x0;K.ext(xd2-2,cy-h2,x0-18,cy-h2);K.ext(xd2-2,cy+h2,x0-18,cy+h2);K.dimV(x0-14,cy-h2,cy+h2,'Ø '+skN(d2),'l',1,[cy-h2/2,cy+h2/2]);
+    if(bB){K.ext(x0-2,cy-h3,x0-44,cy-h3);K.ext(x0-2,cy+h3,x0-44,cy+h3);K.dimV(x0-40,cy-h3,cy+h3,'Ø '+skN(d3),'l',1,[cy-h3/2,cy+h3/2]);
+      K.ext(x0,cy-Hp-3,x0,cy-Hp-22);K.ext(xc,cy-h2-3,xc,cy-Hp-22,1);K.dimH(x0,xc,cy-Hp-18,'b = '+skN(b),'r')}
+    const xd=xe+Math.min(10,(xt-xe)*.3),t1x='Ø '+skN(d1),w1=DK.tw(t1x,K.S,1);
+    if(xt-xd-8>=w1+4)K.dimV(xd,cy-h1,cy+h1,t1x,'r',0,[cy-5,cy+16]);
+    else{const xm=(xe+xt)/2;K.fi([[xm,cy-h1],[xm,cy+h1]]);K.ar(xm,cy-h1,0,-1);K.ar(xm,cy+h1,0,1);K.ext(xm,cy+h1,xm,cy+h1+10+w1,1);K.later(()=>K.tx(xm-5,cy+h1+6+w1/2,t1x,'middle',K.S,1,1,1))}
+    K.ext(x0,cy+Hp+3,x0,yt+4);K.ext(xt,cy+h1+3,xt,yt+4,1);K.dimH(x0,xt,yt,'t = '+skN(t)+' mini');
+    const xA=xc+h2*Math.sqrt(3),Ra=xA-xc-10;K.ang(xA,cy,Ra,150,210,'60°',[{x:xA-Ra+8,y:cy-6,a:'start'},{x:xA-Ra+8,y:cy+16,a:'start'},{x:xA-Ra+14,y:cy-h1/2,a:'start'}]);
+    return K.svg('Centre 60° DIN 332 forme '+form);
+  }
+  const M=r[0],dd=r[3],t1=r[4],t2=r[5],dl=r[6],dlt=r[7],k=Math.min(255/t2,150/dl),hL=dl*k/2,hD=dd*k/2,hM=M*k/2;
+  const cy=118,Hp=hL+60,y1=cy+Hp+28,y2=y1+26,Ht=y2+10,K=SK(W,Ht,'nd');
+  const xl=x0+dlt*k,xq=xl+(hL-hD)*Math.sqrt(3),xm=xl+(hL-hM)*Math.sqrt(3),x1=x0+t1*k,x2=x0+t2*k,xp=x2+hD*.6;
+  const up=(dlt?[[x0,cy-hL],[xl,cy-hL]]:[[x0,cy-hL]]).concat([[xq,cy-hD],[x2,cy-hD],[xp,cy]]),lo=up.slice(0,-1).reverse().map(q=>[q[0],2*cy-q[1]]),hole=up.concat(lo);
+  const mat=[[x0,cy-Hp]].concat(K.wv(x0,cy-Hp,xR,cy-Hp).slice(1),K.wv(xR,cy-Hp,xR,cy+Hp).slice(1),K.wv(xR,cy+Hp,x0,cy+Hp).slice(1),hole.slice().reverse());
+  K.hatch([mat],1);
+  K.fi(K.wv(x0,cy-Hp,xR,cy-Hp));K.fi(K.wv(xR,cy-Hp,xR,cy+Hp));K.fi(K.wv(xR,cy+Hp,x0,cy+Hp));
+  K.ax(x0-10,cy,xp+18,cy);
+  K.fi([[xm,cy-hM],[x1,cy-hM]]);K.fi([[xm,cy+hM],[x1,cy+hM]]);
+  K.fo([[x0,cy-Hp]].concat(up,lo,[[x0,cy+Hp]]));
+  if(dlt)K.fo([[xl,cy-hL],[xl,cy+hL]]);K.fo([[xq,cy-hD],[xq,cy+hD]]);K.fo([[x1,cy-hM],[x1,cy+hM]]);K.fo([[x2,cy-hD],[x2,cy+hD]]);
+  K.ext(x0-2,cy-hL,x0-18,cy-hL);K.ext(x0-2,cy+hL,x0-18,cy+hL);K.dimV(x0-14,cy-hL,cy+hL,'Ø '+skN(dl),'l',1,[cy-hL/2,cy+hL/2]);
+  const xmT=xq+(x1-xq)*.35;K.dimV(xmT,cy-hM,cy+hM,'M'+M,'l',1,[cy-hD/2,cy+hD/2]);
+  K.dimV(x1+Math.min(14,(x2-x1)*.3),cy-hD,cy+hD,'Ø '+skN(dd),'l',1,[cy-hD/2,cy+hD/2]);
+  K.ext(x0,cy+Hp+3,x0,y2+4);K.ext(x1,cy+hM+3,x1,y1+4,1);K.ext(x2,cy+hD+3,x2,y2+4,1);
+  K.dimH(x0,x1,y1,'t1 = '+skN(t1)+' mini');K.dimH(x0,x2,y2,'t2 = '+skN(t2)+' mini');
+  return K.svg('Centre taraudé DIN 332 forme D');
+}
+
 /* ================= MODULE CLAVETTES DIN 6885 ================= */
 // [Ø arbre au-dessus de, jusqu'à, b, h, t1 arbre, t2 moyeu]
 const CLA=[[6,8,2,2,1.2,1],[8,10,3,3,1.8,1.4],[10,12,4,4,2.5,1.8],[12,17,5,5,3,2.3],[17,22,6,6,3.5,2.8],[22,30,8,7,4,3.3],[30,38,10,8,5,3.3],[38,44,12,8,5,3.3],[44,50,14,9,5.5,3.8],[50,58,16,10,6,4.3],[58,65,18,11,7,4.4],[65,75,20,12,7.5,4.9],[75,85,22,14,9,5.4],[85,95,25,14,9,5.4],[95,110,28,16,10,6.4],[110,130,32,18,11,7.4],[130,150,36,20,12,8.4],[150,170,40,22,13,9.4],[170,200,45,25,15,10.4]];
@@ -1157,11 +1389,7 @@ function renderCla(){
     +tile('Moyeu · largeur de rainure',mm(b+wh[0]/1000)+' à '+mm(b+wh[1]/1000),F[3]+F[4]+' ('+um(wh[1])+' / '+um(wh[0])+' µm)')
     +tile('Moyeu · profondeur t2',f2(t2)+' à '+f2(t2+td),'0 / +'+td+' mm')
     +tile('Moyeu · cote à mesurer',f2(d+t2)+' à '+f2(d+t2+td),'du fond de rainure au côté opposé de l\'alésage');
-  const k=170/d,r=85,bw=b*k/2,yb=-(r-t1*k),yt=yb-h*k,yh=-(r+t2*k);
-  $('kaPic').innerHTML='<svg viewBox="-150 -150 300 300" role="img" aria-label="Coupe arbre, moyeu et clavette"><circle r="135" style="fill:var(--hole)" opacity=".85"/><circle r="'+r+'" style="fill:var(--shaft)" opacity=".92"/>'
-   +'<rect x="'+(-bw)+'" y="'+yh+'" width="'+2*bw+'" height="'+(-r*.9-yh)+'" style="fill:var(--surf)"/><rect x="'+(-bw)+'" y="'+yt+'" width="'+2*bw+'" height="'+h*k+'" style="fill:var(--gold);stroke:var(--surf)" stroke-width="1.5"/>'
-   +'<line x1="-120" y1="0" x2="120" y2="0" style="stroke:var(--onpri)" stroke-dasharray="14 3 2 3" stroke-width=".8" opacity=".7"/><line x1="0" y1="-60" x2="0" y2="120" style="stroke:var(--onpri)" stroke-dasharray="14 3 2 3" stroke-width=".8" opacity=".7"/>'
-   +'<text x="0" y="30" class="gl" text-anchor="middle" style="fill:var(--onpri)">ARBRE Ø '+d+'</text><text x="0" y="122" class="gl" text-anchor="middle" style="fill:var(--onpri)">MOYEU</text><text x="'+(bw+8)+'" y="'+(yt+h*k/2+5)+'" class="gl" style="fill:var(--onpri)">'+b+' × '+h+'</text></svg>';
+  $('kaPic').innerHTML=claPic(d,b,h,t1,t2);
   $('kaVerif').className='verif'; $('kaVerif').innerHTML='<b>Valeurs contrôlées</b>Dimensions b × h, t1 et t2 recoupées sur trois tables publiées. Tolérances de profondeur recoupées sur deux tables (+0.1 jusqu\'à 6 × 6, +0.2 jusqu\'à 32 × 18, +0.3 au-delà). Largeurs de rainure calculées selon ISO 286.';
   try{localStorage.setItem('mcs-cla',JSON.stringify(sk))}catch(e){}
 }
@@ -1188,9 +1416,6 @@ try{Object.assign(sd,JSON.parse(localStorage.getItem('mcs-deg')||'{}'))}catch(e)
 function renderDeg(){
   const pr=(id,v)=>document.querySelectorAll('#'+id+' button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v));
   const tile=(a,v,i,k)=>'<div class="val'+(k?' k':'')+'"><b>'+a+'</b><span>'+v+'</span><i>'+(i||'')+'</i></div>';
-  const P=(pts,ex)=>'<polyline points="'+pts+'" fill="none" style="stroke:var(--ink)" stroke-width="2.5" stroke-linejoin="round" '+(ex||'')+'/>';
-  const T=(x,y,s,c,a)=>'<text x="'+x+'" y="'+y+'" class="gv" text-anchor="'+(a||'middle')+'" style="fill:var(--'+(c||'ink')+')">'+s+'</text>';
-  const AX='<line x1="10" y1="190" x2="390" y2="190" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3"/><text x="14" y="184" class="gs">axe</text>';
   // ----- DIN 76 -----
   if(!MP[sd.d])sd.d='12'; $('gD').value=sd.d; $('gP').innerHTML=MP[sd.d].map(p=>'<option value="'+p+'">'+p+' mm'+(p===MP[sd.d][0]?' (gros)':'')+'</option>').join('');
   if(!MP[sd.d].includes(+sd.p))sd.p=String(MP[sd.d][0]); $('gP').value=sd.p;
@@ -1201,16 +1426,14 @@ function renderDeg(){
   if(R){const c=sd.f==='c',dg=ext?d-R[0]:d+R[0],tl=ext?devS('h',d<=3?12:13,dg):devH('H',13,dg),g1=R[c?2:1],g2=R[c?4:3];
     $('gVals').innerHTML=tile('Ø de gorge',mm(dg+tl[0]/1000)+' à '+mm(dg+tl[1]/1000),'nominal '+f2(dg)+' = d '+(ext?'− ':'+ ')+R[0]+' · '+(ext?(d<=3?'h12':'h13'):'H13'),1)
       +tile('Largeur de gorge',f2(g1)+' à '+f2(g2),'g1 mini à g2 maxi, en mm')+tile('Rayon de fond',R[5],'mm, aux deux angles')+tile('Forme',(ext?(c?'B':'A'):(c?'D':'C')),c?'courte : seulement si la place manque':'normale : à prendre par défaut');
-    $('gPic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Dégagement de filetage">'+(ext
-      ?P('20,110 '+Array.from({length:10},(_,i)=>(30+i*20)+',96 '+(40+i*20)+',110').join(' ')+' 222,110 240,140 300,140 318,112 318,70 380,70')+T(120,84,'filetage '+pn2(sd.d,p),'mut')+T(270,160,f2(g1)+' à '+f2(g2),'red')+T(270,128,'Ø '+f2(dg),'ink')+T(350,60,'épaulement','mut')
-      :'<rect x="20" y="30" width="360" height="60" style="fill:var(--soft)"/>'+P('20,90 '+Array.from({length:10},(_,i)=>(30+i*20)+',104 '+(40+i*20)+',90').join(' ')+' 222,90 240,62 300,62 318,90 380,90')+T(120,124,'taraudage '+pn2(sd.d,p),'mut')+T(270,52,f2(g1)+' à '+f2(g2),'red')+T(270,82,'Ø '+f2(dg),'ink')+T(350,112,'fond','mut'))+AX+'</svg>'}
+    $('gPic').innerHTML=d76Pic(ext,d,p,R,c,pn2(sd.d,p))}
   // ----- DIN 509 -----
   pr('eForm',sd.eF); pr('eSol',sd.eS); $('eD').value=sd.eD;
   const D=+sd.eD,GH=D509GH[sd.eF],L=(GH?GH[sd.eS]||[]:D509[sd.eS]).find(x=>D>x[0]&&D<=x[1]);
   $('eErr').hidden=!!L; $('eOut').hidden=!L; if(!L)$('eErr').textContent=GH?'La norme ne donne pas de forme '+sd.eF+' pour ce Ø avec cette sollicitation.':sd.eS==='f'?'En fatigue élevée, la DIN 509 commence au-dessus de Ø 18.':'La table commence au-dessus de Ø 1.6.';
   if(L){const F=sd.eF!=='E';
     $('eVals').innerHTML=tile('Dégagement','DIN 509 – '+sd.eF+' '+L[2]+' × '+L[3],'désignation à porter au plan',1)+tile('Rayon r',L[2],'mm · tolérance ± 0.1')+tile('Profondeur t1',f2(L[3])+' à '+f2(L[3]+.1),'mm au rayon, sous la portée · 0 / +0.1')+tile('Ø de fond de gorge',f2(D-2*L[3]-.2)+' à '+f2(D-2*L[3]),'pour une portée à Ø '+D)+(L[4]?tile('Largeur f',f2(L[4])+' à '+f2(L[4]+.2),'mm le long de la portée · 0 / +0.2'):'')+(F?tile('Profondeur t2',f2(L[5])+' à '+f2(L[5]+.05),'mm dans la face de l\'épaulement · 0 / +0.05'):'');
-    $('ePic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Dégagement d\'épaulement">'+P('20,120 200,120 216,140 262,140 '+(F?'272,134 272,40 380,40':'276,120 276,40 380,40'))+T(110,108,'portée Ø '+D,'mut')+(L[4]?T(238,160,'f = '+L[4],'red'):'')+T(238,180,'t1 = '+L[3],'ink')+(F?T(284,90,'t2 = '+L[5],'red','start'):'')+T(330,30,'épaulement','mut')+AX+'</svg>'}
+    $('ePic').innerHTML=d509Pic(sd.eF,D,L)}
   // ----- centres -----
   pr('nForm',sd.nF); const A=sd.nF==='A',B=sd.nF==='B';
   const opts=A?CEA.map(x=>[x[0],x[0]+' × '+x[1]]):B?CEA.filter(x=>CEB[x[0]]).map(x=>[x[0],x[0]+' × '+x[1]]):CED.map(x=>[x[0],'M'+x[0]]);
@@ -1218,11 +1441,10 @@ function renderDeg(){
   $('nSize').innerHTML=opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join(''); $('nSize').value=sd.nS;
   if(A||B){const r=CEA.find(x=>String(x[0])===sd.nS),b=B&&CEB[r[0]],t=b?b[2]:r[2],a=b?b[3]:r[3];
     $('nVals').innerHTML=tile('Centre','DIN 332 – '+sd.nF+' '+r[0]+' × '+r[1],'désignation à porter au plan',1)+tile('Ø de perçage d1',r[0],'mm, foret à centrer')+tile('Ø du cône 60° d2',r[1],'mm, à l\'entrée du cône')+(b?tile('Ø du chanfrein d3',b[0],'mm, chanfrein de protection')+tile('Hauteur du chanfrein b',b[1],'mm'):'')+tile('Profondeur t',t,'mm mini, depuis la face')+tile('Surlongueur a',a||'—',a?'mm à prévoir si le centre est coupé':'non recoupée pour cette taille');
-    const k=r[1]/2*7>70?70/(r[1]/2):7,h1=r[0]/2*k,h2=r[1]/2*k,x0=60,xc=x0+(b?26:0),xe=xc+(h2-h1)*1.732,xf=x0+Math.max(t*k,xe-x0+30);
-    $('nPic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Centre 60°"><rect x="'+x0+'" y="20" width="320" height="180" style="fill:var(--soft)"/><polygon points="'+x0+','+(110-(b?h2+15:h2))+' '+(b?xc+','+(110-h2)+' ':'')+xe.toFixed(1)+','+(110-h1)+' '+xf.toFixed(1)+','+(110-h1)+' '+(xf+h1*.6).toFixed(1)+',110 '+xf.toFixed(1)+','+(110+h1)+' '+xe.toFixed(1)+','+(110+h1)+' '+(b?xc+','+(110+h2)+' ':'')+x0+','+(110+(b?h2+15:h2))+'" style="fill:var(--surf);stroke:var(--ink)" stroke-width="2.5" stroke-linejoin="round"/><line x1="30" y1="110" x2="390" y2="110" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3"/>'+T(x0-6,102,'Ø'+r[1],'ink','end')+T(xf+h1*.6+10,102,'Ø'+r[0],'red','start')+T(220,40,'60°','mut')+T(220,190,'t = '+t+' mini','ink')+'</svg>'}
+    $('nPic').innerHTML=cenPic(sd.nF,r,b||null)}
   else{const r=CED.find(x=>String(x[0])===sd.nS);
     $('nVals').innerHTML=tile('Centre taraudé','DIN 332 – D M'+r[0],'désignation à porter au plan',1)+(r[1]?tile('Pour bout d\'arbre','Ø '+r[1]+' à '+r[2],'au-dessus de '+r[1]+', jusqu\'à '+r[2]+' mm'):'')+tile('Ø de perçage',r[3],'mm, avant taraudage')+tile('Profondeur de filet t1',r[4],'mm mini')+tile('Profondeur de perçage t2',r[5],'mm mini')+tile('Ø du lamage d\'entrée',r[6],r[7]?'mm, sur '+r[7]+' mm de profondeur':'mm');
-    $('nPic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Centre taraudé"><rect x="60" y="20" width="320" height="180" style="fill:var(--soft)"/><polygon points="60,70 86,85 250,85 262,110 250,135 86,135 60,150" style="fill:var(--surf);stroke:var(--ink)" stroke-width="2.5" stroke-linejoin="round"/><line x1="86" y1="78" x2="200" y2="78" style="stroke:var(--ink)" stroke-width="1"/><line x1="86" y1="142" x2="200" y2="142" style="stroke:var(--ink)" stroke-width="1"/><line x1="30" y1="110" x2="390" y2="110" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3"/>'+T(140,103,'M'+r[0],'red')+T(140,170,'t1 = '+r[4],'ink')+T(170,192,'t2 = '+r[5],'ink')+T(270,102,'Ø'+r[3],'mut','start')+'</svg>'}
+    $('nPic').innerHTML=cenPic('D',r)}
   try{localStorage.setItem('mcs-deg',JSON.stringify(sd))}catch(e){}
 }
 const pn2=(d,p)=>'M'+d+(p===MP[d][0]?'':' × '+p);
