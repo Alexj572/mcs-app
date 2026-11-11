@@ -99,6 +99,14 @@ label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.05em;tex
 /* LIGHTBOX */
 #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
 #lightbox img{max-width:92vw;max-height:88vh;border-radius:8px;box-shadow:0 0 60px rgba(0,0,0,.8);cursor:default}
+#lb-bar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:8px;z-index:2001}
+#lb-bar button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:15px;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer;white-space:nowrap}
+#lightbox img{transition:transform .2s}
+.img-thumb-wrap img{transition:transform .2s}
+.dup-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--border);font-size:15px;cursor:pointer}
+.dup-row input{width:20px;height:20px;accent-color:var(--accent)}
+.dup-dot{width:12px;height:12px;border-radius:50%;flex:none}
+.file-act{background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;margin-left:6px;text-decoration:underline}
 #lightbox-close{position:absolute;top:20px;right:24px;background:none;border:none;color:#fff;font-size:36px;cursor:pointer;line-height:1;z-index:2001}
 /* LOGIN */
 #login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,#0d1a3e 0%,#162454 40%,#1a1a5e 100%)}
@@ -297,7 +305,7 @@ main{flex:1;padding:24px 20px;max-width:1200px;margin:0 auto;width:100%}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadString, getDownloadURL, deleteObject, listAll, getMetadata } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -323,6 +331,7 @@ window.fbSetDoc = setDoc;
 window.fbDeleteDoc = deleteDoc;
 window.fbQuery = query;
 window.fbWhere = where;
+window.fbOnSnapshot = onSnapshot;
 window.fbRef = ref;
 window.fbUploadString = uploadString;
 window.fbGetDownloadURL = getDownloadURL;
@@ -343,6 +352,11 @@ document.dispatchEvent(new Event('firebaseReady'));
 <div id="lightbox" class="hidden" onclick="closeLightbox()">
   <button id="lightbox-close" onclick="closeLightbox()">✕</button>
   <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+  <div id="lb-bar" onclick="event.stopPropagation()">
+    <button type="button" onclick="rotatePhoto(-90)" title="Tourner à gauche">⟲ Gauche</button>
+    <button type="button" onclick="rotatePhoto(90)" title="Tourner à droite">⟳ Droite</button>
+    <button type="button" onclick="printCurrentPhoto()">🖨️ Imprimer</button>
+  </div>
 </div>
 
 <!-- LOGIN -->
@@ -481,6 +495,16 @@ document.dispatchEvent(new Event('firebaseReady'));
 </div>
 
 <!-- ══ MODAL DELETE ══ -->
+<div class="modal-overlay hidden" id="modal-dup">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header"><h3>📄 Dupliquer la fiche</h3><button class="close-btn" onclick="closeModal('modal-dup')">✕</button></div>
+    <div class="modal-body"><p style="font-size:14px;color:var(--text2);margin:0 0 8px">Cochez les machines sur lesquelles créer une copie. Tout est repris sauf les commandes.</p><div id="dup-list"></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-dup')">Annuler</button>
+      <button class="btn btn-primary" id="dup-ok">📄 Dupliquer</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay hidden" id="modal-delete">
   <div class="modal" style="max-width:400px">
     <div class="modal-header"><h3>⚠️ Confirmation</h3><button class="close-btn" onclick="closeModal('modal-delete')">✕</button></div>
@@ -611,11 +635,21 @@ function getFicheRef(ficheId){
   return clientClean+numStr;
 }
 // Pour nouvelle fiche : génère la ref avant insertion
-function genFicheRef(client){
-  const num=fiches.length+1;
-  const numStr=String(num).padStart(6,'0');
+function genFicheRef(client,taken){
   const clientClean=(client||'MCS').replace(/[^a-zA-Z0-9]/g,'').substring(0,15)||'MCS';
-  return clientClean+numStr;
+  let num=fiches.length+1,id;
+  do{id=clientClean+String(num).padStart(6,'0');num++}while(fiches.some(x=>x.id===id)||(taken&&taken.includes(id)));
+  return id;
+}
+// Même chose, mais vérifie aussi dans la base qu'aucun autre poste n'a pris ce numéro entre-temps
+async function newFicheId(client){
+  const taken=[];
+  for(let i=0;i<20;i++){
+    const id=genFicheRef(client,taken);
+    try{const s=await window.fbGetDoc(window.fbDoc(window.db,'fiches',id));if(!s.exists())return id;}catch(e){return id}
+    taken.push(id);
+  }
+  return genFicheRef(client,taken)+'_'+Date.now().toString(36);
 }
 function fmt(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{timeZone:'Europe/Paris'})}
 
@@ -708,25 +742,171 @@ async function svFiches_delete(id){
   logGlobalActivity('Suppression',id,f?f.designation||f.planRef||'Sans titre':'?');
 }
 async function svFiches_deleteByMachine(machineId){
-  const snap=await window.fbGetDocs(window.fbQuery(window.fbCollection(window.db,'fiches'),window.fbWhere('machine_id','==',machineId)));
-  for(const d of snap.docs) await window.fbDeleteDoc(d.ref);
+  for(const champ of ['machineId','machine_id']){
+    const snap=await window.fbGetDocs(window.fbQuery(window.fbCollection(window.db,'fiches'),window.fbWhere(champ,'==',machineId)));
+    for(const d of snap.docs) await window.fbDeleteDoc(d.ref);
+  }
 }
 async function svFiches_deleteAll(){
   const snap=await window.fbGetDocs(window.fbCollection(window.db,'fiches'));
   for(const d of snap.docs) await window.fbDeleteDoc(d.ref);
 }
 
+// Mise à jour en direct : chaque poste voit tout de suite ce que les autres créent ou modifient
+let _unsubF=null,_unsubM=null,_liveT=null,_editWarned=false;
+function stopLiveSync(){try{_unsubF&&_unsubF();_unsubM&&_unsubM();}catch(e){} _unsubF=_unsubM=null;}
+function startLiveSync(){
+  if(!window.fbOnSnapshot||!window.db)return;
+  stopLiveSync();
+  _unsubF=window.fbOnSnapshot(window.fbCollection(window.db,'fiches'),snap=>{
+    fiches=snap.docs.map(d=>ficheFromDB({id:d.id,...d.data()}));liveRefresh();
+  },e=>console.warn('synchro fiches',e));
+  _unsubM=window.fbOnSnapshot(window.fbCollection(window.db,'machines'),snap=>{
+    machines=snap.docs.map(d=>({id:d.id,...d.data()}));liveRefresh();
+  },e=>console.warn('synchro machines',e));
+}
+function liveRefresh(){
+  clearTimeout(_liveT);
+  _liveT=setTimeout(()=>{
+    if(!currentUser)return;
+    if(currentPage==='fiche-edit'&&editFicheId){
+      const f=getFiche(editFicheId);
+      if(!_editWarned&&(!f||(f.updatedAt||'')!==(window._editBase||''))){_editWarned=true;toast(f?'Cette fiche vient d\'être modifiée sur un autre poste':'Cette fiche vient d\'être supprimée sur un autre poste','error');}
+      return;
+    }
+    if(document.querySelector('.modal-overlay:not(.hidden)'))return;          // ne pas déranger une saisie
+    if(!document.getElementById('lightbox').classList.contains('hidden'))return;
+    const main=document.getElementById('main'),y=window.scrollY;
+    if(currentPage==='fiche-view'){
+      if(!getFiche(currentFicheId)){toast('Cette fiche a été supprimée sur un autre poste','error');goTo('fiches');return;}
+      main.innerHTML=renderFicheView(currentFicheId);
+    }else if(currentPage==='fiches'){applyAndRender();}
+    else if(currentPage==='stats'){main.innerHTML=renderStats();}
+    else return;
+    window.scrollTo(0,y);
+  },400);
+}
 function getMachine(id){return machines.find(m=>m.id===id)}
 function getFiche(id){return fiches.find(f=>f.id===id)}
 
 // ── LIGHTBOX ──────────────────────────────────────────
-function openLightbox(src){
-  document.getElementById('lightbox-img').src=src;
+let _lb=null;
+function rotCss(r){return r?`transform:rotate(${r}deg)`:''}
+function applyLbRot(){
+  const img=document.getElementById('lightbox-img'),r=(_lb&&_lb.rot)||0;
+  img.style.transform=r?`rotate(${r}deg)`:'';
+  img.style.maxWidth=r%180?'88vh':'';img.style.maxHeight=r%180?'92vw':'';
+}
+function openLightbox(src,rot){
+  _lb={src,rot:rot||0,ficheId:null,idx:-1,name:''};
+  document.getElementById('lightbox-img').src=src;applyLbRot();
   document.getElementById('lightbox').classList.remove('hidden');
 }
+function openPhoto(ficheId,i){
+  const f=getFiche(ficheId),fl=f&&f.files&&f.files[i];if(!fl)return;
+  openLightbox(fl.url||fl.data,fl.rot);_lb.ficheId=ficheId;_lb.idx=i;_lb.name=fl.name||'';
+}
 function closeLightbox(){
+  const wasOpen=!document.getElementById('lightbox').classList.contains('hidden');
   document.getElementById('lightbox').classList.add('hidden');
   document.getElementById('lightbox-img').src='';
+  if(wasOpen&&_lb&&_lb.ficheId&&currentPage==='fiche-view'){const y=window.scrollY;document.getElementById('main').innerHTML=renderFicheView(currentFicheId);window.scrollTo(0,y);}
+  _lb=null;
+}
+let _rotT=null;
+function rotatePhoto(d){
+  if(!_lb)return;
+  _lb.rot=((_lb.rot||0)+d+360)%360;applyLbRot();
+  if(!_lb.ficheId)return;
+  if(!canDo('editFiche')){toast('Rotation affichée seulement : vous n\'avez pas le droit de modifier les fiches','error');return;}
+  const c={..._lb};clearTimeout(_rotT);
+  _rotT=setTimeout(async()=>{
+    const f=getFiche(c.ficheId),fl=f&&f.files&&f.files[c.idx];if(!fl||(fl.url||fl.data)!==c.src)return;
+    if(c.rot)fl.rot=c.rot;else delete fl.rot;
+    const now=new Date().toISOString();f.updatedAt=now;
+    f.history=f.history||[];f.history.push({date:now,user:currentUser?currentUser.name:'Système',action:'Rotation de la photo « '+(fl.name||'')+' »'});
+    if(f.history.length>20)f.history.splice(0,f.history.length-20);
+    try{await svFiches_update(f);toast('Rotation enregistrée');}catch(e){toast('Rotation non enregistrée (connexion ?)','error');}
+  },800);
+}
+function printCurrentPhoto(){
+  if(!_lb)return;
+  const f=_lb.ficheId?getFiche(_lb.ficheId):null;
+  printImage(_lb.src,_lb.rot||0,(f?getFicheRef(f.id)+' — '+(f.designation||f.planRef||'')+' — ':'')+(_lb.name||''));
+}
+// Imprime une photo ou un plan seul, sur une page A4 orientée selon l'image
+function printImage(src,rot,titre){
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escH(titre||'Impression')}</title><style id="pg">@page{size:A4 portrait;margin:8mm}</style><style>
+html,body{margin:0;padding:0;background:#fff}.t{font:9px Arial,sans-serif;color:#555;height:5mm;line-height:5mm;white-space:nowrap;overflow:hidden}
+.c{position:relative;overflow:hidden}.c img{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(${rot}deg)}
+</style></head><body><div class="t">${escH(titre||'')}</div><div class="c" id="c"><img id="i" src="${src}"></div>
+<script>
+var R=${rot},im=document.getElementById('i');
+function go(){var w=im.naturalWidth||1,h=im.naturalHeight||1,q=R%180!==0,ew=q?h:w,eh=q?w:h,land=ew>eh;
+ document.getElementById('pg').textContent='@page{size:A4 '+(land?'landscape':'portrait')+';margin:8mm}';
+ var W=land?281:194,H=(land?194:281)-6,c=document.getElementById('c');c.style.width=W+'mm';c.style.height=H+'mm';
+ im.style.maxWidth=(q?H:W)+'mm';im.style.maxHeight=(q?W:H)+'mm';setTimeout(function(){window.print()},400);}
+if(im.complete)go();else{im.onload=go;im.onerror=go;}
+<\/script></body></html>`;
+  const url=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+// Ouvre un fichier joint (PDF, etc.) dans un nouvel onglet
+function openFile(src,type){
+  if(!src)return;
+  let url=src;
+  if(src.startsWith('data:')){
+    try{const b=atob(src.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);url=URL.createObjectURL(new Blob([u],{type:type||'application/octet-stream'}));setTimeout(()=>URL.revokeObjectURL(url),60000);}catch(e){}
+  }
+  const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+// Retire un fichier d'une fiche (le fichier n'est effacé du stockage que si aucune autre fiche ne l'utilise)
+function deleteFileFromFiche(ficheId,i){
+  if(!canDo('editFiche')){toast('Permission refusée','error');return;}
+  const f=getFiche(ficheId),fl=f&&f.files&&f.files[i];if(!fl)return;
+  askConfirm(`Retirer le fichier « ${fl.name||'sans nom'} » de cette fiche ?`,'🗑️ Retirer',async()=>{
+    const src=fl.url||fl.data;
+    f.files.splice(i,1);
+    const now=new Date().toISOString();f.updatedAt=now;
+    f.history=f.history||[];f.history.push({date:now,user:currentUser?currentUser.name:'Système',action:'Fichier retiré : '+(fl.name||'')});
+    if(f.history.length>20)f.history.splice(0,f.history.length-20);
+    try{
+      await svFiches_update(f);
+      if(fl.url&&!fiches.some(x=>x.id!==f.id&&(x.files||[]).some(y=>y.url===fl.url)))await deleteStorageFile(fl.url);
+      closeModal('modal-delete');document.getElementById('main').innerHTML=renderFicheView(ficheId);toast('Fichier retiré');
+    }catch(e){closeModal('modal-delete');toast('Échec : vérifiez la connexion','error');}
+  });
+}
+// Duplique une fiche sur une ou plusieurs machines
+function openDupFiche(id){
+  if(!canDo('createFiche')){toast('Permission refusée','error');return;}
+  const f=getFiche(id);if(!f)return;
+  document.getElementById('dup-list').innerHTML=machines.map(m=>`<label class="dup-row"><input type="checkbox" value="${escH(m.id)}"><span class="dup-dot" style="background:${escH(m.color||'#888')}"></span><span>${escH(m.nom)}${m.id===f.machineId?' <small style="color:var(--text2)">(machine de cette fiche)</small>':''}</span></label>`).join('');
+  const ok=document.getElementById('dup-ok');ok.disabled=false;ok.textContent='📄 Dupliquer';
+  ok.onclick=()=>doDupFiche(id);
+  openModal('modal-dup');
+}
+async function doDupFiche(id){
+  const f=getFiche(id);if(!f)return;
+  const ids=[...document.querySelectorAll('#dup-list input:checked')].map(x=>x.value);
+  if(!ids.length){toast('Cochez au moins une machine','error');return;}
+  const ok=document.getElementById('dup-ok');ok.disabled=true;ok.textContent='Duplication…';
+  const now=new Date().toISOString(),user=currentUser?currentUser.name:'Système',made=[];
+  try{
+    for(const mid of ids){
+      const nf=JSON.parse(JSON.stringify(f));
+      nf.id=await newFicheId(f.client);nf.machineId=mid;nf.commandes=[];
+      nf.date=now.split('T')[0];nf.createdAt=now;nf.updatedAt=now;nf.createdBy=user;
+      nf.history=[{date:now,user,action:'Créée par duplication de la fiche '+getFicheRef(f.id)}];
+      fiches.push(nf);await svFiches_add(nf);made.push(nf);
+    }
+    closeModal('modal-dup');
+    toast(made.length+' copie(s) créée(s)');
+    if(made.length===1)goTo('fiche-view',made[0].id);else goTo('fiches');
+  }catch(e){console.error(e);ok.disabled=false;ok.textContent='📄 Dupliquer';toast((made.length?made.length+' copie(s) créée(s), puis ':'')+'échec : vérifiez la connexion','error');}
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox()});
 
@@ -758,10 +938,12 @@ async function doLogin(){
   // Afficher loading
   document.getElementById('main').innerHTML='<div style="text-align:center;padding:60px;color:var(--text2)"><div style="font-size:48px;margin-bottom:16px">⏳</div><p>Chargement des données...</p></div>';
   await loadAllData();
+  startLiveSync();
   goTo('home');
   toast('Bienvenue, '+found.name+' !');
 }
 function doLogout(){
+  stopLiveSync();
   const nd=document.getElementById('nav-devis');if(nd)nd.classList.add('hidden');
   const nu=document.getElementById('nav-usinage');if(nu)nu.classList.add('hidden');
   currentUser=null;
@@ -852,11 +1034,19 @@ function toast(msg,type='success'){
   el.className='toast-item '+type;
   el.innerHTML=(type==='success'?'✅':'❌')+' '+msg;
   t.appendChild(el);
-  setTimeout(()=>el.remove(),3500);
+  setTimeout(()=>el.remove(),type==='error'?6500:3500);
 }
 
 // ── MODALS ────────────────────────────────────────────
-function closeModal(id){document.getElementById(id).classList.add('hidden')}
+function closeModal(id){document.getElementById(id).classList.add('hidden');if(id==='modal-delete'){const b=document.getElementById('delete-ok');if(b){b.textContent='🗑️ Supprimer';b.disabled=false}}}
+function askConfirm(msg,okLabel,cb){
+  const ok=document.getElementById('delete-ok');
+  document.getElementById('delete-msg').textContent=msg;
+  ok.textContent=okLabel||'🗑️ Supprimer';ok.onclick=cb;
+  ok.disabled=true;setTimeout(()=>{ok.disabled=false},700); // évite qu'un double appui valide deux étapes d'un coup
+  openModal('modal-delete');
+}
+const escH=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function openModal(id){document.getElementById(id).classList.remove('hidden')}
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.add('hidden')}));
 
@@ -879,7 +1069,7 @@ function renderHome(){
       </button>`:''}
       ${canTab('accessUsinage')?`<button class="home-btn purple" onclick="goTo('usinage')">
         <div class="home-btn-icon">🔧</div>
-        <div class="home-btn-text"><strong>Aide à l'usinage</strong><span>Filetages, gorges, tolérances ISO</span></div>
+        <div class="home-btn-text"><strong>Aide à l'usinage</strong><span>Filetages, circlips, tolérances, clavettes, dégagements, coupe</span></div>
       </button>`:''}
       ${canDo('accessDevis')?`<button class="home-btn orange" onclick="goTo('devis')">
         <div class="home-btn-icon">💰</div>
@@ -899,7 +1089,7 @@ function renderHome(){
         ${localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair'}
       </button>
     </div>
-    <div style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">v1.0</div>
+    <div style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 12</div>
   </div>`;
 }
 
@@ -989,17 +1179,20 @@ async function saveMachine(){
 function confirmDelMachine(id){
   const m=getMachine(id);if(!m)return;
   const cnt=fiches.filter(f=>f.machineId===id).length;
-  document.getElementById('delete-msg').textContent=`Supprimer "${m.nom}" ?${cnt>0?' '+cnt+' fiche(s) associée(s) seront supprimées.':''}`;
-  document.getElementById('delete-ok').onclick=async()=>{
-    machines=machines.filter(x=>x.id!==id);
-    fiches=fiches.filter(f=>f.machineId!==id);
-    await svMachines_delete(id);
-    await svFiches_deleteByMachine(id);
-    closeModal('modal-delete');
-    document.getElementById('main').innerHTML=renderSettings();
-    toast('Machine supprimée');
-  };
-  openModal('modal-delete');
+  askConfirm(`Supprimer la machine "${m.nom}" ?${cnt>0?' Ses '+cnt+' fiche(s) seront supprimées avec elle.':''}`,'Continuer →',()=>{
+    askConfirm(`DERNIÈRE CONFIRMATION : la machine "${m.nom}"${cnt>0?' et ses '+cnt+' fiche(s)':''} vont être supprimées définitivement. Impossible de revenir en arrière.`,'🗑️ Supprimer définitivement',async()=>{
+      const ok=document.getElementById('delete-ok');ok.disabled=true;ok.textContent='Suppression…';
+      try{
+        await svFiches_deleteByMachine(id);
+        await svMachines_delete(id);
+        machines=machines.filter(x=>x.id!==id);
+        fiches=fiches.filter(f=>f.machineId!==id);
+        closeModal('modal-delete');
+        document.getElementById('main').innerHTML=renderSettings();
+        toast('Machine supprimée');
+      }catch(e){console.error(e);closeModal('modal-delete');toast('Suppression interrompue : vérifiez la connexion et réessayez','error');}
+    });
+  });
 }
 
 // ── FICHES LIST ───────────────────────────────────────
@@ -1237,6 +1430,7 @@ function formatDimsDisplay(forme,dims){
 function renderFicheForm(ficheId,initData){
   editFicheId=ficheId||null;
   const f=ficheId?getFiche(ficheId):null;
+  window._editBase=f?(f.updatedAt||''):null;_editWarned=false;window._forceSave=false;
   const preMid=initData&&initData.machineId?initData.machineId:(f?f.machineId:'');
   const today=new Date().toISOString().split('T')[0];
   const initForme=f?f.forme||'Rond':'Rond';
@@ -1352,7 +1546,7 @@ function renderFicheForm(ficheId,initData){
     </div>
     <div id="file-preview" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start">
       ${existingFiles.map((fl,i)=>{const src=fl.url||fl.data||'';return fl.type&&fl.type.startsWith('image/')&&src
-        ?`<div class="img-thumb-wrap" id="exist-file-${i}"><img src="${src}" alt="${fl.name}" onclick="openLightbox('${src}')"><div class="img-zoom-badge">🔍</div><button class="del-thumb" onclick="removeExistingFile(${i})" title="Supprimer">✕</button></div>`
+        ?`<div class="img-thumb-wrap" id="exist-file-${i}"><img src="${src}" alt="${fl.name}" style="${rotCss(fl.rot)}" onclick="openLightbox('${src}',${fl.rot||0})"><div class="img-zoom-badge">🔍</div><button class="del-thumb" onclick="removeExistingFile(${i})" title="Supprimer">✕</button></div>`
         :`<span class="file-name-badge" id="exist-file-${i}">📄 ${fl.name} <button onclick="removeExistingFile(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;margin-left:4px">✕</button></span>`}).join('')}
     </div>
   </div>
@@ -1594,6 +1788,19 @@ async function submitFiche(){
   const machineId=document.getElementById('f-machine').value;
   const matiere=document.getElementById('f-mat').value.trim();
   if(!machineId||!matiere){toast('Machine et Matière sont obligatoires','error');return}
+  if(editFicheId&&!window._forceSave){
+    let remote=null;
+    try{const s=await window.fbGetDoc(window.fbDoc(window.db,'fiches',editFicheId));remote=s.exists()?s.data():false;}catch(e){}
+    if(remote===false){toast('Cette fiche a été supprimée sur un autre poste : enregistrement annulé','error');return}
+    const ru=remote?(remote.updatedAt||remote.updated_at||''):(window._editBase||'');
+    if(ru!==(window._editBase||'')){
+      const h=(remote.history||[]).slice(-1)[0]||{};
+      const qui=h.user?' par '+h.user:'',quand=ru?' le '+new Date(ru).toLocaleString('fr-FR',{timeZone:'Europe/Paris',dateStyle:'short',timeStyle:'short'}):'';
+      askConfirm(`Attention : cette fiche a été modifiée sur un autre poste${qui}${quand}, pendant que vous la modifiiez. Si vous enregistrez, ses modifications seront remplacées par les vôtres.`,'Enregistrer quand même',()=>{closeModal('modal-delete');window._forceSave=true;submitFiche();});
+      return;
+    }
+  }
+  window._forceSave=false;
   const forme=document.getElementById('f-forme').value;
   const dims=getDimsValues();
   const bridage=''; // bridage maintenant par opération
@@ -1612,9 +1819,10 @@ async function submitFiche(){
       console.log('Upload OK:', fl.name, url);
     }catch(e){
       console.error('Upload Storage error',e.code, e.message, e);
-      // Fallback : stocker en base64 dans Firestore si Storage échoue
-      toast('Storage indisponible, sauvegarde locale...','error');
-      newFiles.push({name:fl.name,type:fl.type,data:fl.data});
+      // On n'enregistre plus le fichier dans la fiche elle-même : la fiche deviendrait trop lourde pour être enregistrée
+      for(const u of newFiles) await deleteStorageFile(u.url);
+      toast(`Envoi de « ${fl.name} » impossible (connexion ?). La fiche n'est pas enregistrée : réessayez.`,'error');
+      return;
     }
   }
   if(editFicheId){
@@ -1648,7 +1856,7 @@ async function submitFiche(){
     toast('Fiche modifiée');goTo('fiche-view',editFicheId);
   }else{
     const ficheClient=document.getElementById('f-client').value.trim();
-    const nf={id:genFicheRef(ficheClient),date,client:ficheClient,planRef,designation:document.getElementById('f-design').value.trim(),machineId,matiere,bridage,forme,dims,operations:JSON.parse(JSON.stringify(formOps)),outillage:JSON.parse(JSON.stringify(window._formOutillage||{})),commandes:JSON.parse(JSON.stringify(formCmds)),remarques:document.getElementById('f-rem').value,files:newFiles,createdAt:now,updatedAt:now,createdBy:user,history:[{date:now,user,action:'Fiche créée'}]};
+    const nf={id:await newFicheId(ficheClient),date,client:ficheClient,planRef,designation:document.getElementById('f-design').value.trim(),machineId,matiere,bridage,forme,dims,operations:JSON.parse(JSON.stringify(formOps)),outillage:JSON.parse(JSON.stringify(window._formOutillage||{})),commandes:JSON.parse(JSON.stringify(formCmds)),remarques:document.getElementById('f-rem').value,files:newFiles,createdAt:now,updatedAt:now,createdBy:user,history:[{date:now,user,action:'Fiche créée'}]};
     fiches.push(nf);
     await svFiches_add(nf);
     toast('Fiche créée');goTo('fiche-view',nf.id);
@@ -1817,9 +2025,9 @@ function renderFicheView(id){
     const others=f.files.filter(fl=>!(fl.type&&fl.type.startsWith('image/')&&(fl.url||fl.data)));
     filesHtml=`<div class="card" style="margin-bottom:16px"><div class="section-title">📎 Fichiers joints</div>
       ${imgs.length?`<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:${others.length?'12px':'0'}">
-        ${f.files.map((fl,i)=>{const src=fl.url||fl.data||'';return fl.type&&fl.type.startsWith('image/')&&src?`<div class="img-thumb-wrap"><img src="${src}" alt="${fl.name}" onclick="openLightbox('${src}')"><div class="img-zoom-badge">🔍</div><button class="del-thumb" onclick="deleteFileFromFiche('${id}',${i})" title="Supprimer">✕</button></div>`:'';}).join('')}
+        ${f.files.map((fl,i)=>{const src=fl.url||fl.data||'';return fl.type&&fl.type.startsWith('image/')&&src?`<div class="img-thumb-wrap"><img src="${src}" alt="${fl.name}" style="${rotCss(fl.rot)}" onclick="openPhoto('${id}',${i})"><div class="img-zoom-badge">🔍</div>${canDo('editFiche')?`<button class="del-thumb" onclick="deleteFileFromFiche('${id}',${i})" title="Retirer">✕</button>`:''}</div>`:'';}).join('')}
       </div>`:''}
-      ${others.length?`<div style="display:flex;flex-wrap:wrap;gap:8px">${f.files.map((fl,i)=>{const src=fl.url||fl.data||'';return !(fl.type&&fl.type.startsWith('image/')&&src)?`<span class="file-name-badge">${fl.type==="application/pdf"?"📕":"📄"} ${fl.name} ${src?`<button onclick="openFile('${src}','${fl.type}')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;margin-left:6px;text-decoration:underline">Ouvrir</button>`:""}  <button onclick="deleteFileFromFiche('${id}',${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;margin-left:4px">✕</button></span>`:'';}).join('')}</div>`:''}
+      ${others.length?`<div style="display:flex;flex-wrap:wrap;gap:8px">${f.files.map((fl,i)=>{const src=fl.url||fl.data||'';return !(fl.type&&fl.type.startsWith('image/')&&src)?`<span class="file-name-badge">${fl.type==="application/pdf"?"📕":"📄"} ${fl.name} ${src?`<button class="file-act" onclick="openFile(fiches.find(x=>x.id==='${id}').files[${i}].url||fiches.find(x=>x.id==='${id}').files[${i}].data,'${fl.type}')">Ouvrir / imprimer</button>`:""}${canDo('editFiche')?`<button onclick="deleteFileFromFiche('${id}',${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px;margin-left:4px">✕</button>`:''}</span>`:'';}).join('')}</div>`:''}
     </div>`;
   }
 
@@ -1830,9 +2038,10 @@ function renderFicheView(id){
       <div style="color:${m.color};font-size:14px">${m.nom} · ${m.type}</div>
       <div style="color:var(--text2);font-size:12px;margin-top:2px">Réf : <strong style="color:var(--text1)">${getFicheRef(f.id)}</strong></div></div>
     </div>
-    <div style="display:flex;gap:8px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;min-width:0;max-width:100%">
       <button class="btn btn-ghost no-print" onclick="printFiche(false)">🖨️ Imprimer</button>
       ${(f.files&&f.files.length)?'<button class="btn btn-ghost no-print" onclick="printFiche(true)" style="font-size:13px">🖨️📎 Avec fichiers</button>':''}
+      ${canDo('createFiche')?`<button class="btn btn-ghost no-print" onclick="openDupFiche('${id}')">📄 Dupliquer</button>`:''}
       <button class="btn btn-blue no-print" onclick="goTo('fiche-edit','${id}')">✏️ Modifier</button>
       ${canDo('deleteFiche')?`<button class="btn btn-red no-print" onclick="confirmDelFiche('${id}')">🗑️</button>`:''}
     </div>
@@ -2145,7 +2354,7 @@ function printFiche(printFiles=false){
   const cmdsRows=(cmds.length===0?'':existingCmds)+blankRows;
 
   // Images intégrées petites
-  const imgsHtml=imgs.length?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${imgs.map(fl=>`<img src="${fl.url||fl.data}" style="width:100px;height:100px;object-fit:cover;border-radius:5px;border:1px solid #ddd">`).join('')}</div>`:'';
+  const imgsHtml=imgs.length?`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">${imgs.map(fl=>`<img src="${fl.url||fl.data}" style="width:100px;height:100px;object-fit:cover;border-radius:5px;border:1px solid #ddd;${rotCss(fl.rot)}">`).join('')}</div>`:'';
 
   // Pages séparées pour chaque fichier image/PDF si demandé
   let filesPages='';
@@ -2155,7 +2364,7 @@ function printFiche(printFiles=false){
         <div style="font-size:9px;color:#666;margin-bottom:8px;border-bottom:1px solid #ddd;padding-bottom:4px">
           MCS — ${f.designation||f.planRef||'Fiche'} — Fichier ${i+1}/${imgs.length+pdfs.length} : ${fl.name}
         </div>
-        <img src="${fl.url||fl.data}" style="max-width:100%;max-height:260mm;object-fit:contain;display:block;margin:0 auto">
+        ${fl.rot&&fl.rot%180?`<div style="width:100%;height:260mm;position:relative;overflow:hidden"><img src="${fl.url||fl.data}" style="position:absolute;left:50%;top:50%;max-width:260mm;max-height:190mm;transform:translate(-50%,-50%) rotate(${fl.rot}deg)"></div>`:`<img src="${fl.url||fl.data}" style="max-width:100%;max-height:260mm;object-fit:contain;display:block;margin:0 auto;${rotCss(fl.rot)}">`}
       </div>`;
     });
     pdfs.forEach((fl,i)=>{
