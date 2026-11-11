@@ -384,6 +384,7 @@ document.dispatchEvent(new Event('firebaseReady'));
     <button onclick="goTo('fiches')" id="nav-fiches">📄 Gestion des fiches</button>
     <button onclick="goTo('stats')" id="nav-stats">📊 Stats</button>
     <button onclick="goTo('devis')" id="nav-devis" class="hidden">💰 Devis Pièce</button>
+    <button onclick="goTo('usinage')" id="nav-usinage">🔧 Usinage</button>
     <div class="nav-spacer"></div>
     <button onclick="goTo('settings')" id="nav-settings" class="nav-settings hidden">⚙️ Paramètres</button>
   </nav>
@@ -766,7 +767,7 @@ function doLogout(){
 document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 
 // ── NAV ───────────────────────────────────────────────
-const PAGE_TITLES={'home':'Accueil','fiche-new':'Nouvelle Fiche','fiche-edit':'Modifier','fiche-view':'Fiche','fiches':'Fiches','devis':'Devis','stats':'Statistiques','settings':'Paramètres','machines':'Machines'};
+const PAGE_TITLES={'home':'Accueil','fiche-new':'Nouvelle Fiche','fiche-edit':'Modifier','fiche-view':'Fiche','fiches':'Fiches','devis':'Devis','usinage':'Usinage','stats':'Statistiques','settings':'Paramètres','machines':'Machines'};
 function updateBottomNav(page){
   // Boutons header nav
   const btnBack=document.getElementById('btn-back');
@@ -808,7 +809,7 @@ function goTo(page,data){
 }
 
 function _navigateTo(page,data){
-  ['home','fiche','fiches','stats','settings','devis'].forEach(p=>{
+  ['home','fiche','fiches','stats','settings','devis','usinage'].forEach(p=>{
     const btn=document.getElementById('nav-'+p);
     if(btn)btn.classList.remove('active');
   });
@@ -817,6 +818,7 @@ function _navigateTo(page,data){
   else if(page==='fiches'||page==='fiche-view'||page==='fiche-edit'){const b=document.getElementById('nav-fiches');if(b)b.classList.add('active')}
   else if(page==='stats'){const b=document.getElementById('nav-stats');if(b)b.classList.add('active')}
   else if(page==='devis'){if(!canDo('accessDevis')){toast('Accès non autorisé','error');return;}const b=document.getElementById('nav-devis');if(b)b.classList.add('active')}
+  else if(page==='usinage'){const b=document.getElementById('nav-usinage');if(b)b.classList.add('active')}
   else if(page==='settings'){
     if(!currentUser||currentUser.role!=='admin'){toast("Accès réservé à l'administrateur",'error');return;}
     const b=document.getElementById('nav-settings');if(b)b.classList.add('active');
@@ -832,6 +834,7 @@ function _navigateTo(page,data){
   else if(page==='fiche-edit'){main.innerHTML=renderFicheForm(data,null);initFormTables()}
   else if(page==='fiche-view')main.innerHTML=renderFicheView(data);
   else if(page==='devis')main.innerHTML=renderDevis();
+  else if(page==='usinage')main.innerHTML=renderUsinage();
   else if(page==='stats')main.innerHTML=renderStats();
   else if(page==='settings')main.innerHTML=renderSettings();
 }
@@ -868,6 +871,10 @@ function renderHome(){
         <div class="home-btn-icon">📊</div>
         <div class="home-btn-text"><strong>Statistiques</strong><span>Analyse de la production</span></div>
       </button>
+      <button class="home-btn purple" onclick="goTo('usinage')">
+        <div class="home-btn-icon">🔧</div>
+        <div class="home-btn-text"><strong>Usinage</strong><span>Filetages, gorges, tolérances ISO</span></div>
+      </button>
       ${canDo('accessDevis')?`<button class="home-btn orange" onclick="goTo('devis')">
         <div class="home-btn-icon">💰</div>
         <div class="home-btn-text"><strong>Devis Pièce</strong><span>Calculer un devis</span></div>
@@ -894,6 +901,12 @@ function renderHome(){
 function renderDevis(){
   return`<div style="width:100%;height:calc(100vh - 100px);display:flex;flex-direction:column;overflow:hidden">
     <iframe id="devis-frame" name="devis-frame" src="MCS_Devis.html" style="flex:1;border:none;width:100%;min-height:600px" title="Devis Pièce" allow="same-origin"></iframe>
+  </div>`;
+}
+// ── USINAGE ───────────────────────────────────────────
+function renderUsinage(){
+  return`<div style="width:100%;height:calc(100vh - 100px);display:flex;flex-direction:column;overflow:hidden">
+    <iframe id="usinage-frame" name="usinage-frame" src="MCS_Usinage.html" style="flex:1;border:none;width:100%;min-height:600px" title="Usinage" allow="same-origin"></iframe>
   </div>`;
 }
 function printDevis(){

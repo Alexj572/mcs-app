@@ -1,11 +1,12 @@
-// MCS App — Service Worker v1.2
-const CACHE_NAME = 'mcs-app-v1';
+// MCS App — Service Worker v1.3
+const CACHE_NAME = 'mcs-app-v2';
 const FIREBASE_HOSTS = ['firestore.googleapis.com','firebasestorage.googleapis.com','identitytoolkit.googleapis.com'];
 
 // Ressources à mettre en cache immédiatement
 const STATIC_ASSETS = [
   './',
   './index.html',
+  './MCS_Usinage.html',
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js',

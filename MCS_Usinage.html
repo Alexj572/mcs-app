@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MCS Usinage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Fiche d'atelier : choix en haut, valeurs machine en gros, dessin normalisé sur papier blanc, puis passes et contrôle. */
+:root{
+  --bg:#f0f4ff; --bgg:linear-gradient(160deg,#f0f4ff 0%,#e4eaf8 50%,#f0f4ff 100%); --surf:#ffffff; --ink:#1a2550; --mut:#5a6a9a; --line:#c8d4ee;
+  --pri:#2952b3; --pri2:#3a6ad4; --onpri:#ffffff; --soft:#e4eaf8; --red:#c0281e; --hole:#2952b3; --shaft:#c0281e; --gold:#b88a10; --shadow:0 4px 20px rgba(41,82,179,.12);
+  --head:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --body:'Barlow','Segoe UI',Arial,sans-serif;
+  --mono:'DM Mono',Consolas,'Courier New',monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1b3d; --bgg:linear-gradient(160deg,#0d1a3e 0%,#1a2a5e 50%,#0d1a3e 100%); --surf:#162040; --ink:#e8ecf4; --mut:#8fa0c8; --line:#2a3d6e;
+  --pri:#2952b3; --pri2:#4a78e8; --onpri:#ffffff; --soft:#1e2d55; --red:#e03020; --hole:#4a90e8; --shaft:#e03020; --gold:#f0c24a; --shadow:0 6px 32px rgba(0,0,0,.5); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0f1b3d; --bgg:linear-gradient(160deg,#0d1a3e 0%,#1a2a5e 50%,#0d1a3e 100%); --surf:#162040; --ink:#e8ecf4; --mut:#8fa0c8; --line:#2a3d6e;
+  --pri:#2952b3; --pri2:#4a78e8; --onpri:#ffffff; --soft:#1e2d55; --red:#e03020; --hole:#4a90e8; --shaft:#e03020; --gold:#f0c24a; --shadow:0 6px 32px rgba(0,0,0,.5); color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.emb header>div.wrap{display:none}
+body{background:var(--bg);background-image:var(--bgg);background-attachment:fixed;min-height:100%;color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4}
+header{background:var(--surf);border-bottom:3px solid var(--red)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.logo{background:#fff;border-radius:6px;padding:3px 6px;height:52px;display:flex;align-items:center}
+.logo img{height:46px;display:block}
+h1{font-family:var(--head);font-weight:700;font-size:1.7rem;letter-spacing:.04em;text-transform:uppercase;margin:0;line-height:1}
+header p{margin:2px 0 0;color:var(--mut);font-size:.9rem}
+main.wrap{padding-block:16px 40px;display:grid;gap:14px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px;min-width:0}
+h2{font-family:var(--head);font-weight:600;font-size:1.05rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.lab{font-family:var(--head);font-weight:600;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:12px 0 6px;display:block}
+.lab:first-child{margin-top:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font-family:var(--head);font-weight:600;font-size:1.15rem;letter-spacing:.03em;min-height:46px;min-width:58px;padding:4px 14px;border:1.5px solid var(--line);background:var(--surf);color:var(--ink);border-radius:6px;cursor:pointer}
+.seg button small{display:block;font-family:var(--body);font-weight:400;font-size:.7rem;letter-spacing:0;color:var(--mut);margin-top:-2px}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--pri),var(--pri2));border-color:var(--pri);color:var(--onpri)}
+.seg button[aria-pressed="true"] small{color:var(--onpri);opacity:.8}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>div{flex:1 1 150px;min-width:0}
+select,input{width:100%;min-height:46px;font-family:var(--mono);font-size:1.1rem;padding:6px 10px;border:1.5px solid var(--line);border-radius:6px;background:var(--surf);color:var(--ink)}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+
+.fiche-t{font-family:var(--head);font-weight:700;font-size:1.9rem;letter-spacing:.02em;margin:0;line-height:1.05}
+.fiche-s{color:var(--mut);font-size:.9rem;margin:2px 0 12px}
+.vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.val{border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:var(--soft)}
+.val.k{background:linear-gradient(135deg,var(--pri),var(--pri2));border-color:var(--pri);color:var(--onpri)}
+.val b{display:block;font-family:var(--head);font-weight:600;font-size:.85rem;letter-spacing:.07em;text-transform:uppercase;opacity:.85}
+.val span{display:block;font-family:var(--mono);font-weight:500;font-size:1.65rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.val i{display:block;font-style:normal;font-size:.8rem;opacity:.8}
+.cols{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:940px){.cols{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)} .stack{display:grid;gap:14px;align-content:start}}
+.stack{display:grid;gap:14px}
+.paper{background:#fff;border:1px solid var(--line);border-radius:6px;overflow-x:auto}
+.paper svg{display:block;width:100%;min-width:880px;height:auto}
+.btn{font-family:var(--head);font-weight:600;font-size:1.05rem;letter-spacing:.04em;min-height:46px;padding:6px 18px;border:0;border-radius:8px;background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--onpri);cursor:pointer;box-shadow:0 4px 12px rgba(41,82,179,.3)}
+.tabs{display:flex;gap:4px;padding-block:0}
+.tabs button{font-family:var(--head);font-weight:600;font-size:1.1rem;letter-spacing:.05em;text-transform:uppercase;min-height:44px;padding:6px 16px;border:0;border-bottom:4px solid transparent;background:none;color:var(--mut);cursor:pointer}
+.tabs button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--red)}
+header{border-bottom-width:1px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:10px}
+.bar h2{margin:0;flex:1 1 auto}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{font-family:var(--head);font-weight:600;font-size:.8rem;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);text-align:left;padding:5px 8px;border-bottom:2px solid var(--line)}
+td{padding:6px 8px;border-bottom:1px solid var(--line)}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.l{font-family:var(--mono);font-weight:500;width:3.2em}
+tr.fin td{font-weight:600;background:var(--soft)}
+.step{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.step button{width:46px;height:46px;font-size:1.4rem;border:1.5px solid var(--line);border-radius:6px;background:var(--surf);color:var(--ink);cursor:pointer}
+.step output{font-family:var(--mono);font-size:1.3rem;min-width:2.2em;text-align:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font-family:var(--mono);font-size:.95rem;min-height:40px;padding:4px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surf);color:var(--ink);cursor:pointer;transition:transform .12s}
+.chips button:hover{transform:translateY(-2px)}
+.chips button[aria-pressed="true"]{background:linear-gradient(135deg,var(--pri),var(--pri2));border-color:var(--pri);color:var(--onpri)}
+.tcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.tcard{box-shadow:var(--shadow);border-radius:12px;padding:14px 16px;border:1px solid var(--line);border-top:6px solid var(--line);background:var(--surf)}
+.tcard b{display:block;font-family:var(--head);font-weight:700;font-size:1.05rem;letter-spacing:.05em;text-transform:uppercase}
+.tcard span{display:block;font-family:var(--mono);font-weight:500;font-size:1.5rem;line-height:1.35;font-variant-numeric:tabular-nums}
+.tcard em{font-style:normal;font-size:.9rem;color:var(--mut)}
+.tcard i{display:block;font-style:normal;font-size:.85rem;color:var(--mut)}
+.tcard.ho{border-top-color:var(--hole)} .tcard.ho b{color:var(--hole)}
+.tcard.sh{border-top-color:var(--shaft)} .tcard.sh b{color:var(--shaft)}
+.tcard.v-jeu{border-top-color:var(--hole)} .tcard.v-ser{border-top-color:var(--shaft)} .tcard.v-inc{border-top-color:var(--gold)}
+.viz{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:900px){.viz{grid-template-columns:minmax(0,1.7fr) minmax(0,1fr)}}
+.viz svg{display:block;width:100%;height:auto}
+.gv{font-family:var(--mono);font-size:15px;font-weight:500;fill:var(--ink)} .gl{font-family:var(--head);font-size:15px;font-weight:700;letter-spacing:.06em} .gs{font-family:var(--body);font-size:12px;fill:var(--mut)}
+@keyframes grow{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+.grow{animation:grow .35s ease-out;transform-box:fill-box;transform-origin:center}
+@media(prefers-reduced-motion:reduce){.grow{animation:none}.chips button{transition:none}}
+.verif{margin:12px 0 0;padding:10px 12px;border:1px solid var(--line);border-left:5px solid var(--hole);border-radius:6px;font-size:.92rem}
+.verif b{display:block;font-family:var(--head);font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.verif.ko{border-left-color:var(--red)}
+.verif.ko b{color:var(--red)}
+.note{color:var(--mut);font-size:.85rem;margin:10px 0 0}
+</style>
+
+<script>
+(function(){var d=document.documentElement;function th(){var t='dark';try{t=localStorage.getItem('mcs-theme')==='light'?'light':'dark'}catch(e){}d.setAttribute('data-theme',t)}
+th();window.addEventListener('storage',th);if(window.self!==window.top)d.classList.add('emb');})();
+</script>
+</head>
+<body style="margin:0">
+<header><div class="wrap">
+  <div class="logo"><img src="data:image/jpeg;base64,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" alt="MCS Mécanique Concept Saar"></div>
+  <div><h1>MCS Usinage</h1><p>Filetages, gorges, tolérances : les cotes à usiner, sans chercher</p></div>
+</div>
+<nav class="wrap tabs" id="tabs" aria-label="Modules"><button type="button" data-m="fil">Filetages</button><button type="button" data-m="cc">Circlips et gorges</button><button type="button" data-m="tol">Tolérances ISO</button></nav></header>
+
+<main class="wrap" id="modFil">
+  <section class="card">
+    <span class="lab">Type de filetage</span>
+    <div class="seg" id="fam"></div>
+    <div class="row" id="spRow" hidden>
+      <div><label class="lab" for="spD">Ø nominal (mm)</label><input id="spD" type="number" step="0.001" min="1" inputmode="decimal"></div>
+      <div><label class="lab" for="spP">Pas</label><input id="spP" type="number" step="0.001" min="0" inputmode="decimal"></div>
+      <div><label class="lab" for="spU">Unité du pas</label><select id="spU"><option value="mm">mm</option><option value="tpi">filets au pouce</option></select></div>
+      <div><label class="lab" for="spA">Profil</label><select id="spA"><option value="60">60° (ISO / UN)</option><option value="55">55° (Whitworth)</option></select></div>
+    </div>
+    <div class="row">
+      <div id="szBox"><label class="lab" for="sz">Dimension</label><select id="sz"></select></div>
+      <div id="pasBox"><label class="lab" for="pas">Pas</label><select id="pas"></select></div>
+      <div><label class="lab" for="lf">Longueur filetée (mm)</label><input id="lf" type="number" step="0.1" min="1" inputmode="decimal"></div>
+      <div><span class="lab">Usinage</span><div class="seg" id="cote">
+        <button type="button" data-v="ext">Extérieur</button><button type="button" data-v="int">Intérieur</button></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <p class="fiche-t" id="ft"></p><p class="fiche-s" id="fs"></p>
+    <div class="vals" id="vals"></div>
+    <p class="note" id="vnote"></p>
+    <p class="verif" id="verif"></p>
+  </section>
+
+  <section class="card">
+    <div class="bar"><h2>Plan A4 à l'échelle</h2>
+      <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="fil">Télécharger le plan en PDF</button></span></div>
+    <p class="note" id="dlMsg" style="margin:0 0 8px"></p>
+    <div class="paper" id="dessin"></div>
+  </section>
+
+  <div class="cols">
+    <section class="card" id="coneCard"><h2>Cône : à usiner, puis à fileter</h2>
+      <div class="row"><div><label class="lab" for="cA">Approche en Z (mm)</label><input id="cA" type="number" step="0.5" min="0" inputmode="decimal"></div></div>
+      <table id="coneT" style="margin-top:10px"></table>
+      <p class="note" id="coneN"></p>
+    </section>
+    <section class="card"><h2>Contrôle</h2>
+      <table id="ctrl"></table>
+      <p class="note" id="cnote"></p>
+    </section>
+  </div>
+</main>
+<main class="wrap" id="modCC" hidden>
+  <section class="card">
+    <div class="row">
+      <div><span class="lab">Pièce</span><div class="seg" id="ccType">
+        <button type="button" data-v="ext">Arbre<small>DIN 471</small></button><button type="button" data-v="int">Alésage<small>DIN 472</small></button></div></div>
+      <div><label class="lab" for="ccD">Ø nominal</label><select id="ccD"></select></div>
+      <div><label class="lab" for="ccPos">Distance face → gorge (mm)</label><input id="ccPos" type="number" step="0.1" min="0" inputmode="decimal"></div>
+    </div>
+  </section>
+  <section class="card">
+    <p class="fiche-t" id="ccT"></p><p class="fiche-s" id="ccS"></p>
+    <div class="vals" id="ccVals"></div>
+    <p class="verif" id="ccVerif"></p>
+  </section>
+  <section class="card">
+    <div class="bar"><h2>Plan A4 à l'échelle</h2>
+      <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="cc">Télécharger le plan en PDF</button></span></div>
+    <p class="note" id="ccMsg" style="margin:0 0 8px"></p>
+    <div class="paper" id="ccDessin"></div>
+  </section>
+  <section class="card"><h2>Programmation de la gorge</h2>
+    <table id="ccProg"></table>
+    <p class="note">X au diamètre, Z0 sur la face de la pièce. Le fond de gorge est donné au milieu de la tolérance.</p>
+    <p class="note" id="ccN"></p>
+  </section>
+</main>
+<main class="wrap" id="modTol" hidden>
+  <section class="card">
+    <div class="row">
+      <div><label class="lab" for="tD">Ø nominal (mm)</label><input id="tD" type="number" step="0.001" min="1" max="500" inputmode="decimal"></div>
+      <div><label class="lab" for="tHl">Alésage</label><div class="row" style="gap:6px;flex-wrap:nowrap"><select id="tHl" aria-label="Position de l'alésage"></select><select id="tHg" aria-label="Qualité de l'alésage"></select></div></div>
+      <div><label class="lab" for="tSl">Arbre</label><div class="row" style="gap:6px;flex-wrap:nowrap"><select id="tSl" aria-label="Position de l'arbre"></select><select id="tSg" aria-label="Qualité de l'arbre"></select></div></div>
+    </div>
+    <span class="lab">Ajustements courants</span>
+    <div class="chips" id="tFits"></div>
+  </section>
+  <p class="card" id="tErr" hidden>Indiquez un Ø nominal entre 1 et 500 mm.</p>
+  <div id="tOut" style="display:grid;gap:14px">
+    <div class="tcards" id="tCards"></div>
+    <section class="card"><h2>Où tombent les deux pièces</h2>
+      <div class="viz"><div><div id="tZones"></div><div id="tGauge"></div></div><div><div id="tPic"></div><p class="note" id="tPicN" style="text-align:center"></p></div></div>
+    </section>
+    <section class="card"><h2>Cotes à usiner</h2>
+      <table id="tProg"></table>
+      <p class="verif"><b>Valeurs contrôlées</b>Qualités IT4 à IT13 recoupées en entier sur une table ISO 286 publiée. Écarts des positions recoupés sur 11 classes d'une table publiée (f6, j6, k6, m6, r6, H7, G7, J7, K7, M7, R7) ; les autres viennent des mêmes tables de la norme, non recoupées une par une.</p>
+    </section>
+  </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id), f3=v=>v.toFixed(3), f2=v=>v.toFixed(2), K=25.4;
+const frac=s=>{if(s[0]==='#')return .06+.013*+s.slice(1);let t=0;s.split('.').forEach(p=>{const q=p.split('/');t+=q.length>1?q[0]/q[1]:+q[0]});return t};
+const pn=s=>s[0]==='#'?s:s.replace('.',' ')+'"';
+
+/* ---------- Données normatives ---------- */
+const FAM=[['m','M','métrique, pas gros et fins'],['un','UN','UNC · UNF · UNEF · 8UN…'],['g','G','BSP cylindrique'],['r','R / Rc','BSPT conique'],['npt','NPT','NPTF, conique US'],['bsw','BSW','Whitworth gros'],['bsf','BSF','Whitworth fin'],['tr','Tr','trapézoïdal'],['acme','ACME','trapézoïdal US'],['rd','Rd','filet rond'],['pg','Pg','presse-étoupe'],['sp','Spécial','Ø et pas libres']];
+// ISO 261 : Ø -> pas (le premier est le pas gros)
+const MP={1.6:[.35],2:[.4,.25],2.5:[.45,.35],3:[.5,.35],3.5:[.6],4:[.7,.5],5:[.8,.5],6:[1,.75],7:[1,.75],8:[1.25,1,.75],9:[1.25,1,.75],10:[1.5,1.25,1,.75],11:[1.5,1,.75],12:[1.75,1.5,1.25,1],14:[2,1.5,1.25,1],15:[1.5,1],16:[2,1.5,1],17:[1.5,1],18:[2.5,2,1.5,1],20:[2.5,2,1.5,1],22:[2.5,2,1.5,1],24:[3,2,1.5,1],25:[2,1.5,1],26:[1.5],27:[3,2,1.5,1],28:[2,1.5,1],30:[3.5,3,2,1.5,1],32:[2,1.5],33:[3.5,3,2,1.5],35:[1.5],36:[4,3,2,1.5],38:[1.5],39:[4,3,2,1.5],40:[3,2,1.5],42:[4.5,4,3,2,1.5],45:[4.5,4,3,2,1.5],48:[5,4,3,2,1.5],50:[3,2,1.5],52:[5,4,3,2,1.5],55:[4,3,2,1.5],56:[5.5,4,3,2,1.5],58:[4,3,2,1.5],60:[5.5,4,3,2,1.5],62:[4,3,2,1.5],64:[6,4,3,2,1.5],65:[4,3,2,1.5],68:[6,4,3,2,1.5],70:[6,4,3,2,1.5],72:[6,4,3,2,1.5],75:[4,3,2,1.5],76:[6,4,3,2,1.5],80:[6,4,3,2,1.5],85:[6,4,3,2],90:[6,4,3,2],95:[6,4,3,2],100:[6,4,3,2]};
+const COARSE={1.6:.35,2:.4,2.5:.45,3:.5,3.5:.6,4:.7,5:.8,6:1,7:1,8:1.25,9:1.25,10:1.5,11:1.5,12:1.75,14:2,16:2,18:2.5,20:2.5,22:2.5,24:3,27:3,30:3.5,33:3.5,36:4,39:4,42:4.5,45:4.5,48:5,52:5,56:5.5,60:5.5,64:6,68:6};
+// ISO 965-1 (µm) : écart g, Td qualité 6, TD1 qualité 6
+const ES={.25:18,.35:19,.4:19,.45:20,.5:20,.6:21,.7:22,.75:22,.8:24,1:26,1.25:28,1.5:32,1.75:34,2:38,2.5:42,3:48,3.5:53,4:60,4.5:63,5:71,5.5:75,6:80};
+const TD={.25:67,.35:85,.4:95,.45:100,.5:106,.6:125,.7:140,.75:140,.8:150,1:180,1.25:212,1.5:236,1.75:265,2:280,2.5:335,3:375,3.5:425,4:475,4.5:500,5:530,5.5:560,6:600};
+const TD1={.25:71,.35:100,.4:112,.45:125,.5:140,.6:160,.7:180,.75:190,.8:200,1:236,1.25:265,1.5:300,1.75:335,2:375,2.5:450,3:500,3.5:560,4:600,4.5:670,5:710,5.5:750,6:800};
+// Tolérances sur flancs qualité 6 : [Td2 vis, TD2 écrou] par plage de Ø
+const TD2=[[1.4,2.8,{.25:[56,75],.35:[63,85],.4:[67,90],.45:[71,95]}],[2.8,5.6,{.35:[67,90],.5:[75,100],.6:[85,112],.7:[90,118],.75:[90,118],.8:[95,125]}],[5.6,11.2,{.75:[100,132],1:[112,150],1.25:[118,160],1.5:[132,180]}],[11.2,22.4,{.75:[106,140],1:[118,160],1.25:[125,170],1.5:[140,190],1.75:[150,200],2:[160,212],2.5:[170,224]}],[22.4,45,{1:[125,170],1.5:[150,200],2:[170,224],3:[200,265],3.5:[212,280],4:[224,300],4.5:[236,315]}],[45,90,{1.5:[160,212],2:[180,236],3:[212,280],4:[236,315],5:[250,335],5.5:[265,355],6:[280,375]}],[90,180,{2:[190,250],3:[224,300],4:[250,335],6:[300,400]}]];
+// [désignation, filets au pouce, foret de taraudage mm]
+const UNCm={'#1':64,'#2':56,'#3':48,'#4':40,'#5':40,'#6':32,'#8':32,'#10':24,'#12':24,'1/4':20,'5/16':18,'3/8':16,'7/16':14,'1/2':13,'9/16':12,'5/8':11,'3/4':10,'7/8':9,'1':8,'1.1/8':7,'1.1/4':7,'1.3/8':6,'1.1/2':6,'1.3/4':5,'2':4.5,'2.1/4':4.5,'2.1/2':4,'2.3/4':4,'3':4,'3.1/4':4,'3.1/2':4,'3.3/4':4,'4':4};
+const UNFm={'#0':80,'#1':72,'#2':64,'#3':56,'#4':48,'#5':44,'#6':40,'#8':36,'#10':32,'#12':28,'1/4':28,'5/16':24,'3/8':24,'7/16':20,'1/2':20,'9/16':18,'5/8':18,'3/4':16,'7/8':14,'1':12,'1.1/8':12,'1.1/4':12,'1.3/8':12,'1.1/2':12};
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+const UND=(()=>{const a=[0,1,2,3,4,5,6,8,10,12].map(n=>'#'+n);for(let n=4;n<=64;n+=(n<28?1:2)){const w=n>>4,r=n%16,k=gcd(r,16);a.push((w||'')+(r?(w?'.':'')+r/k+'/'+16/k:''))}return a})();
+function unOpts(name){const D=frac(name),o=[],add=(t,s)=>{if(t&&!o.some(x=>x[0]===t))o.push([t,s])};
+  add(UNCm[name],'UNC');add(UNFm[name],'UNF');
+  if(name==='#12'||D>=.25&&D<=1.6875)add(D<.4?32:D<.53?28:D<.72?24:D<=1?20:18,'UNEF');
+  if(D===1)add(14,'UNS');
+  if(D>=.25)[[4,2.5,9],[6,1.375,9],[8,1.0625,9],[12,.5625,9],[16,.375,9],[20,.25,3],[28,.25,1.5],[32,.25,1]].forEach(([t,lo,hi])=>{if(D>=lo&&D<=hi)add(t,'UN')});
+  return o}
+
+
+const BSW=[['1/8',40],['3/16',24],['1/4',20],['5/16',18],['3/8',16],['7/16',14],['1/2',12],['9/16',12],['5/8',11],['3/4',10],['7/8',9],['1',8],['1.1/8',7],['1.1/4',7],['1.1/2',6],['1.3/4',5],['2',4.5]];
+const BSF=[['1/4',26],['5/16',22],['3/8',20],['7/16',18],['1/2',16],['9/16',16],['5/8',14],['3/4',12],['7/8',11],['1',10],['1.1/8',9],['1.1/4',9],['1.1/2',8]];
+const ACME=[['1/4',16],['5/16',14],['3/8',12],['7/16',12],['1/2',10],['5/8',8],['3/4',6],['7/8',6],['1',5],['1.1/4',5],['1.1/2',4],['1.3/4',4],['2',4]];
+// ISO 228-1 : [désignation, TPI, d, Td, Td2 (classe A), TD1, foret]
+const GG=[['1/16',28,7.723,.214,.107,.282,6.8],['1/8',28,9.728,.214,.107,.282,8.8],['1/4',19,13.157,.25,.125,.445,11.8],['3/8',19,16.662,.25,.125,.445,15.25],['1/2',14,20.955,.284,.142,.541,19.0],['5/8',14,22.911,.284,.142,.541,21.0],['3/4',14,26.441,.284,.142,.541,24.5],['7/8',14,30.201,.284,.142,.541,28.25],['1',11,33.249,.36,.18,.64,30.75],['1.1/8',11,37.897,.36,.18,.64,35.5],['1.1/4',11,41.910,.36,.18,.64,39.5],['1.1/2',11,47.803,.36,.18,.64,45.25],['1.3/4',11,53.746,.36,.18,.64,51.0],['2',11,59.614,.36,.18,.64,57.0],['2.1/4',11,65.710,.434,.217,.64,63.0],['2.1/2',11,75.184,.434,.217,.64,72.6],['2.3/4',11,81.534,.434,.217,.64,79.0],['3',11,87.884,.434,.217,.64,85.3],['3.1/2',11,100.330,.434,.217,.64,97.75],['4',11,113.030,.434,.217,.64,110.5],['5',11,138.430,.434,.217,.64,0],['6',11,163.830,.434,.217,.64,0]];
+// ISO 7-1 : [désignation, TPI, d au plan de jauge, longueur de jauge, longueur utile, foret]
+const RR=[['1/16',28,7.723,4.0,6.5,6.4],['1/8',28,9.728,4.0,6.5,8.4],['1/4',19,13.157,6.0,9.7,11.2],['3/8',19,16.662,6.4,10.1,14.75],['1/2',14,20.955,8.2,13.2,18.25],['3/4',14,26.441,9.5,14.5,23.75],['1',11,33.249,10.4,16.8,30.0],['1.1/4',11,41.910,12.7,19.1,38.5],['1.1/2',11,47.803,12.7,19.1,44.5],['2',11,59.614,15.9,23.4,56.0],['2.1/2',11,75.184,17.5,26.7,0],['3',11,87.884,20.6,29.8,0],['4',11,113.030,25.4,35.8,0]];
+// ASME B1.20.1 (pouces) : [désignation, TPI, D, E0, L1, L2, foret mm]
+const NPT=[['1/16',27,.3125,.27118,.16,.2611,6.3],['1/8',27,.405,.36351,.1615,.2639,8.7],['1/4',18,.54,.47739,.2278,.4018,11.1],['3/8',18,.675,.61201,.24,.4078,14.7],['1/2',14,.84,.75843,.32,.5337,18.3],['3/4',14,1.05,.96768,.339,.5457,23.4],['1',11.5,1.315,1.21363,.4,.6828,29.4],['1.1/4',11.5,1.66,1.55713,.42,.7068,38.1],['1.1/2',11.5,1.9,1.79609,.42,.7235,44.1],['2',11.5,2.375,2.26902,.436,.7565,56.4],['2.1/2',8,2.875,2.71953,.682,1.1375,66.7],['3',8,3.5,3.34062,.766,1.2,82.6],['3.1/2',8,4.0,3.8375,.821,1.25,95.3],['4',8,4.5,4.33438,.844,1.3,108.0],['5',8,5.563,5.39073,.937,1.4063,134.9],['6',8,6.625,6.44609,.958,1.5125,161.9]];
+// DIN 103 : [d, pas] ; tolérances 4h sur d et 4H sur D1 (µm)
+const TRP={8:[1.5],9:[2,1.5],10:[2,1.5],11:[3,2],12:[3,2],14:[3,2],16:[4,2],18:[4,2],20:[4,2],22:[5,3,8],24:[5,3,8],26:[5,3,8],28:[5,3,8],30:[6,3,10],32:[6,3,10],34:[6,3,10],36:[6,3,10],38:[7,3,10],40:[7,3,10],42:[7,3,10],44:[7,3,12],46:[8,3,12],48:[8,3,12],50:[8,3,12],52:[8,3,12],55:[9,3,14],60:[9,3,14],65:[10,4,16],70:[10,4,16],75:[10,4,16],80:[10,4,16],90:[12,4,18],100:[12,4,20]};
+const TRd={1.5:150,2:180,3:236,4:300,5:335,6:375,7:425,8:450,9:500,10:530,12:600,14:670,16:710,18:750,20:800}, TRD1={1.5:190,2:236,3:315,4:375,5:450,6:500,7:560,8:630,9:670,10:710,12:800,14:900,16:1000,18:1120,20:1180};
+// DIN 405 : [d, filets au pouce]
+const RD=[[8,10],[10,10],[12,10],[14,8],[16,8],[18,8],[20,8],[22,8],[24,8],[26,8],[28,8],[30,8],[32,8],[36,8],[40,6],[44,6],[48,6],[52,6],[55,6],[60,6],[65,6],[70,6],[80,6],[90,6],[100,6]];
+// DIN 40430 : [désignation, d, TPI, d1]
+const PG=[['7',12.5,20,11.28],['9',15.2,18,13.86],['11',18.6,18,17.26],['13.5',20.4,18,19.06],['16',22.5,18,21.16],['21',28.3,16,26.78],['29',37.0,16,35.48],['36',47.0,16,45.48],['42',54.0,16,52.48],['48',59.3,16,57.78]];
+
+const nPass=P=>P<=.8?4:P<=1?5:P<=1.5?6:P<=2?8:P<=2.5?10:P<=3.5?12:P<=5?14:16;
+const rng=(a,b)=>f3(a)+' à '+f3(b);
+
+/* ---------- Tolérances ---------- */
+function mTol(d,P){ if(!ES[P])return null; const t=TD2.find(x=>d>x[0]&&d<=x[1]), q=t&&t[2][P];
+  return {es:ES[P]/1000,Td:TD[P]/1000,TD1:TD1[P]/1000,Td2:q?q[0]/1000:0,TD2:q?q[1]/1000:0}; }
+function unTol(D,p,LE){ const t2=.0015*Math.cbrt(D)+.0015*Math.sqrt(LE)+.015*Math.pow(p,2/3), a=.25*p-.4*p*p;
+  const t1=D<.25?Math.max(a,Math.min(.394*p,.05*Math.pow(p,2/3)+.03*p/D-.002)):a;
+  return {es:.3*t2*K,Td:.06*Math.pow(p,2/3)*K,Td2:t2*K,TD2:1.3*t2*K,TD1:t1*K}; }
+function bsTol(D,p){ const T=.002*Math.cbrt(D)+.003*Math.sqrt(D)+.005*Math.sqrt(p);
+  return {es:0,Td:(T+.01*Math.sqrt(p))*K,Td2:T*K,TD2:T*K,TD1:(.2*p+.004)*K}; }
+
+/* ---------- Profils cylindriques ---------- */
+const v60=(nom,sub,d,P,tpi,tol,drill)=>({nom,sub,P,tpi,ang:60,pe:'iso',pi:'isoi',d,d2:d-.6495*P,he:.6134*P,hi:.5413*P,D1:d-1.0825*P,Dint:d,rl:'d3',tol,top:1,drill});
+const v55=(nom,sub,d,P,tpi,tol,drill)=>{const h=.6403*P;return {nom,sub,P,tpi,ang:55,pe:'w55',pi:'w55',d,d2:d-h,he:h,hi:h,D1:d-2*h,Dint:d,rl:'d1',tol,top:1,drill}};
+const dr=x=>Math.floor(x*10+1e-6)/10;
+
+function cyl(o,ext){
+  const r={ext,P:o.P,tpi:o.tpi,ang:o.ang,nom:o.nom,sub:o.sub,note:'',ctrl:[]}, t=o.tol||{}, ps=o.tpi?o.tpi+' filets au pouce':'mm';
+  if(ext){
+    const hi=o.d-(t.es||0), win=o.top?(t.Td2||t.Td):t.Td, aim=win?hi-win/2:o.d, d3=o.d-2*o.he;
+    r.depth=o.he; r.x0=aim; r.dir=-1; r.prof=o.pe; r.tol=win?[hi-win,hi]:null; r.pr=(o.d-o.d2)/2/o.he;
+    r.vals=[[o.top?'Ø extérieur fini · haut du filet':'Ø extérieur à tourner · haut du filet',f3(aim),win?'tolérance '+rng(hi-win,hi):'cote nominale']];
+    if(o.top) r.vals.push(['Ø à tourner avant filetage','≈ '+f2(hi+.1),'laisse 0.05 à 0.15 pour l\'arasage']);
+    r.vals.push(['Pas',f3(o.P),ps],['Profondeur de filet',f3(o.he),'mm au rayon']);
+    r.labs=[['d',o.d],['d2',o.d2],[o.rl,d3]];
+    r.rep=[['d','Ø extérieur nominal',f3(o.d)],['d2','Ø sur flancs nominal',f3(o.d2)],[o.rl,'Ø à fond de filet nominal',f3(d3)],['P','Pas',f3(o.P)],['h','Profondeur de filet',f3(o.he)]];
+    r.ctrl=[['Ø extérieur après filetage',win?rng(hi-win,hi):f3(o.d)+' (nominal)'],['Bague ENTRE','sur toute la longueur'],['Bague N\'ENTRE PAS','2 filets maxi = '+f2(2*o.P)]];
+    r.gauge=['CONTRÔLE À LA BAGUE','ENTRE : toute la longueur · N\'ENTRE PAS : 2 filets maxi ('+f2(2*o.P)+' mm)'];
+    r.cnote=o.top?'Plaquette arasante : le Ø extérieur mesuré après filetage suit le Ø sur flancs. La tolérance affichée est donc celle des flancs, plus serrée que celle du Ø extérieur seul. Contrôle final à la bague.':'Contrôle final à la bague ou avec l\'écrou.';
+  }else{
+    const lo=o.D1, win=o.top?(t.TD2||t.TD1):t.TD1, aim=win?lo+win/2:lo;
+    r.depth=o.hi; r.x0=aim; r.dir=1; r.prof=o.pi; r.tol=win?[lo,lo+win]:null; r.pr=(o.d2-o.D1)/2/o.hi;
+    r.vals=[[o.top?'Ø d\'alésage fini':'Ø à aléser',f3(aim),win?'tolérance '+rng(lo,lo+win):'cote nominale']];
+    if(o.top) r.vals.push(['Ø à aléser avant filetage','≈ '+f2(lo-.1),'laisse 0.05 à 0.15 pour l\'arasage']);
+    r.vals.push(['Ø de filetage · pointe du filet',f3(aim+2*o.hi),'alésage + 2 × profondeur'],['Pas',f3(o.P),ps],['Profondeur de filet',f3(o.hi),'mm au rayon']);
+    r.labs=[['D1',o.D1],['D2',o.d2],['D',o.Dint]];
+    r.rep=[['D','Ø à fond de filet nominal',f3(o.Dint)],['D2','Ø sur flancs nominal',f3(o.d2)],['D1','Ø d\'alésage mini',f3(o.D1)],['P','Pas',f3(o.P)],['h','Profondeur de filet',f3(o.hi)]];
+    r.ctrl=[['Ø d\'alésage après filetage',win?rng(lo,lo+win):f3(lo)+' (nominal)'],['Tampon ENTRE','sur toute la longueur'],['Tampon N\'ENTRE PAS','2 filets maxi = '+f2(2*o.P)]];
+    r.gauge=['CONTRÔLE AU TAMPON','ENTRE : toute la longueur · N\'ENTRE PAS : 2 filets maxi ('+f2(2*o.P)+' mm)'];
+    if(o.drill>0) r.ctrl.push(['Foret si taraudage','Ø '+f2(o.drill)]);
+    r.cnote=o.top?'Plaquette arasante : le Ø d\'alésage mesuré après filetage suit le Ø sur flancs. Contrôle final au tampon.':'Contrôle final au tampon ou avec la vis.';
+  }
+  r.top=o.top;
+  if(!o.tol) r.note='Pas de tolérance normalisée renseignée pour ce filetage : cotes nominales.';
+  return r;
+}
+
+/* ---------- Calcul d'une fiche ---------- */
+const VERIF={m:[1,'Tolérances 6g / 6H contrôlées par les formules ISO 965.'],g:[1,'Diamètres et tolérances contrôlés contre une table ISO 228-1.'],
+  npt:[0,'Ø sur flancs et longueur L2 contrôlés par les formules ASME B1.20.1. Engagement à la main L1 et foret non recoupés avec une table.'],
+  r:[0,'Longueurs de jauge, longueurs utiles et tolérances d\'entrée bague / tampon non recoupées avec la norme ISO 7-1.'],
+  bsw:[0,'Tolérances calculées par les formules BS 84, non recoupées avec une table.'],bsf:[0,'Tolérances calculées par les formules BS 84, non recoupées avec une table.'],
+  tr:[0,'Diamètres et jeu au fond contrôlés (ISO 2904). Tolérances 4h / 4H non recoupées avec une table.'],acme:[0,'Cotes et tolérances calculées par formule, non recoupées avec une table.'],
+  rd:[0,'Cotes nominales DIN 405, non recoupées avec une table, sans tolérance.'],pg:[0,'Cotes nominales DIN 40430, non recoupées avec une table, sans tolérance.'],sp:[0,'Filetage hors série : cotes et tolérances calculées par formule, non recoupées avec une table.']};
+function calc(fam,i,pasSel,ext,sp){ const r=calc0(fam,i,pasSel,ext,sp); if(!r)return r;
+  let v=VERIF[fam]; if(fam==='un'){const s=pasSel.split('|')[1]; v=s==='UNC'||s==='UNF'?[1,'Tolérances 2A / 2B calculées selon ASME B1.1, recoupées sur les tailles courantes.']:[0,'Tolérances calculées selon ASME B1.1, non recoupées avec une table pour cette série.'];}
+  r.vok=v[0]; r.verif=v[1]+(r.top?' Choix d\'atelier à valider : tolérance du haut du filet reprise de celle des flancs (plaquette arasante), surépaisseur de 0.10 avant filetage.':'');
+  return r; }
+function calc0(fam,i,pasSel,ext,sp){
+  if(fam==='m'){ const d=+i,P=+pasSel,gros=COARSE[d]===P;
+    return cyl(v60('M'+d+(gros?'':' × '+P),'Métrique ISO, pas '+(gros?'gros':'fin')+' · tolérance '+(ext?'6g':'6H')+' (ISO 965)',d,P,null,mTol(d,P),dr(d-P)),ext); }
+  if(fam==='un'){ const q=pasSel.split('|'),tpi=+q[0],D=frac(i),p=1/tpi;
+    return cyl(v60(pn(i)+' – '+tpi+' '+q[1],'Unifié pouce · classe '+(ext?'2A':'2B')+' (ASME B1.1) · valeurs en mm',D*K,p*K,tpi,unTol(D,p,q[1]==='UNC'||q[1]==='UNF'||tpi===8?D:9*p),Math.round((D-p)*K*10)/10),ext); }
+  if(fam==='bsw'||fam==='bsf'){ const L=(fam==='bsw'?BSW:BSF)[i],D=frac(L[0]),p=1/L[1];
+    return cyl(v55(pn(L[0])+' – '+L[1]+' '+fam.toUpperCase(),'Whitworth 55° (BS 84) · classe moyenne · valeurs en mm',D*K,p*K,L[1],bsTol(D,p),dr((D-1.1*p)*K)),ext); }
+  if(fam==='g'){ const L=GG[i];
+    return cyl(v55('G '+L[0].replace('.',' ')+(ext?' A':''),'BSP cylindrique, Whitworth 55° (ISO 228-1)'+(ext?' · classe A':''),L[2],K/L[1],L[1],{es:0,Td:L[3],Td2:L[4],TD2:L[4],TD1:L[5]},L[6]),ext); }
+  if(fam==='tr'){ const d=+i,P=+pasSel,ac=P<2?.15:P<=5?.25:P<=12?.5:1,h=.5*P+ac;
+    return cyl({nom:'Tr '+d+' × '+P,sub:'Trapézoïdal 30° (DIN 103) · jeu au fond ac = '+ac+' mm · 4h / 4H sur le haut du filet',P,tpi:null,ang:30,pe:'tr',pi:'tr',d,d2:d-.5*P,he:h,hi:h,D1:d-P,Dint:d+2*ac,rl:'d3',tol:{Td:TRd[P]/1000,TD1:TRD1[P]/1000}},ext); }
+  if(fam==='acme'){ const L=ACME[i],D=frac(L[0])*K,P=K/L[1],c=(L[1]>10?.005:.01)*K,h=.5*P+c;
+    return cyl({nom:pn(L[0])+' – '+L[1]+' ACME',sub:'Trapézoïdal 29° usage général (ASME B1.5) · classe 2G · valeurs en mm',P,tpi:L[1],ang:29,pe:'acme',pi:'acme',d:D,d2:D-.5*P,he:h,hi:h,D1:D-P,Dint:D+2*c,rl:'d1',tol:{Td:.05*P,TD1:.05*P}},ext); }
+  if(fam==='rd'){ const d=RD[i][0],P=K/RD[i][1];
+    return cyl({nom:'Rd '+d+' × 1/'+RD[i][1],sub:'Filet rond 30° (DIN 405) · '+RD[i][1]+' filets au pouce',P,tpi:RD[i][1],ang:30,pe:'rd',pi:'rd',d,d2:d-.5*P,he:.5*P,hi:.5*P,D1:d-.9*P,Dint:d+.1*P,rl:'d3',tol:null},ext); }
+  if(fam==='pg'){ const L=PG[i],P=K/L[2],h=(L[1]-L[3])/2;
+    return cyl({nom:'Pg '+L[0],sub:'Presse-étoupe 80° (DIN 40430) · '+L[2]+' filets au pouce',P,tpi:L[2],ang:80,pe:'pg',pi:'pg',d:L[1],d2:L[1]-h,he:h,hi:h,D1:L[3],Dint:L[1],rl:'d1',tol:null,top:0},ext); }
+  if(fam==='sp'){ const d=+sp.d, tpi=sp.u==='tpi'?+sp.p:null, P=tpi?K/tpi:+sp.p;
+    if(!(d>0&&P>0&&P<d/2)) return null;
+    if(sp.a==='55') return cyl(v55('Ø '+f3(d)+' – '+(tpi?tpi+' filets':'pas '+P)+' · 55°','Whitworth 55° hors série · tolérance calculée selon BS 84 classe moyenne',d,P,tpi,bsTol(d/K,P/K),dr(d-1.1*P)),ext);
+    const mt=!tpi&&mTol(d,P)&&mTol(d,P).Td2?mTol(d,P):null;
+    return cyl(v60(tpi?'Ø '+f3(d)+' – '+tpi+' filets · 60°':'M'+d+' × '+P+' spécial',mt?'Métrique hors série · tolérance '+(ext?'6g':'6H')+' (ISO 965)':'60° hors série · tolérance calculée selon ASME B1.1 classe '+(ext?'2A':'2B'),d,P,tpi,mt||unTol(d/K,P/K,9*P/K),dr(d-P)),ext); }
+  // coniques
+  const r={ext,con:1,ctrl:[],note:''}; let P,h,E0,E1,L1,L2,D,drill,tpi,cap=null;
+  if(fam==='npt'){ const L=NPT[i]; tpi=L[1]; P=K/tpi; h=.8*P; D=L[2]*K; E0=L[3]*K; L1=L[4]*K; L2=L[5]*K; E1=E0+L1/16; drill=L[6]; cap=D;
+    r.nom=L[0].replace('.',' ')+'" – '+tpi+' NPT'; r.sub='Conique 60°, conicité 1:16 (ASME B1.20.1) · mêmes cotes de base en NPTF · valeurs en mm'; r.ang=60; r.prof='npt';
+  }else{ const L=RR[i]; tpi=L[1]; P=K/tpi; h=.6403*P; L1=L[3]; L2=L[4]; D=L[2]; E1=D-h; E0=E1-L1/16; drill=L[5];
+    r.nom=(ext?'R ':'Rc ')+L[0].replace('.',' '); r.sub='BSPT conique, Whitworth 55°, conicité 1:16 (ISO 7-1)'; r.ang=55; r.prof='w55'; }
+  const top0=ext?E0+h:E1-h;
+  Object.assign(r,{P,tpi,depth:h,pr:.5,L:L2,L1,x0:top0,dir:ext?-1:1,cone:{top0,ext,cap:ext?cap:null,Ldef:L2}});
+  const nf=x=>(x/P).toFixed(1)+' filets', npt=fam==='npt';
+  r.vals=[ext?['Ø haut du filet à Z0 (petit bout)',f3(top0),'mm, profil théorique']:['Ø d\'alésage à Z0 (entrée)',f3(top0),'pointe du filet à Z0 : '+f3(top0+2*h)],[npt?'Engagement à la main · L1':'Longueur de jauge, serrage main',f2(L1),'mm · '+nf(L1)],[npt?'Longueur de filetage standard · L2':'Longueur de filetage utile',f2(L2),'mm · '+nf(L2)+(npt?(ext?' · hors tout L4 = '+f2(L2+3.47*P):' · mini L1 + 3 filets = '+f2(L1+3*P)):'')],['Pas',f3(P),tpi+' filets au pouce'],['Profondeur de filet',f3(h),'mm au rayon']];
+  if(ext){ r.rep=[['E0','Ø sur flancs au petit bout',f3(E0)],['E1','Ø sur flancs à L1 (plan de jauge)',f3(E1)],['L1','Engagement à la main',f2(L1)],['L2','Longueur de filet utile',f2(L2)],['D',fam==='npt'?'Ø extérieur du tube':'Ø extérieur au plan de jauge',f3(D)],['P','Pas',f3(P)]];
+    r.cl=['E0','E1','D']; r.clv=[E0,E1,D]; r.cnote='Bague vissée à la main : le bout de la pièce doit affleurer la face de la bague, dans la tolérance ci-dessus.';
+  }else{ r.rep=[['E1','Ø sur flancs à l\'entrée',f3(E1)],['E0','Ø sur flancs à la profondeur L1',f3(E0)],['L1','Engagement à la main',f2(L1)],['L2','Longueur de filet utile',f2(L2)],['P','Pas',f3(P)]];
+    r.cl=['E1','E0','']; r.clv=[E1,E0]; r.ctrl=drill?[['Foret avant taraud conique (perçage cylindrique)','Ø '+f2(drill)]]:[]; r.cnote='Tampon vissé à la main : le cran du tampon doit affleurer la face de la pièce, dans la tolérance ci-dessus.'; }
+  const gt=npt?P:(D>60?(ext?1.5*P:3.5):(ext?P:1.25*P)), gl=ext?'Entrée de la bague':'Entrée du tampon';
+  r.ctrl.unshift([gl+' (longueur vissée à la main)',f2(L1)+' ± '+f2(gt)],[gl+', mini à maxi',f2(L1-gt)+' à '+f2(L1+gt)]);
+  r.gauge=[gl.toUpperCase(),f2(L1)+' ± '+f2(gt)+' mm  ('+f2(L1-gt)+' à '+f2(L1+gt)+'), vissée à la main'];
+  r.note='Conicité 1:16 au diamètre : 0.0625 mm par mm, demi-angle 1°47′24″. Avec une plaquette arasante, laissez 0.05 à 0.15 au Ø sur le cône avant filetage.';
+  return r;
+}
+
+/* ---------- Plan A4 paysage, à l'échelle ---------- */
+const SCALES=[50,20,10,5,2,1,.5,.2,.1], scTxt=s=>s>=1?s+' : 1':'1 : '+Math.round(1/s);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+let lastSvg='';
+function plan(r){
+  const U=4,W=1188,H=840,ink='#111', ext=r.ext, P=r.P, h=r.depth, k=r.con?1/32:0, sg=ext?1:-1, tip0=r.x0/2, Lf=r.Lf;
+  const cap=r.cone&&r.cone.cap?r.cone.cap/2:1e9;
+  const tip=z=>Math.min(cap,tip0+sg*k*(-z)), root=z=>tip0+sg*k*(-z)-sg*h;
+  const PR={iso:[.125,2],isoi:[.25,2],w55:[.167,12],npt:[.04,1.5],tr:[.366,1],acme:[.3707,1],rd:[.366,26],pg:[.1,5]}[r.prof];
+  const c=PR[0], rf=Math.max(.02,1-c-2*(h/P)*Math.tan(r.ang*Math.PI/360)), run=(1-c-rf)/2;
+  const teeth=(n)=>{const p=[[0,root(0)]];for(let i=0;i<n;i++){const z0=-i*P,a=z0-rf/2*P,b=a-run*P,cc=b-c*P,e=z0-P+rf/2*P;p.push([a,root(a)],[b,tip(b)],[cc,tip(cc)],[e,root(e)])}p.push([-n*P,root(-n*P)]);return p};
+  const rp=(S,cmd,rad)=>{let d=cmd+S[0][0].toFixed(1)+','+S[0][1].toFixed(1);for(let i=1;i<S.length-1;i++){const p=S[i],a=S[i-1],b=S[i+1],la=Math.hypot(p[0]-a[0],p[1]-a[1]),lb=Math.hypot(b[0]-p[0],b[1]-p[1]),q=Math.min(rad,la/2,lb/2);
+    if(q<.4||!la||!lb){d+=' L'+p[0].toFixed(1)+','+p[1].toFixed(1);continue}
+    d+=' L'+(p[0]+(a[0]-p[0])*q/la).toFixed(1)+','+(p[1]+(a[1]-p[1])*q/la).toFixed(1)+' Q'+p[0].toFixed(1)+','+p[1].toFixed(1)+' '+(p[0]+(b[0]-p[0])*q/lb).toFixed(1)+','+(p[1]+(b[1]-p[1])*q/lb).toFixed(1)}
+    const e=S[S.length-1];return d+' L'+e[0].toFixed(1)+','+e[1].toFixed(1)};
+  const wv=(xa,ya,xb,yb)=>{const L=Math.hypot(xb-xa,yb-ya),m=Math.max(2,Math.round(L/4));let t='';for(let j=1;j<=m;j++){const u=j/m,o=3*Math.sin(u*L/16*2*Math.PI);t+=' L'+(xa+(xb-xa)*u+(ya===yb?0:o)).toFixed(1)+','+(ya+(yb-ya)*u+(ya===yb?o:0)).toFixed(1)}return t};
+  const Ln=(x1,y1,x2,y2,ex)=>`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${ink}" stroke-width=".8" ${ex||''}/>`;
+  const Tx=(x,y,t,a,sz,rot,b)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a||'middle'}" font-size="${sz||13}"${b?' font-weight="700"':''}${rot?` transform="rotate(-90 ${x.toFixed(1)} ${y.toFixed(1)})"`:''} fill="${ink}">${esc(t)}</text>`;
+  const AR='marker-start="url(#pa1)" marker-end="url(#pa2)"', AX='stroke-dasharray="16,3,3,3"';
+  const part=d=>`<path d="${d}" fill="url(#ph)" stroke="${ink}" stroke-width="1.8" stroke-linejoin="round"/>`;
+  let g='';
+
+  // ----- Vue principale : coupe longitudinale à l'échelle -----
+  const n=Math.max(1,Math.min(400,Math.floor(Lf/P+1e-6))), zT=-n*P, Le=Math.max(2*P,.3*Lf), zE=-Lf-Le;
+  const rbody=ext?Math.min(cap,Math.max(tip(zT),tip0)):tip(zT), rOut=(tip0+h)+Math.max(2.5*h,.22*tip0), Rm=ext?Math.max(rbody,tip0):rOut;
+  const S=SCALES.find(s=>(Lf+Le)*s<=100&&2*Rm*s<=104)||.1, m=U*S, xZ=80+(400+(Lf+Le)*m)/2, cy=335;
+  const X=z=>xZ+z*m, Yu=q=>cy-q*m, Yl=q=>cy+q*m, rad=PR[1]/76*P*m;
+  const pts=teeth(n); pts.push([zT-.5*h,rbody],[zE,rbody]);
+  const up=pts.map(p=>[X(p[0]),Yu(p[1])]), lo=pts.map(p=>[X(p[0]),Yl(p[1])]), xL=X(zE);
+  if(ext) g+=part(rp(up,'M',rad)+wv(xL,Yu(rbody),xL,Yl(rbody))+rp(lo.slice().reverse(),' L',rad)+' Z');
+  else{ g+=part(rp(up,'M',rad)+wv(xL,Yu(rbody),xL,Yu(rOut))+wv(xL,Yu(rOut),xZ,Yu(rOut))+' Z')+part(rp(lo,'M',rad)+wv(xL,Yl(rbody),xL,Yl(rOut))+wv(xL,Yl(rOut),xZ,Yl(rOut))+' Z');
+    g+=Ln(xZ,Yu(tip0),xZ,Yl(tip0))+Ln(X(zT),Yu(rbody),X(zT),Yl(rbody)); }
+  g+=Ln(xL-26,cy,xZ+150,cy,AX);
+  const dV=(x,q,t,lb)=>Ln(xZ+3,Yu(q),x+6,Yu(q))+Ln(xZ+3,Yl(q),x+6,Yl(q))+Ln(x,Yu(q),x,Yl(q),AR)+Tx(x-6,cy+34,t,'middle',13,1,1)+Tx(x+9,Yu(q)-5,lb,'start',10.5);
+  const z0s=r.con?' à Z0':'';
+  g+=dV(xZ+44,tip0,'Ø '+f3(2*tip0),(ext?'haut du filet':'alésage')+z0s);
+  g+=dV(xZ+92,root(0),'Ø '+f3(2*root(0)),(ext?'fond de filet':'pointe du filet')+z0s);
+  const yLd=Yl(Rm)+40; g+=Ln(X(-Lf),Yl(ext?tip(-Lf):rOut)+4,X(-Lf),yLd+6)+Ln(xZ,Yl(ext?root(0):rOut)+4,xZ,yLd+6)+Ln(X(-Lf),yLd,xZ,yLd,AR)+Tx((X(-Lf)+xZ)/2,yLd-7,f2(Lf),'middle',13,0,1);
+  g+=Tx(xZ+8,cy-7,'Z0','start',13,0,1);
+  const yN=Yu(Rm)-44, xN=X(-Lf*.55); g+=Ln(xN,Yu(ext?tip(-Lf*.55):root(-Lf*.55))-2,xN-24,yN+6,'marker-start="url(#pa1)"')+Ln(xN-24,yN+6,xN-34,yN+6)+Tx(xN-38,yN+10,r.nom+(r.con?'  ·  conicité 1:16':''),'end',14,0,1);
+  const rc=Math.max(2.1*P*m,16), xc=X(-1.5*P), yc=Yu(tip0-sg*h/2); g+=`<circle cx="${xc.toFixed(1)}" cy="${yc.toFixed(1)}" r="${rc.toFixed(1)}" fill="none" stroke="${ink}" stroke-width=".8" stroke-dasharray="6,3"/>`+Tx(xc+rc*.75+8,yc-rc*.75-4,'B','middle',15,0,1);
+  g+=Tx(330,612,'COUPE LONGITUDINALE — ÉCHELLE '+scTxt(S),'middle',13,0,1);
+
+  // ----- Détail B : profil du filet -----
+  const Sd=SCALES.find(s=>P*U*s<=96)||.1, m2=U*Sd, nd=Math.min(4,n), zD=-nd*P, xD=1040, yD=ext?215:300;
+  const xd=z=>xD+z*m2, Yd=q=>yD-(q-tip0)*m2, rad2=PR[1]/76*P*m2, S2=teeth(nd).map(p=>[xd(p[0]),Yd(p[1])]), yb=Yd(root(0))+sg*58, xE=xd(zD);
+  g+=part('M'+xD+','+yb.toFixed(1)+rp(S2,' L',rad2)+wv(xE,Yd(root(zD)),xE,yb)+wv(xE,yb,xD,yb)+' Z');
+  const tc=i=>-(i+rf/2+run+c/2)*P, yP=Yd(tip0)-sg*36;
+  if(nd>1) g+=Ln(xd(tc(0)),Yd(tip(tc(0)))-sg*4,xd(tc(0)),yP-sg*6)+Ln(xd(tc(1)),Yd(tip(tc(1)))-sg*4,xd(tc(1)),yP-sg*6)+Ln(xd(tc(1)),yP,xd(tc(0)),yP,AR)+Tx((xd(tc(0))+xd(tc(1)))/2,yP+(ext?-7:17),'P = '+f3(P),'middle',13,0,1);
+  const xh=xD+32; g+=Ln(xD+3,Yd(tip0),xh+6,Yd(tip0))+Ln(xD+3,Yd(root(0)),xh+6,Yd(root(0)))+Ln(xh,Yd(tip0),xh,Yd(root(0)),AR)+Tx(xh+9,(Yd(tip0)+Yd(root(0)))/2+4,'h = '+f3(h),'start',13,0,1);
+  const zg=-(nd>2?2:1)*P, dz=(rf/2+run*.7)*P, qa=tip(zg)-sg*.3*h;
+  g+=`<path d="M${xd(zg-dz).toFixed(1)},${Yd(qa).toFixed(1)} Q${xd(zg).toFixed(1)},${Yd(qa+sg*.28*h).toFixed(1)} ${xd(zg+dz).toFixed(1)},${Yd(qa).toFixed(1)}" fill="none" stroke="${ink}" stroke-width=".8"/>`+Tx(xd(zg),Yd(tip(zg))+(ext?-12:20),r.ang+'°','middle',14,0,1);
+  if(k){ g+=Ln(xD,Yd(tip0),xE-34,Yd(tip0),'stroke-dasharray="5,3"')+Ln(xD,Yd(tip0),xE-34,Yd(tip0+sg*k*(-zD+34/m2)))+Tx(xE-40,(Yd(tip0)+Yd(tip(zD)))/2+4,'1°47′24″','end',13,0,1)+Tx(xE-40,(Yd(tip0)+Yd(tip(zD)))/2+(ext?-12:20),'pente sur l\'axe','end',11); }
+  g+=Tx(xD+5,yb+(ext?-6:14),'Z0','start',13,0,1);
+  g+=Tx(900,ext?80:92,ext?'FILETAGE EXTÉRIEUR':'FILETAGE INTÉRIEUR','middle',12)+Tx(900,470,'DÉTAIL B — ÉCHELLE '+scTxt(Sd),'middle',13,0,1)+Tx(900,488,'Demi-coupe côté haut : l\'axe de la pièce est vers le bas.','middle',11);
+  if(k) g+=Tx(900,506,'Conicité 1:16 au diamètre : 0.0625 mm par mm · angle au sommet 3°34′48″','middle',11);
+
+  // ----- Tableau des cotes -----
+  const rows=r.vals.map(v=>[v[0],v[1]+(v[2]?'   '+v[2]:'')]).concat(r.coneRows||[],r.gauge?[r.gauge]:[]), ty0=650, rh=18;
+  g+=Tx(64,ty0-8,'COTES À PROGRAMMER (mm)','start',12,0,1)+`<rect x="60" y="${ty0}" width="580" height="${rows.length*rh}" fill="none" stroke="${ink}" stroke-width="1"/>`+Ln(310,ty0,310,ty0+rows.length*rh);
+  rows.forEach((v,i)=>{const y=ty0+i*rh; if(i)g+=Ln(60,y,640,y); g+=Tx(66,y+13,v[0],'start',11)+Tx(316,y+13,v[1],'start',11,0,1)});
+
+  // ----- Cadre et cartouche -----
+  const cx0=660,cy0=640, sub=r.sub.split(' · ');
+  g+=`<rect x="40" y="40" width="1108" height="760" fill="none" stroke="${ink}" stroke-width="2"/><rect x="${cx0}" y="${cy0}" width="488" height="160" fill="#fff" stroke="${ink}" stroke-width="1.5"/>`;
+  g+=Ln(cx0,cy0+62,1148,cy0+62)+Ln(cx0,cy0+112,1148,cy0+112)+Ln(cx0+150,cy0,cx0+150,cy0+62)+Ln(cx0+122,cy0+112,cx0+122,800)+Ln(cx0+244,cy0+112,cx0+244,800)+Ln(cx0+366,cy0+112,cx0+366,800);
+  if(r.logo) g+=`<image x="${cx0+12}" y="${cy0+4}" width="126" height="54" preserveAspectRatio="xMidYMid meet" href="${r.logo}"/>`;
+  g+=Tx(cx0+160,cy0+28,r.nom,'start',20,0,1)+Tx(cx0+160,cy0+50,ext?'Filetage extérieur':'Filetage intérieur','start',13);
+  g+=Tx(cx0+10,cy0+82,sub[0]||'','start',12,0,1)+Tx(cx0+10,cy0+101,sub.slice(1).join(' · '),'start',11);
+  [['ÉCHELLE',scTxt(S)],['DÉTAIL B',scTxt(Sd)],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR','MCS Usinage']].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+Tx(cx0+8+i*122,cy0+149,v[1],'start',14,0,1)});
+  g+=Tx(48,816,(r.vok?'VALEURS CONTRÔLÉES — ':'À CONFIRMER SUR LA PREMIÈRE PIÈCE — ')+r.verif.split(' Choix d')[0],'start',10.5,0,1)+Tx(48,831,(r.top?'Choix d\'atelier à valider : tolérance du haut du filet = celle des flancs (plaquette arasante), surépaisseur 0.10 avant filetage. ':'')+'Cotes en mm. Contrôler la première pièce à la bague ou au tampon avant série.','start',10);
+  return lastSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Arial,Helvetica,sans-serif"><defs>
+  <pattern id="ph" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><rect width="7" height="7" fill="#fff"/><line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width=".8"/></pattern>
+  <marker id="pa1" markerWidth="11" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M0,3 L10,0.7 L10,5.3Z" fill="${ink}"/></marker>
+  <marker id="pa2" markerWidth="11" markerHeight="6" refX="10" refY="3" orient="auto"><path d="M10,3 L0,0.7 L0,5.3Z" fill="${ink}"/></marker></defs>
+  <rect width="${W}" height="${H}" fill="#fff"/>${g}</svg>`;
+}
+
+/* ---------- Interface ---------- */
+const st={fam:'m',i:'10',pas:'1.5',cote:'ext',lf:'',cA:'',sp:{d:'30',p:'1.5',u:'mm',a:'60'}};
+try{const s=JSON.parse(localStorage.getItem('mcs-fil4')||'{}');Object.assign(st,s);st.sp=Object.assign({d:'30',p:'1.5',u:'mm',a:'60'},s.sp||{})}catch(e){}
+const save=()=>{try{localStorage.setItem('mcs-fil4',JSON.stringify(st))}catch(e){}};
+const LIST={bsw:BSW,bsf:BSF,acme:ACME,g:GG,r:RR,npt:NPT};
+
+function fillSizes(){
+  const sp=st.fam==='sp'; $('szBox').hidden=sp; $('spRow').hidden=!sp;
+  if(sp){$('pasBox').hidden=true;$('spD').value=st.sp.d;$('spP').value=st.sp.p;$('spU').value=st.sp.u;$('spA').value=st.sp.a;return}
+  const sz=$('sz'),f=st.fam; let h;
+  if(f==='m') h=Object.keys(MP).sort((a,b)=>a-b).map(d=>`<option value="${d}">M${d}</option>`);
+  else if(f==='un') h=UND.map(d=>`<option value="${esc(d)}">${esc(pn(d))}</option>`);
+  else if(f==='tr') h=Object.keys(TRP).map(d=>`<option value="${d}">Tr ${d}</option>`);
+  else if(f==='rd') h=RD.map((t,j)=>`<option value="${j}">Rd ${t[0]} × 1/${t[1]}</option>`);
+  else if(f==='pg') h=PG.map((t,j)=>`<option value="${j}">Pg ${t[0]}</option>`);
+  else if(f==='g'||f==='r') h=LIST[f].map((t,j)=>`<option value="${j}">${f==='g'?'G ':'R '}${t[0].replace('.',' ')}</option>`);
+  else h=LIST[f].map((t,j)=>`<option value="${j}">${esc(pn(t[0]))} – ${t[1]}</option>`);
+  sz.innerHTML=h.join(''); if([...sz.options].some(o=>o.value===String(st.i))) sz.value=st.i; else st.i=sz.value=f==='m'?'10':f==='un'?'1/2':f==='tr'?'20':sz.options[Math.min(6,sz.options.length-1)].value;
+  fillPas();
+}
+function pasOpts(){const f=st.fam;
+  if(f==='m')return MP[st.i].map(p=>[String(p),p+' mm'+(COARSE[st.i]===p?' (gros)':'')]);
+  if(f==='un')return unOpts(st.i).map(o=>[o[0]+'|'+o[1],o[0]+' filets · '+o[1]]);
+  if(f==='tr')return TRP[st.i].map((p,j)=>[String(p),p+' mm'+(j?'':' (normal)')]);
+  return null}
+function fillPas(){
+  const o=pasOpts(); $('pasBox').hidden=!o; if(!o)return;
+  $('pas').innerHTML=o.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
+  if(!o.some(x=>x[0]===st.pas)) st.pas=o[0][0]; $('pas').value=st.pas;
+}
+const row=a=>'<tr>'+a.map((x,j)=>`<td${j?' class="n"':''}>${x}</td>`).join('')+'</tr>';
+let cur=null;
+function render(){
+  document.querySelectorAll('#fam button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===st.fam));
+  document.querySelectorAll('#cote button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===st.cote));
+  const r=cur=calc(st.fam,st.i,st.pas,st.cote==='ext',st.sp);
+  if(!r){$('ft').textContent='Saisie incomplète';$('fs').textContent='Indiquez un Ø et un pas valides (le pas doit rester inférieur à la moitié du Ø).';['vals','dessin','ctrl','coneT'].forEach(i=>$(i).innerHTML='');$('vnote').hidden=true;$('cnote').textContent='';return}
+  const Ldef=r.con?r.cone.Ldef:Math.max(3*r.P,Math.round(.75*r.x0)); r.Lf=+st.lf>0?+st.lf:Ldef;
+  $('lf').placeholder=f2(Ldef)+(r.con?' (L2)':''); $('lf').value=st.lf;
+  $('ft').textContent=r.nom+(r.ext?' — extérieur':' — intérieur'); $('fs').textContent=r.sub;
+  $('vals').innerHTML=r.vals.map((v,j)=>`<div class="val${j?'':' k'}"><b>${v[0]}</b><span>${v[1]}</span><i>${v[2]}</i></div>`).join('');
+  $('vnote').textContent=r.note; $('vnote').hidden=!r.note;
+  $('verif').className='verif'+(r.vok?'':' ko'); $('verif').innerHTML='<b>'+(r.vok?'Valeurs contrôlées':'À confirmer sur la première pièce')+'</b>'+esc(r.verif)+' Contrôlez toujours la première pièce à la bague ou au tampon avant de lancer la série.';
+  $('coneCard').hidden=!r.con;
+  if(r.con){ const c=r.cone, L=r.Lf, a=+st.cA>0?+st.cA:0, sg=c.ext?1:-1, X=z=>c.top0+sg*z/16, of=c.ext?0:2*r.depth, op=c.ext?'Tournage du cône':'Alésage du cône', th=c.ext?'haut du filet':'pointe du filet';
+    $('cA').value=st.cA; $('cA').placeholder='0';
+    let h='<tr><th>1 · '+op+'</th><th class="n">Z</th><th class="n">X (Ø)</th></tr>'+row(['Départ','0',f3(X(0))]), fin;
+    if(c.cap&&X(L)>c.cap){const zc=(c.cap-c.top0)*16; h+=row(['Fin du cône, puis cylindre au Ø du tube','−'+f2(zc),f3(c.cap)]); fin='X'+f3(c.cap)+' à Z−'+f2(zc)+', puis cylindre';}
+    else {h+=row(['Fin','−'+f2(L),f3(X(L))]); fin='X'+f3(X(L))+' à Z−'+f2(L);}
+    h+='<tr><th>2 · Filetage, '+th+'</th><th class="n">Z</th><th class="n">X (Ø)</th></tr>'+row(['Début du filet','0',f3(X(0)+of)])+(a?row(['Point d\'approche, sur la pente','+'+f2(a),f3(X(-a)+of)]):'')+row(['Fin','−'+f2(L),f3(X(L)+of)])+row(['Pas','',f3(r.P)])+row(['Profondeur au rayon','',f3(r.depth)]);
+    $('coneT').innerHTML=h; $('coneN').textContent=c.ext?'Tous les X sont au diamètre, sur le haut du filet. Z0 est la face de la pièce.':'Tous les X sont au diamètre. Le filetage est donné à la pointe du filet : Ø d\'alésage + 2 × la profondeur. Z0 est la face de la pièce.';
+    r.coneRows=[[op.toUpperCase(),'X'+f3(X(0))+' à Z0  →  '+fin],['FILETAGE, '+th.toUpperCase(),'X'+f3(X(0)+of)+' à Z0  →  X'+f3(X(L)+of)+' à Z−'+f2(L)]]; }
+  r.logo=document.querySelector('.logo img').src;
+  $('dessin').innerHTML=plan(r);
+  $('ctrl').innerHTML=r.ctrl.length?'<tr><th>Cote</th><th class="n">mm</th></tr>'+r.ctrl.map(row).join(''):'';
+  $('cnote').textContent=r.cnote; $('dlMsg').textContent=''; save();
+}
+$('fam').innerHTML=FAM.map(f=>`<button type="button" data-v="${f[0]}">${f[1]}<small>${f[2]}</small></button>`).join('');
+$('fam').onclick=e=>{const b=e.target.closest('button');if(!b)return;st.fam=b.dataset.v;st.i='';st.lf='';fillSizes();render()};
+$('cote').onclick=e=>{const b=e.target.closest('button');if(!b)return;st.cote=b.dataset.v;render()};
+$('sz').onchange=e=>{st.i=e.target.value;st.lf='';fillPas();render()};
+$('pas').onchange=e=>{st.pas=e.target.value;render()};
+$('lf').oninput=e=>{st.lf=e.target.value;render()}; $('cA').oninput=e=>{st.cA=e.target.value;render()};
+[['spD','d'],['spP','p'],['spU','u'],['spA','a']].forEach(([id,k])=>{$(id).oninput=e=>{st.sp[k]=e.target.value;render()}});
+fillSizes(); render();
+
+
+/* ================= MODULE CIRCLIPS ET GORGES ================= */
+// DIN 471 (arbres) : [d1, s, d2, n mini]  ·  largeur de gorge m déduite de s, tolérance H13
+const C471=[[3,.4,2.8,.3],[4,.4,3.8,.3],[5,.6,4.8,.3],[6,.7,5.7,.5],[7,.8,6.7,.5],[8,.8,7.6,.6],[9,1,8.6,.6],[10,1,9.6,.6],[11,1,10.5,.8],[12,1,11.5,.8],[13,1,12.4,.9],[14,1,13.4,.9],[15,1,14.3,1.1],[16,1,15.2,1.2],[17,1,16.2,1.2],[18,1.2,17,1.5],[19,1.2,18,1.5],[20,1.2,19,1.5],[21,1.2,20,1.5],[22,1.2,21,1.5],[24,1.2,22.9,1.7],[25,1.2,23.9,1.7],[26,1.2,24.9,1.7],[28,1.5,26.6,2.1],[29,1.5,27.6,2.1],[30,1.5,28.6,2.1],[32,1.5,30.3,2.6],[34,1.5,32.3,2.6],[35,1.5,33,3],[36,1.75,34,3],[38,1.75,36,3],[40,1.75,37.5,3.8],[42,1.75,39.5,3.8],[45,1.75,42.5,3.8],[48,1.75,45.5,3.8],[50,2,47,4.5],[52,2,49,4.5],[55,2,52,4.5],[56,2,53,4.5],[58,2,55,4.5],[60,2,57,4.5],[62,2,59,4.5],[63,2,60,4.5],[65,2.5,62,4.5],[68,2.5,65,4.5],[70,2.5,67,4.5],[72,2.5,69,4.5],[75,2.5,72,4.5],[78,2.5,75,4.5],[80,2.5,76.5,5.3],[82,2.5,78.5,5.3],[85,3,81.5,5.3],[88,3,84.5,5.3],[90,3,86.5,5.3],[95,3,91.5,5.3],[100,3,96.5,5.3]];
+// DIN 472 (alésages) : [d1, s, d2, n mini]
+const C472=[[8,.8,8.4,.6],[9,.8,9.4,.6],[10,1,10.4,.6],[11,1,11.4,.6],[12,1,12.5,.8],[13,1,13.6,.9],[14,1,14.6,.9],[15,1,15.7,1.1],[16,1,16.8,1.2],[17,1,17.8,1.2],[18,1,19,1.5],[19,1,20,1.5],[20,1,21,1.5],[21,1,22,1.5],[22,1,23,1.5],[24,1.2,25.2,1.8],[25,1.2,26.2,1.8],[26,1.2,27.2,1.8],[28,1.2,29.4,2.1],[30,1.2,31.4,2.1],[31,1.2,32.7,2.6],[32,1.2,33.7,2.6],[34,1.5,35.7,2.6],[35,1.5,37,3],[36,1.5,38,3],[37,1.5,39,3],[38,1.5,40,3],[40,1.75,42.5,3.8],[42,1.75,44.5,3.8],[45,1.75,47.5,3.8],[47,1.75,49.5,3.8],[48,1.75,50.5,3.8],[50,2,53,4.5],[52,2,55,4.5],[55,2,58,4.5],[56,2,59,4.5],[58,2,61,4.5],[60,2,63,4.5],[62,2,65,4.5],[63,2,66,4.5],[65,2.5,68,4.5],[68,2.5,71,4.5],[70,2.5,73,4.5],[72,2.5,75,4.5],[75,2.5,78,4.5],[78,2.5,81,4.5],[80,2.5,83.5,5.3],[82,2.5,85.5,5.3],[85,3,88.5,5.3],[88,3,91.5,5.3],[90,3,93.5,5.3],[92,3,95.5,5.3],[95,3,98.5,5.3],[98,3,101.5,5.3],[100,3,103.5,5.3],[102,4,106,6],[105,4,109,6],[108,4,112,6],[110,4,114,6],[112,4,116,6],[115,4,119,6],[120,4,124,6],[125,4,129,6],[130,4,134,6],[135,4,139,6],[140,4,144,6],[145,4,149,6],[150,4,155,7.5]];
+const MOF={.4:.5,.6:.7,.7:.8,.8:.9,1:1.1,1.2:1.3,1.5:1.6,1.75:1.85,2:2.15,2.5:2.65,3:3.15,4:4.15};
+// ISO 286 : tolérances fondamentales (µm) par palier de cote
+const ITS=[3,6,10,18,30,50,80,120,180], ITV={10:[40,48,58,70,84,100,120,140,160],11:[60,75,90,110,130,160,190,220,250],12:[100,120,150,180,210,250,300,350,400],13:[140,180,220,270,330,390,460,540,630]};
+const IT=(g,x)=>ITV[g][ITS.findIndex(s=>x<=s)]/1000;
+
+function calcCC(ext,d1,pos){
+  const L=(ext?C471:C472).find(x=>x[0]===+d1); if(!L)return null;
+  const s=L[1],d2=L[2],n=L[3],m=MOF[s],g=ext?(d1<=10?10:d1<=22?11:d1<=100?12:13):(d1<=22?11:d1<=100?12:13),tol=IT(g,d2),tm=IT(13,m),t=Math.abs(d1-d2)/2,sg=ext?1:-1;
+  const aim=d2-sg*tol/2, lo=ext?d2-tol:d2, hi=ext?d2:d2+tol, p=+pos>0?+pos:n;
+  const r={ext,d1:+d1,s,d2,n,m,tol,tm,t,aim,p,cls:(ext?'h':'H')+g,warn:p<n-1e-9,
+    nom:(ext?'Arbre':'Alésage')+' Ø '+d1+' — circlip '+(ext?'DIN 471':'DIN 472'),
+    sub:(ext?'Gorge extérieure pour anneau élastique d\'arbre · DIN 471':'Gorge intérieure pour anneau élastique d\'alésage · DIN 472')+' · circlip '+d1+' × '+s};
+  const dv=ext?'0 / −'+f3(tol):'+'+f3(tol)+' / 0', tlo=Math.abs(d1-(ext?hi:lo))/2, thi=Math.abs(d1-(ext?lo:hi))/2;
+  r.lo=lo; r.hi=hi; r.dv=dv;
+  r.vals=[['Ø fond de gorge · mini à maxi',f3(lo)+' à '+f3(hi),r.cls+' ('+dv+') · viser '+f3(aim)],['Largeur de gorge · mini à maxi',f2(m)+' à '+f2(m+tm),'H13 (0 / +'+f2(tm)+')'],['Profondeur de gorge · mini à maxi',f3(tlo)+' à '+f3(thi),'mm au rayon'],['Circlip',d1+' × '+s,(ext?'DIN 471':'DIN 472')+' · épaisseur '+s+' mm']];
+  r.prog=[['Flanc côté face','Z−'+f2(p),''],['Flanc opposé','Z−'+f2(p+m),''],['Fond de gorge','','X'+f3(aim)],[ext?'Ø extérieur (surface)':'Ø d\'alésage (surface)','','X'+f3(+d1)]];
+  r.vok=!(ext&&d1>100);
+  r.verif='Cotes nominales recoupées sur deux sources publiées. Classe de tolérance du fond de gorge ('+r.cls+') '+(r.vok?'recoupée sur un catalogue':'non recoupée au-dessus de Ø 100')+', écarts en mm selon ISO 286. Largeur de gorge H13.';
+  return r;
+}
+
+function planCC(r){
+  const U=4,W=1188,H=840,ink='#111',ext=r.ext,sg=ext?1:-1,R=r.d1/2,r2=r.d2/2,n=r.p,m=r.m,t=r.t;
+  const wv=(xa,ya,xb,yb)=>{const L=Math.hypot(xb-xa,yb-ya),k=Math.max(2,Math.round(L/4));let s='';for(let j=1;j<=k;j++){const u=j/k,o=3*Math.sin(u*L/16*2*Math.PI);s+=' L'+(xa+(xb-xa)*u+(ya===yb?0:o)).toFixed(1)+','+(ya+(yb-ya)*u+(ya===yb?o:0)).toFixed(1)}return s};
+  const Ln=(x1,y1,x2,y2,ex)=>`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${ink}" stroke-width=".8" ${ex||''}/>`;
+  const Tx=(x,y,s,a,sz,rot,b)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a||'middle'}" font-size="${sz||13}"${b?' font-weight="700"':''}${rot?` transform="rotate(-90 ${x.toFixed(1)} ${y.toFixed(1)})"`:''} fill="${ink}">${esc(s)}</text>`;
+  const AR='marker-start="url(#pa1)" marker-end="url(#pa2)"', AX='stroke-dasharray="16,3,3,3"';
+  const part=d=>`<path d="${d}" fill="url(#ph)" stroke="${ink}" stroke-width="1.8" stroke-linejoin="miter"/>`;
+  const poly=(P,c)=>P.map((p,i)=>(i||c?' L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1)).join('');
+  let g='';
+  // ----- Vue principale -----
+  const zE=-(n+m)-Math.max(3*m,.5*r.d1), rOut=r2+Math.max(2.5*t,.22*R), Rm=ext?R:rOut;
+  const S=SCALES.find(s=>-zE*s<=100&&2*Rm*s<=104)||.1, k=U*S, xZ=80+(400-zE*k)/2, cy=335, X=z=>xZ+z*k, Yu=q=>cy-q*k, Yl=q=>cy+q*k, xL=X(zE);
+  const prof=[[0,R],[-n,R],[-n,r2],[-n-m,r2],[-n-m,R],[zE,R]], up=prof.map(p=>[X(p[0]),Yu(p[1])]), lo=prof.map(p=>[X(p[0]),Yl(p[1])]);
+  if(ext) g+=part(poly(up)+wv(xL,Yu(R),xL,Yl(R))+poly(lo.slice().reverse(),1)+' Z');
+  else g+=part(poly(up)+wv(xL,Yu(R),xL,Yu(rOut))+wv(xL,Yu(rOut),xZ,Yu(rOut))+' Z')+part(poly(lo)+wv(xL,Yl(R),xL,Yl(rOut))+wv(xL,Yl(rOut),xZ,Yl(rOut))+' Z')+Ln(xZ,Yu(R),xZ,Yl(R));
+  g+=Ln(xL-26,cy,xZ+110,cy,AX);
+  const xd=xZ+50; g+=Ln(xZ+3,Yu(R),xd+6,Yu(R))+Ln(xZ+3,Yl(R),xd+6,Yl(R))+Ln(xd,Yu(R),xd,Yl(R),AR)+Tx(xd-6,cy+30,'Ø '+r.d1,'middle',14,1,1);
+  g+=Tx(xZ+8,cy-7,'Z0','start',13,0,1);
+  const yd=Yl(Rm)+40; g+=Ln(X(-n),Yl(ext?R:rOut)+4,X(-n),yd+6)+Ln(xZ,Yl(ext?R:rOut)+4,xZ,yd+6)+Ln(X(-n),yd,xZ,yd,AR)+Tx(xZ+10,yd+4,f2(n),'start',13,0,1);
+  const rc=Math.max((m+t)*k*1.3,18), xc=X(-n-m/2), yc=Yu((R+r2)/2); g+=`<circle cx="${xc.toFixed(1)}" cy="${yc.toFixed(1)}" r="${rc.toFixed(1)}" fill="none" stroke="${ink}" stroke-width=".8" stroke-dasharray="6,3"/>`+Tx(xc-rc*.75-9,yc-rc*.75-4,'B','middle',15,0,1);
+  g+=Tx(330,612,'COUPE LONGITUDINALE — ÉCHELLE '+scTxt(S),'middle',13,0,1);
+  // ----- Détail B : la gorge -----
+  const span=n+m+Math.max(1.5*m,2*t), Sd=SCALES.find(s=>span*U*s<=330&&3.7*t*U*s<=190)||.1, k2=U*Sd, xD=1040, yD=ext?250:330, xq=z=>xD+z*k2, Yq=q=>yD-(q-R)*k2, zD=-span, rb=r2-sg*2.5*t, xE=xq(zD);
+  const pr2=[[0,rb],[0,R],[-n,R],[-n,r2],[-n-m,r2],[-n-m,R],[zD,R]].map(p=>[xq(p[0]),Yq(p[1])]);
+  g+=part(poly(pr2)+wv(xE,Yq(R),xE,Yq(rb))+wv(xE,Yq(rb),xD,Yq(rb))+' Z');
+  const z1=-n-(m-r.s)/2, rt=R+sg*1.3*t; g+=`<rect x="${xq(z1-r.s).toFixed(1)}" y="${Math.min(Yq(r2),Yq(rt)).toFixed(1)}" width="${(r.s*k2).toFixed(1)}" height="${Math.abs(Yq(r2)-Yq(rt)).toFixed(1)}" fill="url(#pc)" stroke="${ink}" stroke-width="1.2"/>`;
+  const yM=Yq(rt)-sg*30, yN=yM-sg*30;
+  g+=Ln(xq(-n),Yq(R)-sg*4,xq(-n),yN-sg*6)+Ln(xq(-n-m),Yq(R)-sg*4,xq(-n-m),yM-sg*6)+Ln(xD,Yq(R)-sg*4,xD,yN-sg*6);
+  g+=Ln(xq(-n-m),yM,xq(-n),yM,AR)+Tx(xq(-n-m)-8,yM+4,'m = '+f2(m)+'  H13','end',13,0,1)+Ln(xq(-n),yN,xD,yN,AR)+Tx(xq(-n)-8,yN+4,'n = '+f2(n)+(r.p>r.n?'':' mini'),'end',13,0,1);
+  const xt=xD+34; g+=Ln(xD+3,Yq(R),xt+6,Yq(R))+Ln(xq(-n)+3,Yq(r2),xt+6,Yq(r2),'stroke-dasharray="4,3"')+Ln(xt,Yq(R),xt,Yq(r2),AR)+Tx(xt+9,(Yq(R)+Yq(r2))/2+4,'t = '+f2(t),'start',13,0,1);
+  g+=Ln(xq(z1-r.s/2),Yq(rt)-sg*3,xq(z1-r.s/2)-30,Yq(rt)-sg*14)+Tx(xq(z1-r.s/2)-34,Yq(rt)-sg*14+4,'circlip s = '+r.s,'end',12);
+  g+=Tx(xD+5,Yq(rb)+(ext?-6:14),'Z0','start',13,0,1);
+  g+=Tx(900,ext?80:92,ext?'GORGE EXTÉRIEURE':'GORGE INTÉRIEURE','middle',12)+Tx(900,470,'DÉTAIL B — ÉCHELLE '+scTxt(Sd),'middle',13,0,1)+Tx(900,488,'Fond de gorge Ø '+f3(r.d2)+'  ('+r.dv+')  ·  mini '+f3(r.lo)+' / maxi '+f3(r.hi),'middle',11)+Tx(900,504,'Demi-coupe côté haut : l\'axe de la pièce est vers le bas.','middle',11);
+  // ----- Tableau, cadre, cartouche -----
+  const rows=r.vals.map(v=>[v[0],v[1]+'   '+v[2]]).concat([['MATIÈRE MINI AVANT LA GORGE','n = '+f2(r.n)+' mm entre le bout de la pièce et la gorge'],['GORGE, FLANCS','Z−'+f2(r.p)+' et Z−'+f2(r.p+m)+'  (largeur '+f2(m)+')'],['GORGE, FOND','X'+f3(r.aim)]]), ty0=650, rh=18;
+  g+=Tx(64,ty0-8,'COTES À PROGRAMMER (mm)','start',12,0,1)+`<rect x="60" y="${ty0}" width="580" height="${rows.length*rh}" fill="none" stroke="${ink}" stroke-width="1"/>`+Ln(250,ty0,250,ty0+rows.length*rh);
+  rows.forEach((v,i)=>{const y=ty0+i*rh; if(i)g+=Ln(60,y,640,y); g+=Tx(66,y+13,v[0],'start',11)+Tx(256,y+13,v[1],'start',11,0,1)});
+  const cx0=660,cy0=640;
+  g+=`<rect x="40" y="40" width="1108" height="760" fill="none" stroke="${ink}" stroke-width="2"/><rect x="${cx0}" y="${cy0}" width="488" height="160" fill="#fff" stroke="${ink}" stroke-width="1.5"/>`;
+  g+=Ln(cx0,cy0+62,1148,cy0+62)+Ln(cx0,cy0+112,1148,cy0+112)+Ln(cx0+150,cy0,cx0+150,cy0+62)+Ln(cx0+122,cy0+112,cx0+122,800)+Ln(cx0+244,cy0+112,cx0+244,800)+Ln(cx0+366,cy0+112,cx0+366,800);
+  if(r.logo) g+=`<image x="${cx0+12}" y="${cy0+4}" width="126" height="54" preserveAspectRatio="xMidYMid meet" href="${r.logo}"/>`;
+  g+=Tx(cx0+160,cy0+28,'Gorge circlip Ø '+r.d1,'start',20,0,1)+Tx(cx0+160,cy0+50,ext?'Arbre — gorge extérieure':'Alésage — gorge intérieure','start',13);
+  g+=Tx(cx0+10,cy0+82,ext?'DIN 471 — anneau élastique pour arbre':'DIN 472 — anneau élastique pour alésage','start',12,0,1)+Tx(cx0+10,cy0+101,'Circlip '+r.d1+' × '+r.s+'  ·  fond de gorge '+r.cls+'  ·  largeur H13','start',11);
+  [['ÉCHELLE',scTxt(S)],['DÉTAIL B',scTxt(Sd)],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR','MCS Usinage']].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+Tx(cx0+8+i*122,cy0+149,v[1],'start',14,0,1)});
+  g+=Tx(48,816,(r.vok?'VALEURS CONTRÔLÉES — ':'À CONFIRMER SUR LA PREMIÈRE PIÈCE — ')+r.verif,'start',10,0,1)+Tx(48,831,'Cotes en mm. Vérifier le montage du circlip sur la première pièce avant série.','start',10);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Arial,Helvetica,sans-serif"><defs>
+  <pattern id="ph" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><rect width="7" height="7" fill="#fff"/><line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width=".8"/></pattern>
+  <pattern id="pc" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(-45)"><rect width="4" height="4" fill="#fff"/><line x1="0" y1="0" x2="0" y2="4" stroke="#111" stroke-width="1"/></pattern>
+  <marker id="pa1" markerWidth="11" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M0,3 L10,0.7 L10,5.3Z" fill="${ink}"/></marker>
+  <marker id="pa2" markerWidth="11" markerHeight="6" refX="10" refY="3" orient="auto"><path d="M10,3 L0,0.7 L0,5.3Z" fill="${ink}"/></marker></defs>
+  <rect width="${W}" height="${H}" fill="#fff"/>${g}</svg>`;
+}
+
+const sc={type:'ext',d:'30',pos:''}; let curCC=null, svgCC='';
+try{Object.assign(sc,JSON.parse(localStorage.getItem('mcs-cc')||'{}'))}catch(e){}
+function fillCC(){ const L=sc.type==='ext'?C471:C472; $('ccD').innerHTML=L.map(x=>`<option value="${x[0]}">Ø ${x[0]}</option>`).join('');
+  if(!L.some(x=>String(x[0])===String(sc.d))) sc.d='30'; $('ccD').value=sc.d; }
+function renderCC(){
+  document.querySelectorAll('#ccType button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===sc.type));
+  const r=curCC=calcCC(sc.type==='ext',sc.d,sc.pos); if(!r)return;
+  $('ccPos').placeholder=f2(r.n)+' (mini)'; $('ccPos').value=sc.pos;
+  $('ccT').textContent=r.nom; $('ccS').textContent=r.sub;
+  $('ccVals').innerHTML=r.vals.map((v,j)=>`<div class="val${j?'':' k'}"><b>${v[0]}</b><span>${v[1]}</span><i>${v[2]}</i></div>`).join('');
+  $('ccVerif').className='verif'+(r.vok?'':' ko'); $('ccVerif').innerHTML='<b>'+(r.vok?'Valeurs contrôlées':'À confirmer sur la première pièce')+'</b>'+esc(r.verif)+(r.warn?' <strong>Attention : la distance saisie est inférieure au mini de la norme ('+f2(r.n)+' mm).</strong>':'');
+  $('ccN').textContent='Matière mini à laisser entre le bout de la pièce et la gorge : '+f2(r.n)+' mm (valeur n de la norme, pour que l\'épaulement tienne l\'effort). Si votre gorge est plus loin du bout, saisissez votre cote en haut.';
+  $('ccProg').innerHTML='<tr><th>Gorge</th><th class="n">Z</th><th class="n">X (Ø)</th></tr>'+r.prog.map(row).join('');
+  r.logo=document.querySelector('.logo img').src; $('ccDessin').innerHTML=svgCC=planCC(r); $('ccMsg').textContent='';
+  try{localStorage.setItem('mcs-cc',JSON.stringify(sc))}catch(e){}
+}
+$('ccType').onclick=e=>{const b=e.target.closest('button');if(!b)return;sc.type=b.dataset.v;sc.pos='';fillCC();renderCC()};
+$('ccD').onchange=e=>{sc.d=e.target.value;sc.pos='';renderCC()};
+$('ccPos').oninput=e=>{sc.pos=e.target.value;renderCC()};
+fillCC(); renderCC();
+
+/* ================= MODULE TOLÉRANCES ISO 286 ================= */
+const TR_=[3,6,10,18,30,50,80,120,180,250,315,400,500];
+const ITT={4:[3,4,4,5,6,7,8,10,12,14,16,18,20],5:[4,5,6,8,9,11,13,15,18,20,23,25,27],6:[6,8,9,11,13,16,19,22,25,29,32,36,40],7:[10,12,15,18,21,25,30,35,40,46,52,57,63],8:[14,18,22,27,33,39,46,54,63,72,81,89,97],9:[25,30,36,43,52,62,74,87,100,115,130,140,155],10:[40,48,58,70,84,100,120,140,160,185,210,230,250],11:[60,75,90,110,130,160,190,220,250,290,320,360,400],12:[100,120,150,180,210,250,300,350,400,460,520,570,630],13:[140,180,220,270,330,390,460,540,630,720,810,890,970]};
+// Écarts fondamentaux des arbres (µm) : es pour d à g, ei pour j à p
+const FD={d:[-20,-30,-40,-50,-65,-80,-100,-120,-145,-170,-190,-210,-230],e:[-14,-20,-25,-32,-40,-50,-60,-72,-85,-100,-110,-125,-135],f:[-6,-10,-13,-16,-20,-25,-30,-36,-43,-50,-56,-62,-68],g:[-2,-4,-5,-6,-7,-9,-10,-12,-14,-15,-17,-18,-20],
+  k:[0,1,1,1,2,2,2,3,3,4,4,4,5],m:[2,4,6,7,8,9,11,13,15,17,20,21,23],n:[4,8,10,12,15,17,20,23,27,31,34,37,40],p:[6,12,15,18,22,26,32,37,43,50,56,62,68],
+  j56:[-2,-2,-2,-3,-4,-5,-7,-9,-11,-13,-16,-18,-20],j7:[-4,-4,-5,-6,-8,-10,-12,-15,-18,-21,-26,-28,-32]};
+const SUB=[3,6,10,18,30,50,65,80,100,120,140,160,180,200,225,250,280,315,355,400,450,500];
+const FR=[10,15,19,23,28,34,41,43,51,54,63,65,68,77,80,84,94,98,108,114,126,132], FS=[14,19,23,28,35,43,53,59,71,79,92,100,108,122,130,140,158,170,190,208,232,252];
+const JH={6:[2,5,5,6,8,10,13,16,18,22,25,29,33],7:[4,6,8,10,12,14,18,22,26,30,36,39,43],8:[6,10,12,15,20,24,28,34,41,47,55,60,66]};
+const SHL=['d','e','f','g','h','js','j','k','m','n','p','r','s'], HOL=['D','E','F','G','H','JS','J','K','M','N','P','R','S'];
+const grS=l=>l==='j'?[5,6,7]:l==='h'||l==='js'?[4,5,6,7,8,9,10,11,12,13]:[4,5,6,7,8,9,10,11];
+const grH=l=>l==='J'?[6,7,8]:l==='K'?[5,6,7,8]:l==='H'||l==='JS'?[5,6,7,8,9,10,11,12,13]:[5,6,7,8,9,10,11];
+const ri=D=>TR_.findIndex(x=>D<=x), si=D=>SUB.findIndex(x=>D<=x);
+function fdS(l,D){return l==='r'?FR[si(D)]:l==='s'?FS[si(D)]:FD[l][ri(D)]}
+function devS(l,g,D){ const t=ITT[g][ri(D)];
+  if(l==='h')return [-t,0]; if(l==='js')return [-t/2,t/2];
+  if('defg'.includes(l)){const es=fdS(l,D);return [es-t,es]}
+  let ei; if(l==='j')ei=FD[g===7?'j7':'j56'][ri(D)]; else if(l==='k')ei=g>=4&&g<=7?FD.k[ri(D)]:0; else ei=fdS(l,D);
+  return [ei,ei+t]; }
+function devH(l,g,D){ const i=ri(D),t=ITT[g][i],dl=D<=3?0:t-ITT[g-1][i];
+  if(l==='H')return [0,t]; if(l==='JS')return [-t/2,t/2];
+  if('DEFG'.includes(l)){const EI=-FD[l.toLowerCase()][i];return [EI,EI+t]}
+  let ES; if(l==='J')ES=JH[g][i];
+  else if(l==='K')ES=D<=3?0:-FD.k[i]+dl;
+  else if(l==='M')ES=g<=8?(D<=3?-2:(g===6&&i===10?-9:-FD.m[i]+dl)):-FD.m[i];
+  else if(l==='N')ES=g<=8?(D<=3?-4:-FD.n[i]+dl):(D<=3?-4:0);
+  else {const x=fdS(l.toLowerCase(),D); ES=g<=7?-x+dl:-x;}
+  return [ES-t,ES]; }
+
+const FITS=['H7/g6','H7/h6','H7/js6','H7/k6','H7/m6','H7/n6','H7/p6','H7/r6','H7/s6','H8/f7','H8/e8','H8/h7','H9/d9','H9/h9','H11/h11','H11/d11','G7/h6','F8/h7','K7/h6','N7/h6','P7/h6'];
+const stl={D:'30',hl:'H',hg:'7',sl:'g',sg:'6'};
+try{Object.assign(stl,JSON.parse(localStorage.getItem('mcs-tol')||'{}'))}catch(e){}
+const um=v=>(v>0?'+':v<0?'−':'')+Math.abs(v).toFixed(v%1?1:0), mm=v=>v.toFixed(3);
+function fillTol(){
+  $('tHl').innerHTML=HOL.map(l=>`<option>${l}</option>`).join(''); $('tSl').innerHTML=SHL.map(l=>`<option>${l}</option>`).join('');
+  $('tHl').value=stl.hl; $('tSl').value=stl.sl; fillGr(); }
+function fillGr(){
+  const a=grH(stl.hl), b=grS(stl.sl); if(!a.includes(+stl.hg))stl.hg=String(a.includes(7)?7:a[0]); if(!b.includes(+stl.sg))stl.sg=String(b.includes(6)?6:b[0]);
+  $('tHg').innerHTML=a.map(g=>`<option>${g}</option>`).join(''); $('tSg').innerHTML=b.map(g=>`<option>${g}</option>`).join(''); $('tHg').value=stl.hg; $('tSg').value=stl.sg; }
+function fitKind(jmin,jmax){return jmin>=0?['jeu','Ajustement avec jeu','La pièce tourne ou glisse, il reste toujours du jeu.']:jmax<=0?['ser','Ajustement serré','Montage à la presse ou à chaud, toujours du serrage.']:['inc','Ajustement incertain','Selon les pièces : léger jeu ou léger serrage.']}
+function renderTol(){
+  const D=+stl.D, fit=stl.hl+stl.hg+'/'+stl.sl+stl.sg;
+  document.querySelectorAll('#tFits button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===fit));
+  $('tD').value=stl.D;
+  if(!(D>=1&&D<=500)){$('tOut').hidden=true;$('tErr').hidden=false;return} $('tOut').hidden=false;$('tErr').hidden=true;
+  const [EI,ES]=devH(stl.hl,+stl.hg,D), [ei,es]=devS(stl.sl,+stl.sg,D), jmin=EI-es, jmax=ES-ei, k=fitKind(jmin,jmax);
+  const card=(cls,t,lo,hi,a,b)=>`<div class="tcard ${cls}"><b>${t}</b><span>${mm(D+lo/1000)} <em>à</em> ${mm(D+hi/1000)}</span><i>écarts ${um(b)} / ${um(a)} µm · viser ${mm(D+(lo+hi)/2000)}</i></div>`;
+  $('tCards').innerHTML=card('ho','Alésage Ø '+D+' '+stl.hl+stl.hg,EI,ES,EI,ES)+card('sh','Arbre Ø '+D+' '+stl.sl+stl.sg,ei,es,ei,es)
+    +`<div class="tcard v-${k[0]}"><b>${k[1]}</b><span>${jmin<0?'serrage '+Math.abs(jmin).toFixed(jmin%1?1:0):'jeu '+jmin.toFixed(jmin%1?1:0)} <em>à</em> ${jmax<0?'serrage '+Math.abs(jmax).toFixed(jmax%1?1:0):'jeu '+jmax.toFixed(jmax%1?1:0)} µm</span><i>${k[2]}</i></div>`;
+  // --- graphique des zones de tolérance ---
+  const W=640,H=320,y0=160,M=Math.max(Math.abs(ES),Math.abs(EI),Math.abs(es),Math.abs(ei),1),s=118/M,Y=v=>y0-v*s;
+  const bar=(x,lo,hi,c,n)=>{const h=Math.max(3,Y(lo)-Y(hi));return `<g class="grow"><rect x="${x}" y="${Y(hi).toFixed(1)}" width="150" height="${h.toFixed(1)}" rx="5" style="fill:var(--${c})" opacity=".9"/><rect x="${x}" y="${Y(hi).toFixed(1)}" width="150" height="${h.toFixed(1)}" rx="5" style="fill:none;stroke:var(--${c})" stroke-width="2"/></g>
+    <text x="${x+75}" y="${(Y(hi)-8).toFixed(1)}" class="gv" text-anchor="middle">${um(hi)}</text><text x="${x+75}" y="${(Y(lo)+18).toFixed(1)}" class="gv" text-anchor="middle">${um(lo)}</text>
+    <text x="${x+75}" y="${H-8}" class="gl" text-anchor="middle" style="fill:var(--${c})">${n}</text>`};
+  $('tZones').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Zones de tolérance de l'alésage et de l'arbre par rapport à la cote nominale">
+    <line x1="60" y1="${y0}" x2="${W-20}" y2="${y0}" style="stroke:var(--ink)" stroke-width="1.5"/><text x="${W-22}" y="${y0-7}" class="gs" text-anchor="end">ligne zéro · Ø ${mm(D)}</text>
+    <text x="56" y="${y0-126}" class="gs" text-anchor="end">+</text><text x="56" y="${y0+134}" class="gs" text-anchor="end">−</text><text x="20" y="${y0+4}" class="gs">µm</text>
+    ${bar(150,EI,ES,'hole',stl.hl+stl.hg+' · alésage')}${bar(360,ei,es,'shaft',stl.sl+stl.sg+' · arbre')}</svg>`;
+  // --- jauge jeu / serrage ---
+  const G=Math.max(Math.abs(jmin),Math.abs(jmax),1)*1.25, gx=v=>320+v/G*260, a=gx(jmin), b=gx(jmax);
+  $('tGauge').innerHTML=`<svg viewBox="0 0 640 150" role="img" aria-label="Plage de jeu ou de serrage de l'ajustement">
+    <rect x="60" y="62" width="260" height="18" rx="9" style="fill:var(--shaft)" opacity=".16"/><rect x="320" y="62" width="260" height="18" rx="9" style="fill:var(--hole)" opacity=".16"/>
+    <line x1="320" y1="48" x2="320" y2="94" style="stroke:var(--ink)" stroke-width="1.5"/><text x="320" y="40" class="gs" text-anchor="middle">0</text>
+    <text x="60" y="40" class="gl" style="fill:var(--shaft)">SERRAGE</text><text x="580" y="40" class="gl" text-anchor="end" style="fill:var(--hole)">JEU</text>
+    <rect class="grow" x="${Math.min(a,b).toFixed(1)}" y="58" width="${Math.max(6,Math.abs(b-a)).toFixed(1)}" height="26" rx="13" style="fill:var(--gold)"/>
+    <text x="${Math.max(70,Math.min(a,570)).toFixed(1)}" y="112" class="gv" text-anchor="middle">${um(jmin)}</text><text x="${Math.max(70,Math.min(b,570)).toFixed(1)}" y="134" class="gv" text-anchor="middle">${um(jmax)}</text>
+    <text x="320" y="146" class="gs" text-anchor="middle">écart alésage − arbre, en µm</text></svg>`;
+  // --- illustration arbre dans alésage ---
+  const jm=(jmin+jmax)/2, gp=Math.max(-9,Math.min(16,jm/G*22)), rs=70, rb=rs+gp;
+  $('tPic').innerHTML=`<svg viewBox="0 0 260 260" role="img" aria-label="Arbre dans son alésage, jeu ou serrage amplifié">
+    <rect x="14" y="14" width="232" height="232" rx="26" style="fill:var(--hole)" opacity=".85"/>
+    <circle cx="130" cy="130" r="${Math.max(rb,rs).toFixed(1)}" style="fill:var(--surf)"/>
+    <circle cx="130" cy="${(130+Math.max(0,gp)).toFixed(1)}" r="${rs}" style="fill:var(--shaft)" opacity=".9"/>
+    ${gp<0?`<circle cx="130" cy="130" r="${(rs+gp/2).toFixed(1)}" style="fill:none;stroke:var(--gold)" stroke-width="${(-gp).toFixed(1)}" stroke-dasharray="5,4"/>`:''}
+    <text x="130" y="134" class="gl" text-anchor="middle" style="fill:var(--onpri)">ARBRE</text><text x="130" y="36" class="gl" text-anchor="middle" style="fill:var(--onpri)">ALÉSAGE</text></svg>`;
+  $('tPicN').textContent=k[0]==='jeu'?'Jeu amplifié pour le voir : l\'arbre repose au fond de l\'alésage.':k[0]==='ser'?'Serrage amplifié : l\'anneau pointillé est la matière en trop à comprimer.':'Entre les deux : la pièce peut tomber côté jeu ou côté serrage.';
+  $('tProg').innerHTML='<tr><th>Pièce</th><th class="n">Mini</th><th class="n">Maxi</th><th class="n">À viser</th></tr>'+row(['Alésage '+stl.hl+stl.hg,mm(D+EI/1000),mm(D+ES/1000),mm(D+(EI+ES)/2000)])+row(['Arbre '+stl.sl+stl.sg,mm(D+ei/1000),mm(D+es/1000),mm(D+(ei+es)/2000)]);
+  try{localStorage.setItem('mcs-tol',JSON.stringify(stl))}catch(e){}
+}
+$('tFits').innerHTML=FITS.map(f=>`<button type="button" data-v="${f}">${f}</button>`).join('');
+$('tFits').onclick=e=>{const b=e.target.closest('button');if(!b)return;const m=b.dataset.v.match(/^([A-Z]+)(\d+)\/([a-z]+)(\d+)$/);stl.hl=m[1];stl.hg=m[2];stl.sl=m[3];stl.sg=m[4];fillTol();renderTol()};
+$('tD').oninput=e=>{stl.D=e.target.value;renderTol()};
+$('tHl').onchange=e=>{stl.hl=e.target.value;fillGr();renderTol()}; $('tSl').onchange=e=>{stl.sl=e.target.value;fillGr();renderTol()};
+$('tHg').onchange=e=>{stl.hg=e.target.value;renderTol()}; $('tSg').onchange=e=>{stl.sg=e.target.value;renderTol()};
+fillTol(); renderTol();
+
+/* ---------- Onglets ---------- */
+let mod='fil'; try{mod=localStorage.getItem('mcs-mod')||'fil'}catch(e){}
+function showMod(m){mod=m;$('modFil').hidden=m!=='fil';$('modCC').hidden=m!=='cc';$('modTol').hidden=m!=='tol';document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));try{localStorage.setItem('mcs-mod',m)}catch(e){}}
+$('tabs').onclick=e=>{const b=e.target.closest('button');if(b)showMod(b.dataset.m)}; showMod(mod);
+
+/* ---------- Export PDF A4 pour impression ---------- */
+async function planPdf(svg){
+  const img=new Image(); await new Promise((ok,ko)=>{img.onload=ok;img.onerror=()=>ko(new Error('svg'));img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)});
+  const cv=document.createElement('canvas'); cv.width=3508; cv.height=2480; const x=cv.getContext('2d'); x.fillStyle='#fff'; x.fillRect(0,0,3508,2480); x.drawImage(img,0,0,3508,2480);
+  const pdf=new window.jspdf.jsPDF({orientation:'l',unit:'mm',format:'a4'}); pdf.addImage(cv.toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);
+  return pdf.output('arraybuffer');
+}
+(async()=>{
+  const native=!window.claude, dl=native?null:await (window.claude.use?window.claude.use('downloads'):null); if(!native&&!dl)return;
+  const put=async(filename,data)=>{ if(!native)return dl.save({filename,data}); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:filename.endsWith('.pdf')?'application/pdf':'image/svg+xml'})); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); };
+  document.querySelectorAll('.dlBox').forEach(b=>b.hidden=false);
+  document.querySelectorAll('.dlBtn').forEach(btn=>btn.onclick=async()=>{ const cc=btn.dataset.m==='cc', svg=cc?svgCC:lastSvg, msg=$(cc?'ccMsg':'dlMsg'); if(!svg)return;
+    const name=cc?'plan-gorge-circlip-'+(curCC.ext?'arbre-':'alesage-')+curCC.d1:'plan-'+cur.nom.replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'')+(cur.ext?'-ext':'-int');
+    msg.textContent='Préparation du plan…';
+    try{ let data,fn; try{data=await planPdf(svg);fn=name+'.pdf'}catch(e){data=svg;fn=name+'.svg'}
+      await put(fn,data); msg.textContent='Plan enregistré : '+fn+'. Imprimez-le en A4 paysage, à 100 %.'; }
+    catch(e){ msg.textContent=e&&e.code==='declined'?'Enregistrement annulé.':'Enregistrement impossible ici ('+((e&&e.code)||'erreur')+').'; } });
+})();
+</script>
+</body>
+</html>
