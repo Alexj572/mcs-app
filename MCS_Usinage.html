@@ -62,12 +62,30 @@ select,input{width:100%;min-height:46px;font-family:var(--mono);font-size:1.1rem
 .paper{background:#fff;border:1px solid var(--line);border-radius:6px;overflow-x:auto}
 .paper{cursor:zoom-in}
 .paper svg{display:block;width:100%;height:auto}
-.zhint{font-size:.85rem;color:var(--mut);margin:0 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.zhint span{flex:1;min-width:150px}
+.zhint{font-size:.85rem;color:var(--mut);margin:0 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.zhint .zt{flex:1;min-width:150px}
 .paper{touch-action:pan-y}
 #pr{display:none}
 @media print{@page{size:A4 landscape;margin:6mm}html,body{background:#fff!important;padding:0!important;margin:0!important}body>*:not(#pr){display:none!important}#pr{display:block}#pr svg{display:block;width:100%;height:auto;max-height:196mm}}
 .gbox svg{display:block;width:100%;height:auto;max-height:340px}
 .conv{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:4px 10px;align-items:end}.conv>span{font-size:1.3rem;color:var(--mut);padding-bottom:10px}.conv .lab{margin-top:8px}
+.zhint .fiBox{display:flex;gap:6px;flex:0 1 auto;min-width:0}.ofIn{width:170px;min-height:40px;font-size:.95rem;font-family:var(--body)}
+.quick{padding-block:10px 0;display:grid;gap:8px}
+.qrow{display:flex;gap:8px}.qrow input{flex:1;min-width:0;font-family:var(--body);font-size:1rem}
+.btn.ghost{background:var(--surf);color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.qlist{display:flex;gap:6px;align-items:center;overflow-x:auto;padding-bottom:2px}.qlist b{font-family:var(--head);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);flex:none}
+.qlist button{flex:none;font-family:var(--mono);font-size:.85rem;min-height:34px;padding:3px 11px;border:1.5px solid var(--line);border-radius:999px;background:var(--surf);color:var(--ink);cursor:pointer;white-space:nowrap}
+#qFav button{border-color:var(--gold)}
+.star{font-family:var(--head);font-weight:600;font-size:.95rem;min-height:38px;padding:4px 12px;border:1.5px solid var(--line);border-radius:999px;background:var(--surf);color:var(--mut);cursor:pointer;white-space:nowrap}
+.star[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.modal{position:fixed;inset:0;z-index:70;background:rgba(8,14,36,.6);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:16px}
+.mbox{width:min(640px,100%);margin-block:auto}
+.mrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) auto;gap:6px;margin-bottom:6px}.mrow input{font-size:.9rem;padding:5px 7px}
+@page fiche{size:A4 portrait;margin:8mm}
+@media print{#pr.fiche{page:fiche;color:#000;font:10pt Arial,Helvetica,sans-serif}#pr.fiche svg{max-height:none}
+.fih{display:flex;gap:10px;align-items:center;border:1.5px solid #000;padding:6px;margin-bottom:6px}.fih img{height:44px}.fih>div{flex:1}.fih b{display:block;font-size:14pt}.fih span{display:block;font-size:12pt;font-weight:700}.fih small{font-size:8pt}
+#pr.fiche table{border-collapse:collapse;width:100%;font-size:9pt}#pr.fiche td,#pr.fiche th{border:1px solid #000;padding:3px 6px;color:#000;background:none;text-align:left;font-family:Arial,sans-serif;font-size:9pt;letter-spacing:0;text-transform:none}
+.fih table{width:62mm!important;flex:none}.fip{border:1px solid #000}
+#pr.fiche h3{font-size:10pt;margin:8px 0 3px;text-transform:uppercase}#pr.fiche p{font-size:8pt;margin:3px 0}.fir td{height:7mm}.fib{break-inside:avoid}#pr.fiche h3{break-after:avoid}#pr.fiche .fiv{margin-top:8px}}
 .ver{text-align:center;font-size:.75rem;color:var(--mut);margin:0;padding:6px 0 18px}
 #zv{position:fixed;inset:0;z-index:60;background:#ffffff;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #zc{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
@@ -146,9 +164,15 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
 <body style="margin:0">
 <header><div class="wrap">
   <div class="logo"><img src="data:image/jpeg;base64,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" alt="MCS Mécanique Concept Saar"></div>
-  <div><h1>Aide à l'usinage</h1><p>Filetages, gorges, tolérances, calculs de coupe : les cotes à usiner, sans chercher</p></div>
+  <div><h1>Aide à l'usinage</h1><p>Filetages, gorges, tolérances, clavettes, calculs de coupe : les cotes à usiner, sans chercher</p></div>
 </div>
-<nav class="wrap tabs" id="tabs" aria-label="Modules"><button type="button" data-m="fil">Filetages</button><button type="button" data-m="cc">Circlips et gorges</button><button type="button" data-m="tol">Tolérances ISO</button><button type="button" data-m="cal">Coupe et calculs</button></nav></header>
+<nav class="wrap tabs" id="tabs" aria-label="Modules"><button type="button" data-m="fil">Filetages</button><button type="button" data-m="cc">Circlips et gorges</button><button type="button" data-m="tol">Tolérances ISO</button><button type="button" data-m="cla">Clavettes</button><button type="button" data-m="cal">Coupe et calculs</button></nav></header>
+<section class="wrap quick" id="quick">
+  <form class="qrow" id="qForm"><input id="qIn" type="search" enterkeyhint="search" autocomplete="off" placeholder="Recherche : M12x1.25 · G1/2 · 1/4 NPT · 25H7 · circlip 30 · clavette 30" aria-label="Recherche directe"><button type="submit" class="btn">Aller</button><button type="button" class="btn ghost" id="cfgBtn" aria-label="Réglages d'atelier">⚙</button></form>
+  <p class="note" id="qMsg" style="margin:0" hidden></p>
+  <div class="qlist" id="qFav" hidden></div><div class="qlist" id="qRec" hidden></div>
+</section>
+
 
 <main class="wrap" id="modFil">
   <section class="card">
@@ -170,7 +194,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   </section>
 
   <section class="card">
-    <p class="fiche-t" id="ft"></p><p class="fiche-s" id="fs"></p>
+    <button type="button" class="star" data-m="fil" style="float:right;margin-left:8px"></button><p class="fiche-t" id="ft"></p><p class="fiche-s" id="fs"></p>
     <div class="vals" id="vals"></div>
     <p class="note" id="vnote"></p>
     <p class="verif" id="verif"></p>
@@ -179,7 +203,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="fil">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span>Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="fiBox" data-m="fil" hidden><input class="ofIn" type="text" maxlength="30" placeholder="N° pièce / OF" aria-label="N° de pièce ou OF pour la fiche"><button type="button" class="btn fiBtn">📋 Fiche de réglage</button></span><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
     <p class="note" id="dlMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="dessin"></div>
   </section>
@@ -206,14 +230,14 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     </div>
   </section>
   <section class="card">
-    <p class="fiche-t" id="ccT"></p><p class="fiche-s" id="ccS"></p>
+    <button type="button" class="star" data-m="cc" style="float:right;margin-left:8px"></button><p class="fiche-t" id="ccT"></p><p class="fiche-s" id="ccS"></p>
     <div class="vals" id="ccVals"></div>
     <p class="verif" id="ccVerif"></p>
   </section>
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="cc">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span>Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="fiBox" data-m="cc" hidden><input class="ofIn" type="text" maxlength="30" placeholder="N° pièce / OF" aria-label="N° de pièce ou OF pour la fiche"><button type="button" class="btn fiBtn">📋 Fiche de réglage</button></span><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
     <p class="note" id="ccMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="ccDessin"></div>
   </section>
@@ -235,6 +259,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   </section>
   <p class="card" id="tErr" hidden>Indiquez un Ø nominal entre 1 et 500 mm.</p>
   <div id="tOut" style="display:grid;gap:14px">
+    <div class="bar" style="margin:0"><p class="fiche-t" id="tTitle" style="flex:1"></p><button type="button" class="star" data-m="tol"></button></div>
     <div class="tcards" id="tCards"></div>
     <section class="card"><h2>Où tombent les deux pièces</h2>
       <div class="viz"><div><div id="tZones"></div><div id="tGauge"></div></div><div><div id="tPic"></div><p class="note" id="tPicN" style="text-align:center"></p></div></div>
@@ -243,12 +268,34 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
       <table id="tProg"></table>
       <p class="verif"><b>Valeurs contrôlées</b>Qualités IT4 à IT13 recoupées en entier sur une table ISO 286 publiée. Écarts des positions recoupés sur 11 classes d'une table publiée (f6, j6, k6, m6, r6, H7, G7, J7, K7, M7, R7) ; les autres viennent des mêmes tables de la norme, non recoupées une par une.</p>
     </section>
+    <section class="card"><div class="bar"><h2>Plan A4</h2>
+      <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="tol">Télécharger le plan en PDF</button></span></div>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="fiBox" data-m="tol" hidden><input class="ofIn" type="text" maxlength="30" placeholder="N° pièce / OF" aria-label="N° de pièce ou OF pour la fiche"><button type="button" class="btn fiBtn">📋 Fiche de réglage</button></span><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
+    <p class="note" id="tMsg" style="margin:0 0 8px"></p>
+    <div class="paper" id="tDessin"></div></section>
   </div>
+</main>
+<main class="wrap" id="modCla" hidden>
+  <section class="card">
+    <div class="row">
+      <div><label class="lab" for="kaD">Ø de l'arbre (mm)</label><input id="kaD" type="number" min="6" max="200" step="0.1" inputmode="decimal"></div>
+      <div style="flex:2 1 280px"><span class="lab">Ajustement de la clavette</span><div class="seg" id="kaFit"></div></div>
+    </div>
+  </section>
+  <p class="card" id="kaErr" hidden>La table DIN 6885 couvre les arbres de Ø 6 à Ø 200 mm.</p>
+  <section class="card" id="kaOut">
+    <button type="button" class="star" data-m="cla" style="float:right;margin-left:8px"></button><p class="fiche-t" id="kaT"></p><p class="fiche-s" id="kaS"></p>
+    <div class="viz"><div class="vals" id="kaVals" style="align-content:start"></div><div><div class="gbox" id="kaPic"></div><p class="note" style="text-align:center">Coupe de l'arbre dans son moyeu, clavette en haut.</p></div></div>
+    <p class="verif" id="kaVerif"></p>
+    <p class="note">La longueur de la clavette dépend du couple à passer : elle n'est pas donnée ici, elle vient du plan.</p>
+  </section>
 </main>
 <main class="wrap" id="modCal" hidden>
   <section class="card">
     <h2>Vitesse de broche et avance</h2>
     <div class="seg" id="kMode"><button type="button" data-v="t">Tournage<small>la pièce tourne</small></button><button type="button" data-v="o">Outil tournant<small>fraise, foret</small></button></div>
+    <div id="kMachB" style="margin-top:10px" hidden><span class="lab">Machine</span><div class="chips" id="kMach"></div></div>
+    <p class="note" id="kMachN">Ajoutez vos machines dans ⚙ Réglages (en haut) pour retrouver leur maxi broche d'un clic.</p>
     <div class="row" style="margin-top:12px">
       <div><label class="lab" for="kD" id="kDl">Ø usiné (mm)</label><input id="kD" type="number" step="0.1" min="0" inputmode="decimal"></div>
       <div><label class="lab" for="kVc">Vc (m/min)</label><input id="kVc" type="number" step="1" min="0" inputmode="decimal"></div>
@@ -323,14 +370,25 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 7</p>
+<p class="ver">Aide à l'usinage · version 8</p>
 <div id="pr"></div>
+<div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
+  <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
+  <p class="note" id="cfgInfo" style="margin:0 0 10px"></p>
+  <div class="row"><div><label class="lab" for="cfgSur">Surépaisseur avant filetage (mm)</label><input id="cfgSur" type="number" step="0.01" min="0" max="1" inputmode="decimal"></div>
+    <div><label class="lab" for="cfgPar">Nom dans le cartouche des plans</label><input id="cfgPar" type="text" maxlength="14"></div></div>
+  <span class="lab">Machines : nom, maxi broche, maxi outil tournant (tr/min)</span><div id="cfgM"></div>
+  <button type="button" class="btn ghost" id="cfgAdd">+ Ajouter une machine</button>
+  <div class="bar" style="margin:14px 0 0"><span id="cfgMsg" class="note" style="flex:1;margin:0"></span><button type="button" class="btn" id="cfgSave">Enregistrer</button></div>
+</div></div>
 <div id="zv" hidden role="dialog" aria-label="Plan agrandi"><div id="zc"></div><div id="zb"><button type="button" id="zP" aria-label="Zoomer">+</button><button type="button" id="zM" aria-label="Dézoomer">−</button><button type="button" id="zF" aria-label="Voir le plan entier">⤢</button><button type="button" id="zX" aria-label="Fermer">✕</button></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const $=id=>document.getElementById(id), f3=v=>v.toFixed(3), f2=v=>v.toFixed(2), K=25.4;
 const frac=s=>{if(s[0]==='#')return .06+.013*+s.slice(1);let t=0;s.split('.').forEach(p=>{const q=p.split('/');t+=q.length>1?q[0]/q[1]:+q[0]});return t};
 const pn=s=>s[0]==='#'?s:s.replace('.',' ')+'"';
+let CFG={sur:.1,par:'MCS Usinage',mach:[]};
+try{const j=JSON.parse(localStorage.getItem('mcs-cfg'));if(j&&typeof j==='object')CFG=Object.assign(CFG,j)}catch(e){}
 
 /* ---------- Données normatives ---------- */
 const FAM=[['m','M','métrique, pas gros et fins'],['un','UN','UNC · UNF · UNEF · 8UN…'],['g','G','BSP cylindrique'],['r','R / Rc','BSPT conique'],['npt','NPT','NPTF, conique US'],['bsw','BSW','Whitworth gros'],['bsf','BSF','Whitworth fin'],['tr','Tr','trapézoïdal'],['acme','ACME','trapézoïdal US'],['rd','Rd','filet rond'],['pg','Pg','presse-étoupe'],['sp','Spécial','Ø et pas libres']];
@@ -396,7 +454,7 @@ function cyl(o,ext){
     const hi=o.d-(t.es||0), win=o.top?(t.Td2||t.Td):t.Td, aim=win?hi-win/2:o.d, d3=o.d-2*o.he;
     r.depth=o.he; r.x0=aim; r.dir=-1; r.prof=o.pe; r.tol=win?[hi-win,hi]:null; r.pr=(o.d-o.d2)/2/o.he;
     r.vals=[[o.top?'Ø extérieur fini · haut du filet':'Ø extérieur à tourner · haut du filet',f3(aim),win?'tolérance '+rng(hi-win,hi):'cote nominale']];
-    if(o.top) r.vals.push(['Ø à tourner avant filetage','≈ '+f2(hi+.1),'laisse 0.05 à 0.15 pour l\'arasage']);
+    if(o.top) r.vals.push(['Ø à tourner avant filetage','≈ '+f2(hi+CFG.sur),'laisse environ '+f2(CFG.sur)+' pour l\'arasage']);
     r.vals.push(['Pas',f3(o.P),ps],['Profondeur de filet',f3(o.he),'mm au rayon']);
     r.labs=[['d',o.d],['d2',o.d2],[o.rl,d3]];
     r.rep=[['d','Ø extérieur nominal',f3(o.d)],['d2','Ø sur flancs nominal',f3(o.d2)],[o.rl,'Ø à fond de filet nominal',f3(d3)],['P','Pas',f3(o.P)],['h','Profondeur de filet',f3(o.he)]];
@@ -407,7 +465,7 @@ function cyl(o,ext){
     const lo=o.D1, win=o.top?(t.TD2||t.TD1):t.TD1, aim=win?lo+win/2:lo;
     r.depth=o.hi; r.x0=aim; r.dir=1; r.prof=o.pi; r.tol=win?[lo,lo+win]:null; r.pr=(o.d2-o.D1)/2/o.hi;
     r.vals=[[o.top?'Ø d\'alésage fini':'Ø à aléser',f3(aim),win?'tolérance '+rng(lo,lo+win):'cote nominale']];
-    if(o.top) r.vals.push(['Ø à aléser avant filetage','≈ '+f2(lo-.1),'laisse 0.05 à 0.15 pour l\'arasage']);
+    if(o.top) r.vals.push(['Ø à aléser avant filetage','≈ '+f2(lo-CFG.sur),'laisse environ '+f2(CFG.sur)+' pour l\'arasage']);
     r.vals.push(['Ø de filetage · pointe du filet',f3(aim+2*o.hi),'alésage + 2 × profondeur'],['Pas',f3(o.P),ps],['Profondeur de filet',f3(o.hi),'mm au rayon']);
     r.labs=[['D1',o.D1],['D2',o.d2],['D',o.Dint]];
     r.rep=[['D','Ø à fond de filet nominal',f3(o.Dint)],['D2','Ø sur flancs nominal',f3(o.d2)],['D1','Ø d\'alésage mini',f3(o.D1)],['P','Pas',f3(o.P)],['h','Profondeur de filet',f3(o.hi)]];
@@ -430,7 +488,7 @@ const VERIF={m:[1,'Tolérances 6g / 6H contrôlées par les formules ISO 965.'],
   rd:[0,'Cotes nominales DIN 405, non recoupées avec une table, sans tolérance.'],pg:[0,'Cotes nominales DIN 40430, non recoupées avec une table, sans tolérance.'],sp:[0,'Filetage hors série : cotes et tolérances calculées par formule, non recoupées avec une table.']};
 function calc(fam,i,pasSel,ext,sp){ const r=calc0(fam,i,pasSel,ext,sp); if(!r)return r;
   let v=VERIF[fam]; if(fam==='un'){const s=pasSel.split('|')[1]; v=s==='UNC'||s==='UNF'?[1,'Tolérances 2A / 2B calculées selon ASME B1.1, recoupées sur les tailles courantes.']:[0,'Tolérances calculées selon ASME B1.1, non recoupées avec une table pour cette série.'];}
-  r.vok=v[0]; r.verif=v[1]+(r.top?' Choix d\'atelier à valider : tolérance du haut du filet reprise de celle des flancs (plaquette arasante), surépaisseur de 0.10 avant filetage.':'');
+  r.vok=v[0]; r.verif=v[1]+(r.top?' Choix d\'atelier à valider : tolérance du haut du filet reprise de celle des flancs (plaquette arasante), surépaisseur de '+f2(CFG.sur)+' avant filetage.':'');
   return r; }
 function calc0(fam,i,pasSel,ext,sp){
   if(fam==='m'){ const d=+i,P=+pasSel,gros=COARSE[d]===P;
@@ -544,8 +602,8 @@ function plan(r){
   if(r.logo) g+=`<image x="${cx0+12}" y="${cy0+4}" width="126" height="54" preserveAspectRatio="xMidYMid meet" href="${r.logo}"/>`;
   g+=Tx(cx0+160,cy0+28,r.nom,'start',20,0,1)+Tx(cx0+160,cy0+50,ext?'Filetage extérieur':'Filetage intérieur','start',13);
   g+=Tx(cx0+10,cy0+82,sub[0]||'','start',12,0,1)+Tx(cx0+10,cy0+101,sub.slice(1).join(' · '),'start',11);
-  [['ÉCHELLE',scTxt(S)],['DÉTAIL B',scTxt(Sd)],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR','MCS Usinage']].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+Tx(cx0+8+i*122,cy0+149,v[1],'start',14,0,1)});
-  g+=Tx(48,816,(r.vok?'VALEURS CONTRÔLÉES — ':'À CONFIRMER SUR LA PREMIÈRE PIÈCE — ')+r.verif.split(' Choix d')[0],'start',10.5,0,1)+Tx(48,831,(r.top?'Choix d\'atelier à valider : tolérance du haut du filet = celle des flancs (plaquette arasante), surépaisseur 0.10 avant filetage. ':'')+'Cotes en mm. Contrôler la première pièce à la bague ou au tampon avant série.','start',10);
+  [['ÉCHELLE',scTxt(S)],['DÉTAIL B',scTxt(Sd)],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR',CFG.par]].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+Tx(cx0+8+i*122,cy0+149,v[1],'start',14,0,1)});
+  g+=Tx(48,816,(r.vok?'VALEURS CONTRÔLÉES — ':'À CONFIRMER SUR LA PREMIÈRE PIÈCE — ')+r.verif.split(' Choix d')[0],'start',10.5,0,1)+Tx(48,831,(r.top?'Choix d\'atelier à valider : tolérance du haut du filet = celle des flancs (plaquette arasante), surépaisseur '+f2(CFG.sur)+' avant filetage. ':'')+'Cotes en mm. Contrôler la première pièce à la bague ou au tampon avant série.','start',10);
   return lastSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Arial,Helvetica,sans-serif"><defs>
   <pattern id="ph" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><rect width="7" height="7" fill="#fff"/><line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width=".8"/></pattern>
   <marker id="pa1" markerWidth="11" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M0,3 L10,0.7 L10,5.3Z" fill="${ink}"/></marker>
@@ -689,7 +747,7 @@ function planCC(r){
   if(r.logo) g+=`<image x="${cx0+12}" y="${cy0+4}" width="126" height="54" preserveAspectRatio="xMidYMid meet" href="${r.logo}"/>`;
   g+=Tx(cx0+160,cy0+28,'Gorge circlip Ø '+r.d1,'start',20,0,1)+Tx(cx0+160,cy0+50,ext?'Arbre — gorge extérieure':'Alésage — gorge intérieure','start',13);
   g+=Tx(cx0+10,cy0+82,ext?'DIN 471 — anneau élastique pour arbre':'DIN 472 — anneau élastique pour alésage','start',12,0,1)+Tx(cx0+10,cy0+101,'Circlip '+r.d1+' × '+r.s+'  ·  fond de gorge '+r.cls+'  ·  largeur H13','start',11);
-  [['ÉCHELLE',scTxt(S)],['DÉTAIL B',scTxt(Sd)],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR','MCS Usinage']].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+Tx(cx0+8+i*122,cy0+149,v[1],'start',14,0,1)});
+  [['ÉCHELLE',scTxt(S)],['DÉTAIL B',scTxt(Sd)],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR',CFG.par]].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+Tx(cx0+8+i*122,cy0+149,v[1],'start',14,0,1)});
   g+=Tx(48,816,(r.vok?'VALEURS CONTRÔLÉES — ':'À CONFIRMER SUR LA PREMIÈRE PIÈCE — ')+r.verif,'start',10,0,1)+Tx(48,831,'Cotes en mm. Vérifier le montage du circlip sur la première pièce avant série.','start',10);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Arial,Helvetica,sans-serif"><defs>
   <pattern id="ph" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><rect width="7" height="7" fill="#fff"/><line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width=".8"/></pattern>
@@ -719,6 +777,58 @@ $('ccType').onclick=e=>{const b=e.target.closest('button');if(!b)return;sc.type=
 $('ccD').onchange=e=>{sc.d=e.target.value;sc.pos='';renderCC()};
 $('ccPos').oninput=e=>{sc.pos=e.target.value;renderCC()};
 fillCC(); renderCC();
+
+
+/* ================= PLAN A4 DES TOLÉRANCES ================= */
+let curTol=null, svgTol='';
+function planTol(r){
+  const U=4,W=1188,H=840,ink='#111',D=r.D;
+  const wv=(xa,ya,xb,yb)=>{const L=Math.hypot(xb-xa,yb-ya),k=Math.max(2,Math.round(L/4));let s='';for(let j=1;j<=k;j++){const u=j/k,o=3*Math.sin(u*L/16*2*Math.PI);s+=' L'+(xa+(xb-xa)*u+(ya===yb?0:o)).toFixed(1)+','+(ya+(yb-ya)*u+(ya===yb?o:0)).toFixed(1)}return s};
+  const Ln=(x1,y1,x2,y2,ex)=>`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${ink}" stroke-width=".8" ${ex||''}/>`;
+  const Tx=(x,y,s,a,sz,rot,b)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${a||'middle'}" font-size="${sz||13}"${b?' font-weight="700"':''}${rot?` transform="rotate(-90 ${x.toFixed(1)} ${y.toFixed(1)})"`:''} fill="${ink}">${esc(s)}</text>`;
+  const AR='marker-start="url(#pa1)" marker-end="url(#pa2)"', AX='stroke-dasharray="16,3,3,3"';
+  const S=SCALES.find(s=>D*U*s<=200)||.1, k=U*S, h=D*k/2, cy=320, hN=r.hl+r.hg, sN=r.sl+r.sg;
+  let g='';
+  // ----- Arbre : vue extérieure -----
+  const xa=90, La=Math.max(130,Math.min(250,1.3*D*k)), xb=xa+La;
+  g+=`<path d="M${xb},${cy-h} L${xa},${cy-h}${wv(xa,cy-h,xa,cy+h)} L${xb},${cy+h} Z" fill="#fff" stroke="${ink}" stroke-width="1.8"/>`;
+  g+=Ln(xa-24,cy,xb+70,cy,AX);
+  const xd=xb+38; g+=Ln(xb+3,cy-h,xd+6,cy-h)+Ln(xb+3,cy+h,xd+6,cy+h)+Ln(xd,cy-h,xd,cy+h,AR)+Tx(xd-6,cy,'Ø '+D+' '+sN,'middle',14,1,1);
+  const yl=cy+Math.max(h,60)+70;
+  g+=Tx((xa+xb)/2,yl,'ARBRE  Ø '+D+' '+sN,'middle',15,0,1)+Tx((xa+xb)/2,yl+20,'mini '+mm(D+r.ei/1000)+'  ·  maxi '+mm(D+r.es/1000),'middle',13)+Tx((xa+xb)/2,yl+38,'à viser '+mm(D+(r.ei+r.es)/2000)+'   ('+um(r.es)+' / '+um(r.ei)+' µm)','middle',12);
+  // ----- Alésage : coupe -----
+  const xc=470, Lb=Math.max(120,Math.min(210,1.1*D*k)), xe=xc+Lb, w=Math.max(26,Math.min(50,.3*D*k));
+  const blk=(y1,y2)=>`<path d="M${xe},${y1} L${xc},${y1}${wv(xc,y1,xc,y2)} L${xe},${y2}${wv(xe,y2,xe,y1)} Z" fill="url(#ph)" stroke="${ink}" stroke-width="1.8"/>`;
+  g+=blk(cy-h-w,cy-h)+blk(cy+h,cy+h+w)+Ln(xc-24,cy,xe+70,cy,AX);
+  const xf=(xc+xe)/2; g+=Ln(xf,cy-h,xf,cy+h,AR)+Tx(xf-6,cy,'Ø '+D+' '+hN,'middle',14,1,1);
+  g+=Tx(xf,yl,'ALÉSAGE  Ø '+D+' '+hN,'middle',15,0,1)+Tx(xf,yl+20,'mini '+mm(D+r.EI/1000)+'  ·  maxi '+mm(D+r.ES/1000),'middle',13)+Tx(xf,yl+38,'à viser '+mm(D+(r.EI+r.ES)/2000)+'   ('+um(r.ES)+' / '+um(r.EI)+' µm)','middle',12);
+  g+=Tx(380,612,'ÉCHELLE '+scTxt(S),'middle',13,0,1);
+  // ----- Zones de tolérance -----
+  const M=Math.max(Math.abs(r.ES),Math.abs(r.EI),Math.abs(r.es),Math.abs(r.ei),1), s=150/M, y0=320, Y=v=>y0-v*s;
+  const bar=(x,lo,hi,pat,n)=>{const hh=Math.max(4,Y(lo)-Y(hi));return `<rect x="${x}" y="${Y(hi).toFixed(1)}" width="96" height="${hh.toFixed(1)}" fill="url(#${pat})" stroke="${ink}" stroke-width="1.5"/>`+Tx(x+48,Y(hi)-7,um(hi),'middle',13,0,1)+Tx(x+48,Y(lo)+17,um(lo),'middle',13,0,1)+Tx(x+48,522,n,'middle',13,0,1)};
+  g+=Tx(960,92,'ZONES DE TOLÉRANCE (µm)','middle',13,0,1)+Ln(800,y0,1128,y0,'stroke-width="1.2"')+Tx(804,y0-6,'0','start',12)+Tx(1124,y0-6,'Ø '+mm(D),'end',11)+Tx(804,130,'+','start',14)+Tx(804,516,'−','start',14);
+  g+=bar(850,r.EI,r.ES,'ph',hN+' alésage')+bar(990,r.ei,r.es,'pc',sN+' arbre');
+  const jt=v=>v<0?'serrage '+Math.abs(v).toFixed(v%1?1:0):'jeu '+v.toFixed(v%1?1:0);
+  g+=Tx(960,556,r.kind+' : '+jt(r.jmin)+' à '+jt(r.jmax)+' µm','middle',13,0,1);
+  // ----- Tableau, cadre, cartouche -----
+  const rows=[['ALÉSAGE '+hN+' · mini à maxi',mm(D+r.EI/1000)+' à '+mm(D+r.ES/1000)+'   écarts '+um(r.ES)+' / '+um(r.EI)+' µm'],['ALÉSAGE · à viser',mm(D+(r.EI+r.ES)/2000)],['ARBRE '+sN+' · mini à maxi',mm(D+r.ei/1000)+' à '+mm(D+r.es/1000)+'   écarts '+um(r.es)+' / '+um(r.ei)+' µm'],['ARBRE · à viser',mm(D+(r.ei+r.es)/2000)],['AJUSTEMENT',r.kind+' : '+jt(r.jmin)+' à '+jt(r.jmax)+' µm']], ty0=680, rh=20;
+  g+=Tx(64,ty0-8,'COTES À USINER (mm)','start',12,0,1)+`<rect x="60" y="${ty0}" width="580" height="${rows.length*rh}" fill="none" stroke="${ink}" stroke-width="1"/>`+Ln(250,ty0,250,ty0+rows.length*rh);
+  rows.forEach((v,i)=>{const y=ty0+i*rh; if(i)g+=Ln(60,y,640,y); g+=Tx(66,y+14,v[0],'start',11)+Tx(256,y+14,v[1],'start',11,0,1)});
+  const cx0=660,cy0=640;
+  g+=`<rect x="40" y="40" width="1108" height="760" fill="none" stroke="${ink}" stroke-width="2"/><rect x="${cx0}" y="${cy0}" width="488" height="160" fill="#fff" stroke="${ink}" stroke-width="1.5"/>`;
+  g+=Ln(cx0,cy0+62,1148,cy0+62)+Ln(cx0,cy0+112,1148,cy0+112)+Ln(cx0+150,cy0,cx0+150,cy0+62)+Ln(cx0+122,cy0+112,cx0+122,800)+Ln(cx0+244,cy0+112,cx0+244,800)+Ln(cx0+366,cy0+112,cx0+366,800);
+  if(r.logo) g+=`<image x="${cx0+12}" y="${cy0+4}" width="126" height="54" preserveAspectRatio="xMidYMid meet" href="${r.logo}"/>`;
+  g+=Tx(cx0+160,cy0+28,'Ø '+D+' '+hN+' / '+sN,'start',20,0,1)+Tx(cx0+160,cy0+50,r.kind,'start',13);
+  g+=Tx(cx0+10,cy0+82,'ISO 286 — tolérances et ajustements','start',12,0,1)+Tx(cx0+10,cy0+101,'Alésage '+hN+'  ·  arbre '+sN+'  ·  cotes en mm, écarts en µm','start',11);
+  [['ÉCHELLE',scTxt(S)],['NORME','ISO 286'],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR',CFG.par]].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+Tx(cx0+8+i*122,cy0+149,v[1],'start',14,0,1)});
+  g+=Tx(48,816,'VALEURS CONTRÔLÉES — Qualités IT4 à IT13 recoupées en entier sur une table ISO 286 publiée ; écarts des positions recoupés sur 11 classes courantes.','start',10,0,1)+Tx(48,831,'Cotes en mm à 20 °C. Mesurer la pièce à température d\'atelier stabilisée.','start',10);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Arial,Helvetica,sans-serif"><defs>
+  <pattern id="ph" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)"><rect width="7" height="7" fill="#fff"/><line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width=".8"/></pattern>
+  <pattern id="pc" patternUnits="userSpaceOnUse" width="4" height="4" patternTransform="rotate(-45)"><rect width="4" height="4" fill="#fff"/><line x1="0" y1="0" x2="0" y2="4" stroke="#111" stroke-width="1"/></pattern>
+  <marker id="pa1" markerWidth="11" markerHeight="6" refX="0" refY="3" orient="auto"><path d="M0,3 L10,0.7 L10,5.3Z" fill="${ink}"/></marker>
+  <marker id="pa2" markerWidth="11" markerHeight="6" refX="10" refY="3" orient="auto"><path d="M10,3 L0,0.7 L0,5.3Z" fill="${ink}"/></marker></defs>
+  <rect width="${W}" height="${H}" fill="#fff"/>${g}</svg>`;
+}
 
 /* ================= MODULE TOLÉRANCES ISO 286 ================= */
 const TR_=[3,6,10,18,30,50,80,120,180,250,315,400,500];
@@ -765,7 +875,7 @@ function renderTol(){
   const D=+stl.D, fit=stl.hl+stl.hg+'/'+stl.sl+stl.sg;
   document.querySelectorAll('#tFits button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===fit));
   $('tD').value=stl.D;
-  if(!(D>=1&&D<=500)){$('tOut').hidden=true;$('tErr').hidden=false;return} $('tOut').hidden=false;$('tErr').hidden=true;
+  if(!(D>=1&&D<=500)){curTol=null;$('tOut').hidden=true;$('tErr').hidden=false;return} $('tOut').hidden=false;$('tErr').hidden=true;
   const [EI,ES]=devH(stl.hl,+stl.hg,D), [ei,es]=devS(stl.sl,+stl.sg,D), jmin=EI-es, jmax=ES-ei, k=fitKind(jmin,jmax);
   const card=(cls,t,lo,hi,a,b)=>`<div class="tcard ${cls}"><b>${t}</b><span>${mm(D+lo/1000)} <em>à</em> ${mm(D+hi/1000)}</span><i>écarts ${um(b)} / ${um(a)} µm · viser ${mm(D+(lo+hi)/2000)}</i></div>`;
   $('tCards').innerHTML=card('ho','Alésage Ø '+D+' '+stl.hl+stl.hg,EI,ES,EI,ES)+card('sh','Arbre Ø '+D+' '+stl.sl+stl.sg,ei,es,ei,es)
@@ -798,6 +908,7 @@ function renderTol(){
     <text x="130" y="134" class="gl" text-anchor="middle" style="fill:var(--onpri)">ARBRE</text><text x="130" y="36" class="gl" text-anchor="middle" style="fill:var(--onpri)">ALÉSAGE</text></svg>`;
   $('tPicN').textContent=k[0]==='jeu'?'Jeu amplifié pour le voir : l\'arbre repose au fond de l\'alésage.':k[0]==='ser'?'Serrage amplifié : l\'anneau pointillé est la matière en trop à comprimer.':'Entre les deux : la pièce peut tomber côté jeu ou côté serrage.';
   $('tProg').innerHTML='<tr><th>Pièce</th><th class="n">Mini</th><th class="n">Maxi</th><th class="n">À viser</th></tr>'+row(['Alésage '+stl.hl+stl.hg,mm(D+EI/1000),mm(D+ES/1000),mm(D+(EI+ES)/2000)])+row(['Arbre '+stl.sl+stl.sg,mm(D+ei/1000),mm(D+es/1000),mm(D+(ei+es)/2000)]);
+  curTol={D,hl:stl.hl,hg:stl.hg,sl:stl.sl,sg:stl.sg,EI,ES,ei,es,jmin,jmax,kind:k[1],logo:document.querySelector('.logo img').src}; $('tDessin').innerHTML=svgTol=planTol(curTol); $('tMsg').textContent='';
   try{localStorage.setItem('mcs-tol',JSON.stringify(stl))}catch(e){}
 }
 $('tFits').innerHTML=FITS.map(f=>`<button type="button" data-v="${f}">${f}</button>`).join('');
@@ -817,7 +928,7 @@ fillTol(); renderTol();
   document.querySelectorAll('.paper').forEach(p=>{p.addEventListener('click',()=>open(p));
     p.addEventListener('touchstart',e=>{if(e.touches.length>1){e.preventDefault();open(p)}},{passive:false});
     p.addEventListener('gesturestart',e=>{e.preventDefault();open(p)})});
-  if(!window.claude)document.querySelectorAll('.prBtn').forEach(b=>{b.hidden=false;b.addEventListener('click',()=>{const s=b.closest('section').querySelector('.paper svg');if(!s)return;$('pr').innerHTML=s.outerHTML;setTimeout(()=>window.print(),50)})});
+  if(!window.claude)document.querySelectorAll('.prBtn').forEach(b=>{b.hidden=false;b.addEventListener('click',()=>{const s=b.closest('section').querySelector('.paper svg');if(!s)return;$('pr').className='';$('pr').innerHTML=s.outerHTML;setTimeout(()=>window.print(),50)})});
   const close=()=>{zv.hidden=true;zc.innerHTML='';P.clear()};
   $('zX').onclick=close; $('zF').onclick=fit; $('zP').onclick=()=>zoom(1.5,zv.clientWidth/2,zv.clientHeight/2); $('zM').onclick=()=>zoom(1/1.5,zv.clientWidth/2,zv.clientHeight/2);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!zv.hidden)close()});
@@ -926,8 +1037,151 @@ $('sF').value=c.sf;$('pD').value=c.pD;$('pS').value=c.pS;$('cD').value=c.cD;$('c
 fillK();renderK();renderS();renderP();renderC();
 })();
 
-function showMod(m){mod=m;$('modFil').hidden=m!=='fil';$('modCC').hidden=m!=='cc';$('modTol').hidden=m!=='tol';$('modCal').hidden=m!=='cal';document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));try{localStorage.setItem('mcs-mod',m)}catch(e){}}
+function showMod(m){mod=m;$('modFil').hidden=m!=='fil';$('modCC').hidden=m!=='cc';$('modTol').hidden=m!=='tol';$('modCal').hidden=m!=='cal';$('modCla').hidden=m!=='cla';document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===m));try{localStorage.setItem('mcs-mod',m)}catch(e){}}
 $('tabs').onclick=e=>{const b=e.target.closest('button');if(b)showMod(b.dataset.m)}; showMod(mod);
+
+
+/* ================= MODULE CLAVETTES DIN 6885 ================= */
+// [Ø arbre au-dessus de, jusqu'à, b, h, t1 arbre, t2 moyeu]
+const CLA=[[6,8,2,2,1.2,1],[8,10,3,3,1.8,1.4],[10,12,4,4,2.5,1.8],[12,17,5,5,3,2.3],[17,22,6,6,3.5,2.8],[22,30,8,7,4,3.3],[30,38,10,8,5,3.3],[38,44,12,8,5,3.3],[44,50,14,9,5.5,3.8],[50,58,16,10,6,4.3],[58,65,18,11,7,4.4],[65,75,20,12,7.5,4.9],[75,85,22,14,9,5.4],[85,95,25,14,9,5.4],[95,110,28,16,10,6.4],[110,130,32,18,11,7.4],[130,150,36,20,12,8.4],[150,170,40,22,13,9.4],[170,200,45,25,15,10.4]];
+const CFIT={p:['Serré','P',9,'P',9,'clavette bloquée dans l\'arbre et le moyeu'],n:['Normal','N',9,'JS',9,'montage courant'],g:['Glissant','H',9,'D',10,'le moyeu coulisse sur la clavette']};
+const sk={d:'30',fit:'n'}; let curCla=null;
+try{Object.assign(sk,JSON.parse(localStorage.getItem('mcs-cla')||'{}'))}catch(e){}
+function renderCla(){
+  document.querySelectorAll('#kaFit button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===sk.fit)); $('kaD').value=sk.d;
+  const d=+sk.d, L=CLA.find(x=>d>x[0]&&d<=x[1])||(d===6?CLA[0]:null);
+  $('kaErr').hidden=!!L; $('kaOut').hidden=!L; if(!L){curCla=null;return}
+  const b=L[2],h=L[3],t1=L[4],t2=L[5],F=CFIT[sk.fit]||CFIT.n,td=b<=6?.1:b<=32?.2:.3,ws=devH(F[1],F[2],b),wh=devH(F[3],F[4],b),vok=d<=44;
+  const tile=(a,v,i,k)=>'<div class="val'+(k?' k':'')+'"><b>'+a+'</b><span>'+v+'</span><i>'+i+'</i></div>';
+  curCla={d,b,h}; $('kaT').textContent='Arbre Ø '+d+' — clavette '+b+' × '+h; $('kaS').textContent='Clavette parallèle DIN 6885 · ajustement '+F[0].toLowerCase()+' : '+F[5];
+  $('kaVals').innerHTML=tile('Clavette',b+' × '+h,'largeur × hauteur, DIN 6885',1)
+    +tile('Arbre · largeur de rainure',mm(b+ws[0]/1000)+' à '+mm(b+ws[1]/1000),F[1]+F[2]+' ('+um(ws[1])+' / '+um(ws[0])+' µm)')
+    +tile('Arbre · profondeur t1',f2(t1)+' à '+f2(t1+td),'0 / +'+td+' mm')
+    +tile('Arbre · cote à mesurer',f2(d-t1-td)+' à '+f2(d-t1),'du fond de rainure au dos de l\'arbre')
+    +tile('Moyeu · largeur de rainure',mm(b+wh[0]/1000)+' à '+mm(b+wh[1]/1000),F[3]+F[4]+' ('+um(wh[1])+' / '+um(wh[0])+' µm)')
+    +tile('Moyeu · profondeur t2',f2(t2)+' à '+f2(t2+td),'0 / +'+td+' mm')
+    +tile('Moyeu · cote à mesurer',f2(d+t2)+' à '+f2(d+t2+td),'du fond de rainure au côté opposé de l\'alésage');
+  const k=170/d,r=85,bw=b*k/2,yb=-(r-t1*k),yt=yb-h*k,yh=-(r+t2*k);
+  $('kaPic').innerHTML='<svg viewBox="-150 -150 300 300" role="img" aria-label="Coupe arbre, moyeu et clavette"><circle r="135" style="fill:var(--hole)" opacity=".85"/><circle r="'+r+'" style="fill:var(--shaft)" opacity=".92"/>'
+   +'<rect x="'+(-bw)+'" y="'+yh+'" width="'+2*bw+'" height="'+(-r*.9-yh)+'" style="fill:var(--surf)"/><rect x="'+(-bw)+'" y="'+yt+'" width="'+2*bw+'" height="'+h*k+'" style="fill:var(--gold);stroke:var(--surf)" stroke-width="1.5"/>'
+   +'<line x1="-120" y1="0" x2="120" y2="0" style="stroke:var(--onpri)" stroke-dasharray="14 3 2 3" stroke-width=".8" opacity=".7"/><line x1="0" y1="-60" x2="0" y2="120" style="stroke:var(--onpri)" stroke-dasharray="14 3 2 3" stroke-width=".8" opacity=".7"/>'
+   +'<text x="0" y="30" class="gl" text-anchor="middle" style="fill:var(--onpri)">ARBRE Ø '+d+'</text><text x="0" y="122" class="gl" text-anchor="middle" style="fill:var(--onpri)">MOYEU</text><text x="'+(bw+8)+'" y="'+(yt+h*k/2+5)+'" class="gl" style="fill:var(--onpri)">'+b+' × '+h+'</text></svg>';
+  $('kaVerif').className='verif'+(vok?'':' ko'); $('kaVerif').innerHTML='<b>'+(vok?'Valeurs contrôlées':'À confirmer sur le plan')+'</b>Dimensions b × h, t1 et t2 recoupées sur '+(vok?'trois':'deux')+' tables publiées. '+(vok?'Tolérance de profondeur recoupée sur deux tables.':'Tolérance de profondeur (+'+td+' mm) non recoupée au-dessus de Ø 44.')+' Largeurs de rainure calculées selon ISO 286.';
+  try{localStorage.setItem('mcs-cla',JSON.stringify(sk))}catch(e){}
+}
+$('kaFit').innerHTML=Object.keys(CFIT).map(k=>'<button type="button" data-v="'+k+'">'+CFIT[k][0]+'<small>arbre '+CFIT[k][1]+CFIT[k][2]+' · moyeu '+CFIT[k][3]+CFIT[k][4]+'</small></button>').join('');
+$('kaFit').onclick=e=>{const b=e.target.closest('button');if(!b)return;sk.fit=b.dataset.v;renderCla()};
+$('kaD').oninput=e=>{sk.d=e.target.value;renderCla()};
+renderCla();
+
+/* ================= ACCÈS RAPIDE : recherche, favoris, récents, fiche, réglages ================= */
+(()=>{
+const jget=(k,d)=>{try{const j=JSON.parse(localStorage.getItem(k));return j==null?d:j}catch(e){return d}}, jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let FAV=jget('mcs-fav',[]), REC=jget('mcs-rec',[]); if(!Array.isArray(FAV))FAV=[]; if(!Array.isArray(REC))REC=[];
+const SNAP={fil:()=>cur&&{m:'fil',t:cur.nom+(cur.ext?' ext.':' int.'),s:JSON.parse(JSON.stringify(st))},
+  cc:()=>curCC&&{m:'cc',t:'Circlip '+(curCC.ext?'arbre':'alésage')+' Ø'+curCC.d1,s:{type:sc.type,d:sc.d,pos:sc.pos}},
+  tol:()=>curTol&&{m:'tol',t:'Ø'+stl.D+' '+stl.hl+stl.hg+'/'+stl.sl+stl.sg,s:Object.assign({},stl)},
+  cla:()=>curCla&&{m:'cla',t:'Clavette Ø'+curCla.d+' '+CFIT[sk.fit][0].toLowerCase(),s:Object.assign({},sk)}};
+const GO={fil:s=>{Object.assign(st,s);st.sp=Object.assign({d:'30',p:'1.5',u:'mm',a:'60'},s.sp||{});fillSizes();render()},cc:s=>{Object.assign(sc,s);fillCC();renderCC()},tol:s=>{Object.assign(stl,s);fillTol();renderTol()},cla:s=>{Object.assign(sk,s);renderCla()}};
+const key=e=>e.m+'|'+e.t;
+function lists(){
+  const chips=(L,ic)=>L.map(e=>'<button type="button" data-k="'+esc(key(e))+'">'+ic+esc(e.t)+'</button>').join('');
+  $('qFav').hidden=!FAV.length; $('qFav').innerHTML='<b>Favoris</b>'+chips(FAV,'★ ');
+  $('qRec').hidden=!REC.length; $('qRec').innerHTML='<b>Récents</b>'+chips(REC,'');
+  document.querySelectorAll('.star').forEach(b=>{const e=SNAP[b.dataset.m](),on=!!e&&FAV.some(f=>key(f)===key(e));b.setAttribute('aria-pressed',on);b.textContent=on?'★ Favori':'☆ Favori'});
+}
+const timers={};
+function after(m){ if(m==='tol')$('tTitle').textContent=curTol?SNAP.tol().t:''; lists();
+  clearTimeout(timers[m]); timers[m]=setTimeout(()=>{const e=SNAP[m]();if(!e||mod!==m)return;REC=[e].concat(REC.filter(x=>key(x)!==key(e))).slice(0,10);jset('mcs-rec',REC);lists()},2500); }
+const r0=render, r1=renderCC, r2=renderTol, r3=renderCla; renderCla=function(){r3();after('cla')};
+render=function(){r0();after('fil')}; renderCC=function(){r1();after('cc')}; renderTol=function(){r2();after('tol')};
+const jump=e=>{GO[e.m](JSON.parse(JSON.stringify(e.s)));showMod(e.m);window.scrollTo(0,0)};
+$('quick').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;const x=FAV.concat(REC).find(f=>key(f)===b.dataset.k);if(x)jump(x)});
+document.querySelectorAll('.star').forEach(b=>b.addEventListener('click',()=>{const e=SNAP[b.dataset.m]();if(!e)return;const i=FAV.findIndex(f=>key(f)===key(e));if(i>=0)FAV.splice(i,1);else FAV=[e].concat(FAV).slice(0,30);jset('mcs-fav',FAV);lists()}));
+
+/* ----- recherche directe ----- */
+const nf=s=>s.trim().replace(/["”″]|pouces?|''/g,'').trim().replace(/\s+/g,' ').replace(/^(\d+) (\d+\/\d+)$/,'$1.$2');
+const dec=s=>String(+String(s).replace(',','.'));
+function find(q){
+  let m, raw=q.trim().replace(/\s+/g,' ');
+  if(m=raw.match(/^[øØ]?\s*(\d+(?:[.,]\d+)?)\s*([A-Za-z]{1,2})\s*(\d{1,2})(?:\s*\/\s*([a-z]{1,2})\s*(\d{1,2}))?$/)){
+    const D=dec(m[1]),s=Object.assign({},stl,{D});
+    if(HOL.includes(m[2])&&grH(m[2]).includes(+m[3])){s.hl=m[2];s.hg=m[3];if(m[4]){if(!(SHL.includes(m[4])&&grS(m[4]).includes(+m[5])))return{err:'Classe d\'arbre '+m[4]+m[5]+' absente de la table.'};s.sl=m[4];s.sg=m[5]}}
+    else if(SHL.includes(m[2])&&grS(m[2]).includes(+m[3])&&!m[4]){s.sl=m[2];s.sg=m[3]}
+    else return{err:'Classe '+m[2]+m[3]+' absente de la table. Majuscule = alésage (H7), minuscule = arbre (g6).'};
+    if(!(+D>=1&&+D<=500))return{err:'Les tolérances vont de Ø 1 à Ø 500.'};
+    return{m:'tol',s}}
+  let l=raw.toLowerCase(), cote=st.cote;
+  if(/clavet|rainure|din ?6885/.test(l)){const n=l.replace(/din ?6885/,'').match(/(\d+(?:[.,]\d+)?)/);if(!n)return{err:'Indiquez le Ø de l\'arbre : « clavette 30 ».'};const d=+dec(n[1]);if(!(d>=6&&d<=200))return{err:'La table des clavettes va de Ø 6 à Ø 200.'};return{m:'cla',s:{d:String(d),fit:sk.fit}}}
+  if(/circlip|segment|anneau|din ?47[12]/.test(l)){const n=l.replace(/din ?47[12]/,'').match(/(\d+)/),int=/al[eé]s|int|472/.test(l);
+    if(!n)return{err:'Indiquez le Ø : « circlip 30 » ou « circlip alésage 47 ».'};
+    if(!(int?C472:C471).some(x=>x[0]===+n[1]))return{err:'Pas de circlip normalisé Ø '+n[1]+' pour '+(int?'alésage':'arbre')+' dans la table.'};
+    return{m:'cc',s:{type:int?'int':'ext',d:n[1],pos:''}}}
+  if(/\b(int|int[ée]rieur|taraudage|[ée]crou|femelle)\b/.test(l))cote='int'; else if(/\b(ext|ext[ée]rieur|vis|m[âa]le)\b/.test(l))cote='ext';
+  l=l.replace(/\b(int[ée]rieur|ext[ée]rieur|int|ext|taraudage|filetage|[ée]crou|vis|femelle|m[âa]le)\b/g,'').replace(/\s+/g,' ').trim();
+  const F=(fam,i,pas,c)=>({m:'fil',s:Object.assign({},st,{fam,i:String(i),pas:pas==null?'':String(pas),cote:c||cote,lf:'',cA:''})});
+  const idx=(L,name,lab)=>{const j=L.findIndex(t=>String(t[0])===name);return j<0?{err:lab+' '+name.replace('.',' ')+' absent de la table.'}:j};
+  if(m=l.match(/^m\s*(\d+(?:[.,]\d+)?)\s*(?:[x×*]\s*(\d+(?:[.,]\d+)?))?$/)){const d=dec(m[1]);if(!MP[d])return{err:'M'+d+' absent de la table ISO.'};
+    if(m[2]){const p=+dec(m[2]);if(!MP[d].includes(p))return{err:'Pas '+p+' inexistant pour M'+d+'. Pas disponibles : '+MP[d].join(' · ')+'.'};return F('m',d,p)}return F('m',d,MP[d][0])}
+  if(m=l.match(/^tr\s*(\d+)\s*(?:[x×*]\s*(\d+(?:[.,]\d+)?))?$/)){if(!TRP[m[1]])return{err:'Tr '+m[1]+' absent de la table.'};
+    if(m[2]){const p=+dec(m[2]);if(!TRP[m[1]].includes(p))return{err:'Pas '+p+' inexistant pour Tr '+m[1]+'. Pas disponibles : '+TRP[m[1]].join(' · ')+'.'};return F('tr',m[1],p)}return F('tr',m[1],TRP[m[1]][0])}
+  if(m=l.match(/^pg\s*(\d+(?:[.,]\d+)?)$/)){const j=idx(PG,dec(m[1]),'Pg');return j.err?j:F('pg',j)}
+  if(m=l.match(/^rd\s*(\d+)/)){const j=RD.findIndex(t=>t[0]===+m[1]);return j<0?{err:'Rd '+m[1]+' absent de la table.'}:F('rd',j)}
+  if(/npt/.test(l)){const n=nf(l.replace(/nptf?/,'')),j=idx(NPT,n,'NPT');return j.err?j:F('npt',j)}
+  if(m=l.match(/\b(bsw|bsf|acme)\b/)){const n=nf(l.replace(m[1],'')),j=idx(LIST[m[1]],n,m[1].toUpperCase());return j.err?j:F(m[1],j)}
+  if(m=l.match(/^(?:bsp\s*|g\s*)([\d ./]+)"?$/)){const j=idx(GG,nf(m[1]),'G');return j.err?j:F('g',j)}
+  if(m=l.match(/^(?:bspt\s*|r(c)?\s*)([\d ./]+)"?$/)){const j=idx(RR,nf(m[2]),'R');return j.err?j:F('r',j,null,m[1]?'int':/bspt/.test(l)?cote:'ext')}
+  if(m=l.match(/^(#\d+|n°\s*\d+|[\d ./]+?)"?\s*(?:-\s*(\d+))?\s*(unc|unf|unef|uns|un)?$/)){ if(!m[2]&&!m[3])return null;
+    const name=m[1][0]==='n'?'#'+m[1].replace(/\D/g,''):m[1][0]==='#'?m[1]:nf(m[1]); if(!UND.includes(name))return{err:'Ø '+name.replace('.',' ')+' absent de la table UN.'};
+    const o=unOpts(name),x=o.find(v=>m[2]?v[0]===+m[2]:v[1]===m[3].toUpperCase());
+    if(!x)return{err:'Pas introuvable pour '+pn(name)+'. Disponibles : '+o.map(v=>v[0]+' '+v[1]).join(' · ')+'.'};return F('un',name,x[0]+'|'+x[1])}
+  return null}
+$('qForm').addEventListener('submit',e=>{e.preventDefault();const q=$('qIn').value,msg=$('qMsg');if(!q.trim())return;const r=find(q);
+  if(r&&!r.err){msg.hidden=true;$('qIn').value='';$('qIn').blur();jump(r)}
+  else{msg.hidden=false;msg.textContent=r?r.err:'Pas trouvé. Exemples : M12x1.25 · G1/2 · Rc 3/4 · 1/4 NPT · 1/2-13 UNC · Tr20x4 · 25H7 · 30 H7/g6 · circlip 30 · clavette 30.'}});
+
+/* ----- fiche de réglage (impression A4 portrait) ----- */
+const OF=document.querySelectorAll('.ofIn'); let ofv=''; try{ofv=sessionStorage.getItem('mcs-of')||''}catch(e){}
+OF.forEach(i=>{i.value=ofv;i.addEventListener('input',()=>{ofv=i.value;OF.forEach(o=>{if(o!==i)o.value=ofv});try{sessionStorage.setItem('mcs-of',ofv)}catch(e){}})});
+function fiche(m){
+  const T={fil:()=>[$('ft').textContent,$('fs').textContent,lastSvg,[cur.con?['Cône : points à programmer','<table>'+$('coneT').innerHTML+'</table><p>'+esc($('coneN').textContent)+'</p>']:0,$('ctrl').innerHTML?['Contrôle','<table>'+$('ctrl').innerHTML+'</table><p>'+esc($('cnote').textContent)+'</p>']:0],$('verif').textContent],
+    cc:()=>[$('ccT').textContent,$('ccS').textContent,svgCC,[['Gorge : points à programmer','<table>'+$('ccProg').innerHTML+'</table><p>'+esc($('ccN').textContent)+'</p>']],$('ccVerif').textContent],
+    tol:()=>['Ajustement '+SNAP.tol().t,curTol.kind,svgTol,[],'']}[m]();
+  if(!T[2])return; const cell=(a,b)=>'<tr><td>'+a+'</td><td>'+esc(b||'')+'</td></tr>';
+  $('pr').className='fiche';
+  $('pr').innerHTML='<div class="fih"><img src="'+document.querySelector('.logo img').src+'" alt=""><div><b>FICHE DE RÉGLAGE</b><span>'+esc(T[0])+'</span><small>'+esc(T[1])+'</small></div><table>'+cell('N° pièce / OF',ofv)+cell('Machine','')+cell('Date',new Date().toLocaleDateString('fr-FR'))+cell('Opérateur','')+'</table></div>'
+    +'<div class="fip">'+T[2]+'</div>'+T[3].filter(Boolean).map(s=>'<h3>'+s[0]+'</h3>'+s[1]).join('')
+    +''
+    +(T[4]?'<p class="fiv">'+esc(T[4])+'</p>':'')+'<p class="fiv">Visa réglage : ____________________  Visa contrôle : ____________________</p>';
+  setTimeout(()=>window.print(),80);
+}
+if(!window.claude)document.querySelectorAll('.fiBox').forEach(b=>{b.hidden=false;b.querySelector('.fiBtn').addEventListener('click',()=>fiche(b.dataset.m))});
+
+/* ----- réglages d'atelier ----- */
+const host=(()=>{try{return window.parent!==window&&window.parent.db&&window.parent.fbDoc?window.parent:null}catch(e){return null}})();
+const admin=()=>{try{return !host||!host.mcsIsAdmin||!!host.mcsIsAdmin()}catch(e){return true}};
+const clean=j=>({sur:j&&+j.sur>=0&&+j.sur<=1?+j.sur:.1,par:String(j&&j.par||'MCS Usinage').slice(0,14),mach:(j&&Array.isArray(j.mach)?j.mach:[]).filter(x=>x&&x.nom).slice(0,12).map(x=>({nom:String(x.nom).slice(0,20),mx:+x.mx||0,mo:+x.mo||0}))});
+function machChips(){const b=$('kMach');b.innerHTML=CFG.mach.map((x,i)=>'<button type="button" data-i="'+i+'">'+esc(x.nom)+'</button>').join('');$('kMachB').hidden=!CFG.mach.length;$('kMachN').hidden=!!CFG.mach.length;$('kMachN').textContent='Ajoutez vos machines dans ⚙ Réglages (en haut) pour retrouver leur maxi broche d\'un clic.'}
+function apply(j){CFG=clean(j);jset('mcs-cfg',CFG);render();renderCC();renderTol();machChips()}
+$('kMach').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const x=CFG.mach[+b.dataset.i],o=$('kMode').querySelector('[aria-pressed="true"]').dataset.v==='o',v=o?x.mo:x.mx;
+  if(!v){$('kMachN').hidden=false;$('kMachN').textContent='Pas de maxi '+(o?'outil tournant':'broche')+' renseigné pour '+x.nom+'.';return}
+  $('kMachN').hidden=true;$('kMx').value=v;$('kMx').dispatchEvent(new Event('input',{bubbles:true}))});
+const mrow=x=>'<div class="mrow"><input class="mN" type="text" maxlength="20" placeholder="Nom de la machine" aria-label="Nom de la machine" value="'+esc(x.nom||'')+'"><input class="mB" type="number" min="0" step="100" inputmode="numeric" placeholder="Maxi broche" aria-label="Maxi broche en tr/min" value="'+(x.mx||'')+'"><input class="mO" type="number" min="0" step="100" inputmode="numeric" placeholder="Maxi outil tournant" aria-label="Maxi outil tournant en tr/min" value="'+(x.mo||'')+'"><button type="button" class="btn ghost mDel" aria-label="Retirer cette machine">✕</button></div>';
+function openCfg(){const ad=admin();$('cfgSur').value=CFG.sur;$('cfgPar').value=CFG.par;$('cfgM').innerHTML=CFG.mach.map(mrow).join('');$('cfgMsg').textContent='';
+  $('cfgInfo').textContent=!ad?'Seul l\'administrateur peut modifier ces réglages.':host?'Ces réglages sont enregistrés dans MCS App : ils valent pour tous les postes.':'Ces réglages sont enregistrés sur cet appareil.';
+  $('cfg').querySelectorAll('input,#cfgAdd,#cfgSave,.mDel').forEach(el=>el.disabled=!ad);$('cfg').hidden=false}
+$('cfgBtn').onclick=openCfg; $('cfgX').onclick=()=>{$('cfg').hidden=true};
+$('cfgAdd').onclick=()=>{if($('cfgM').children.length<12)$('cfgM').insertAdjacentHTML('beforeend',mrow({}))};
+$('cfgM').addEventListener('click',e=>{const b=e.target.closest('.mDel');if(b)b.parentNode.remove()});
+$('cfgSave').onclick=async()=>{const sur=parseFloat($('cfgSur').value);if(!(sur>=0&&sur<=1)){$('cfgMsg').textContent='Surépaisseur : entre 0 et 1 mm.';return}
+  const j=clean({sur,par:$('cfgPar').value.trim(),mach:[...$('cfgM').children].map(r=>({nom:r.querySelector('.mN').value.trim(),mx:r.querySelector('.mB').value,mo:r.querySelector('.mO').value}))});
+  apply(j); if(!host){$('cfgMsg').textContent='Enregistré sur cet appareil.';return}
+  $('cfgMsg').textContent='Enregistrement…';
+  try{await host.fbSetDoc(host.fbDoc(host.db,'settings','usinage'),j);$('cfgMsg').textContent='Enregistré pour tous les postes.'}
+  catch(e){$('cfgMsg').textContent='Enregistré sur cet appareil seulement : la base de MCS App a refusé l\'écriture.'}};
+machChips(); lists(); $('tTitle').textContent=curTol?SNAP.tol().t:'';
+if(host)(async()=>{try{const s=await host.fbGetDoc(host.fbDoc(host.db,'settings','usinage'));if(s.exists())apply(s.data())}catch(e){}})();
+})();
 
 /* ---------- Export PDF A4 pour impression ---------- */
 async function planPdf(svg){
@@ -940,8 +1194,8 @@ async function planPdf(svg){
   const native=!window.claude, dl=native?null:await (window.claude.use?window.claude.use('downloads'):null); if(!native&&!dl)return;
   const put=async(filename,data)=>{ if(!native)return dl.save({filename,data}); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:filename.endsWith('.pdf')?'application/pdf':'image/svg+xml'})); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); };
   document.querySelectorAll('.dlBox').forEach(b=>b.hidden=false);
-  document.querySelectorAll('.dlBtn').forEach(btn=>btn.onclick=async()=>{ const cc=btn.dataset.m==='cc', svg=cc?svgCC:lastSvg, msg=$(cc?'ccMsg':'dlMsg'); if(!svg)return;
-    const name=cc?'plan-gorge-circlip-'+(curCC.ext?'arbre-':'alesage-')+curCC.d1:'plan-'+cur.nom.replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'')+(cur.ext?'-ext':'-int');
+  document.querySelectorAll('.dlBtn').forEach(btn=>btn.onclick=async()=>{ const tl=btn.dataset.m==='tol', cc=btn.dataset.m==='cc', svg=tl?svgTol:cc?svgCC:lastSvg, msg=$(tl?'tMsg':cc?'ccMsg':'dlMsg'); if(!svg)return;
+    const name=tl?'plan-ajustement-D'+stl.D+'-'+stl.hl+stl.hg+'-'+stl.sl+stl.sg:cc?'plan-gorge-circlip-'+(curCC.ext?'arbre-':'alesage-')+curCC.d1:'plan-'+cur.nom.replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'')+(cur.ext?'-ext':'-int');
     msg.textContent='Préparation du plan…';
     try{ let data,fn; try{data=await planPdf(svg);fn=name+'.pdf'}catch(e){data=svg;fn=name+'.svg'}
       await put(fn,data); msg.textContent='Plan enregistré : '+fn+'. Imprimez-le en A4 paysage, à 100 %.'; }
