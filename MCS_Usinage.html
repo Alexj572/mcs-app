@@ -305,12 +305,12 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <h2>Dégagement d'épaulement · DIN 509</h2>
     <div class="row">
       <div><label class="lab" for="eD">Ø de la portée (mm)</label><input id="eD" type="number" min="1.7" step="0.1" inputmode="decimal"></div>
-      <div><span class="lab">Forme</span><div class="seg" id="eForm"><button type="button" data-v="E">E<small>portée seule rectifiée</small></button><button type="button" data-v="F">F<small>portée et face rectifiées</small></button></div></div>
+      <div><span class="lab">Forme</span><div class="seg" id="eForm"><button type="button" data-v="E">E<small>portée seule rectifiée</small></button><button type="button" data-v="F">F<small>portée et face rectifiées</small></button><button type="button" data-v="G">G<small>Ø 3 à 18</small></button><button type="button" data-v="H">H<small>au-dessus de Ø 18</small></button></div></div>
       <div><span class="lab">Sollicitation</span><div class="seg" id="eSol"><button type="button" data-v="n">Normale</button><button type="button" data-v="f">Fatigue élevée</button></div></div>
     </div>
     <p class="note" id="eErr" hidden></p>
     <div class="viz" id="eOut" style="margin-top:12px"><div class="vals" id="eVals" style="align-content:start"></div><div class="gbox" id="ePic"></div></div>
-    <p class="verif"><b>Valeurs contrôlées</b>Rayon, profondeurs et largeur recoupés sur deux tables DIN 509 publiées. Les formes G et H ne sont pas reprises : les deux tables ne donnent pas les mêmes valeurs.</p>
+    <p class="verif"><b>Valeurs contrôlées</b>Formes E et F : rayon, profondeurs et largeur recoupés sur deux tables publiées (la forme E sur trois). Formes G et H : rayon et profondeurs recoupés sur deux tables, la largeur n'est pas donnée car elle n'est qu'approchée dans la norme. Tolérances : DIN 509, tableau 1.</p>
   </section>
   <section class="card">
     <h2>Centres 60° · DIN 332</h2>
@@ -319,7 +319,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
       <div><label class="lab" for="nSize">Taille</label><select id="nSize"></select></div>
     </div>
     <div class="viz" style="margin-top:12px"><div class="vals" id="nVals" style="align-content:start"></div><div class="gbox" id="nPic"></div></div>
-    <p class="verif"><b>Valeurs contrôlées</b>Formes A et B recoupées sur trois tables publiées (DIN 332-1, ISO 866 et ISO 2540). Forme D recoupée sur deux tables (DIN 332-2). La forme R et les tailles B 1.25, 5 et 8 ne sont pas reprises : une seule source lisible.</p>
+    <p class="verif"><b>Valeurs contrôlées</b>Formes A et B recoupées sur trois tables publiées (DIN 332-1, ISO 866 et ISO 2540). Forme D recoupée sur deux à trois tables (DIN 332-2). La forme R, les tailles B 1.25, 5 et 8 et le centre taraudé M3 ne sont pas repris : pas de deuxième table concordante.</p>
   </section>
 </main>
 <main class="wrap" id="modCal" hidden>
@@ -400,7 +400,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 10</p>
+<p class="ver">Aide à l'usinage · version 11</p>
 <div id="pr"></div>
 <div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
   <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
@@ -1113,7 +1113,8 @@ const D509={n:[[1.6,3,.2,.1,1,.1],[3,10,.4,.2,2,.1],[10,18,.6,.2,2,.1],[18,80,.6
 // DIN 332-1 forme A : [d1, d2, t mini, a] ; forme B : d1 -> [d3, b, t mini, a] ; DIN 332-2 forme D : [M, Ø arbre de, à, perçage, t1, t2]
 const CEA=[[1,2.12,1.9,3],[1.25,2.65,2.3,0],[1.6,3.35,2.9,5],[2,4.25,3.7,6],[2.5,5.3,4.6,7],[3.15,6.7,5.9,9],[4,8.5,7.4,11],[5,10.6,9.2,0],[6.3,13.2,11.5,18],[8,17,14.8,0],[10,21.2,18.4,28]];
 const CEB={1:[3.15,.3,2.2,3.5],1.6:[5,.5,3.4,5.5],2:[6.3,.6,4.3,6.6],2.5:[8,.8,5.4,8.3],3.15:[10,.9,6.8,10],4:[12.5,1.2,8.6,12.7],6.3:[18,1.4,12.9,20],10:[28,2,20.4,31]};
-const CED=[[5,13,16,4.2,12.5,17],[6,16,21,5,16,21],[8,21,24,6.8,19,25],[10,24,30,8.5,22,30],[12,30,38,10.2,28,37],[16,38,50,14,36,45],[20,50,85,17.5,42,53],[24,85,130,21,50,63]];
+const CED=[[4,0,0,3.3,10,14,4.3,0],[5,13,16,4.2,12.5,17,5.3,4],[6,16,21,5,16,21,6.4,5],[8,21,24,6.8,19,25,8.4,6],[10,24,30,8.5,22,30,10.5,7.5],[12,30,38,10.2,28,37,13,9.5],[16,38,50,14,36,45,17,12],[20,50,85,17.5,42,53,21,15],[24,85,130,21,50,63,25,18]];
+const D509GH={G:{n:[[3,18,.4,.2,0,.2]]},H:{n:[[18,80,.8,.3,0,.05]],f:[[18,50,1.2,.3,0,.05]]}};
 const sd={d:'12',p:'1.75',cote:'ext',f:'n',eD:'30',eF:'E',eS:'n',nF:'A',nS:'4'};
 try{Object.assign(sd,JSON.parse(localStorage.getItem('mcs-deg')||'{}'))}catch(e){}
 function renderDeg(){
@@ -1137,11 +1138,11 @@ function renderDeg(){
       :'<rect x="20" y="30" width="360" height="60" style="fill:var(--soft)"/>'+P('20,90 '+Array.from({length:10},(_,i)=>(30+i*20)+',104 '+(40+i*20)+',90').join(' ')+' 222,90 240,62 300,62 318,90 380,90')+T(120,124,'taraudage '+pn2(sd.d,p),'mut')+T(270,52,f2(g1)+' à '+f2(g2),'red')+T(270,82,'Ø '+f2(dg),'ink')+T(350,112,'fond','mut'))+AX+'</svg>'}
   // ----- DIN 509 -----
   pr('eForm',sd.eF); pr('eSol',sd.eS); $('eD').value=sd.eD;
-  const D=+sd.eD,L=D509[sd.eS].find(x=>D>x[0]&&D<=x[1]);
-  $('eErr').hidden=!!L; $('eOut').hidden=!L; if(!L)$('eErr').textContent=sd.eS==='f'?'En fatigue élevée, la DIN 509 commence au-dessus de Ø 18.':'La table commence au-dessus de Ø 1.6.';
-  if(L){const F=sd.eF==='F';
-    $('eVals').innerHTML=tile('Dégagement','DIN 509 – '+sd.eF+' '+L[2]+' × '+L[3],'désignation à porter au plan',1)+tile('Rayon r',L[2],'mm')+tile('Profondeur t1',L[3],'mm au rayon, sous la portée')+tile('Ø de fond de gorge',f2(D-2*L[3]),'Ø '+D+' − 2 × '+L[3])+tile('Largeur f',L[4],'mm le long de la portée')+(F?tile('Profondeur t2',L[5],'mm dans la face de l\'épaulement'):'');
-    $('ePic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Dégagement d\'épaulement">'+P('20,120 200,120 216,140 262,140 '+(F?'272,134 272,40 380,40':'276,120 276,40 380,40'))+T(110,108,'portée Ø '+D,'mut')+T(238,160,'f = '+L[4],'red')+T(238,180,'t1 = '+L[3],'ink')+(F?T(284,90,'t2 = '+L[5],'red','start'):'')+T(330,30,'épaulement','mut')+AX+'</svg>'}
+  const D=+sd.eD,GH=D509GH[sd.eF],L=(GH?GH[sd.eS]||[]:D509[sd.eS]).find(x=>D>x[0]&&D<=x[1]);
+  $('eErr').hidden=!!L; $('eOut').hidden=!L; if(!L)$('eErr').textContent=GH?'La norme ne donne pas de forme '+sd.eF+' pour ce Ø avec cette sollicitation.':sd.eS==='f'?'En fatigue élevée, la DIN 509 commence au-dessus de Ø 18.':'La table commence au-dessus de Ø 1.6.';
+  if(L){const F=sd.eF!=='E';
+    $('eVals').innerHTML=tile('Dégagement','DIN 509 – '+sd.eF+' '+L[2]+' × '+L[3],'désignation à porter au plan',1)+tile('Rayon r',L[2],'mm · tolérance ± 0.1')+tile('Profondeur t1',f2(L[3])+' à '+f2(L[3]+.1),'mm au rayon, sous la portée · 0 / +0.1')+tile('Ø de fond de gorge',f2(D-2*L[3]-.2)+' à '+f2(D-2*L[3]),'pour une portée à Ø '+D)+(L[4]?tile('Largeur f',f2(L[4])+' à '+f2(L[4]+.2),'mm le long de la portée · 0 / +0.2'):'')+(F?tile('Profondeur t2',f2(L[5])+' à '+f2(L[5]+.05),'mm dans la face de l\'épaulement · 0 / +0.05'):'');
+    $('ePic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Dégagement d\'épaulement">'+P('20,120 200,120 216,140 262,140 '+(F?'272,134 272,40 380,40':'276,120 276,40 380,40'))+T(110,108,'portée Ø '+D,'mut')+(L[4]?T(238,160,'f = '+L[4],'red'):'')+T(238,180,'t1 = '+L[3],'ink')+(F?T(284,90,'t2 = '+L[5],'red','start'):'')+T(330,30,'épaulement','mut')+AX+'</svg>'}
   // ----- centres -----
   pr('nForm',sd.nF); const A=sd.nF==='A',B=sd.nF==='B';
   const opts=A?CEA.map(x=>[x[0],x[0]+' × '+x[1]]):B?CEA.filter(x=>CEB[x[0]]).map(x=>[x[0],x[0]+' × '+x[1]]):CED.map(x=>[x[0],'M'+x[0]]);
@@ -1152,7 +1153,7 @@ function renderDeg(){
     const k=r[1]/2*7>70?70/(r[1]/2):7,h1=r[0]/2*k,h2=r[1]/2*k,x0=60,xc=x0+(b?26:0),xe=xc+(h2-h1)*1.732,xf=x0+Math.max(t*k,xe-x0+30);
     $('nPic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Centre 60°"><rect x="'+x0+'" y="20" width="320" height="180" style="fill:var(--soft)"/><polygon points="'+x0+','+(110-(b?h2+15:h2))+' '+(b?xc+','+(110-h2)+' ':'')+xe.toFixed(1)+','+(110-h1)+' '+xf.toFixed(1)+','+(110-h1)+' '+(xf+h1*.6).toFixed(1)+',110 '+xf.toFixed(1)+','+(110+h1)+' '+xe.toFixed(1)+','+(110+h1)+' '+(b?xc+','+(110+h2)+' ':'')+x0+','+(110+(b?h2+15:h2))+'" style="fill:var(--surf);stroke:var(--ink)" stroke-width="2.5" stroke-linejoin="round"/><line x1="30" y1="110" x2="390" y2="110" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3"/>'+T(x0-6,114,'Ø'+r[1],'ink','end')+T(xf+h1*.6+10,114,'Ø'+r[0],'red','start')+T(220,40,'60°','mut')+T(220,190,'t = '+t+' mini','ink')+'</svg>'}
   else{const r=CED.find(x=>String(x[0])===sd.nS);
-    $('nVals').innerHTML=tile('Centre taraudé','DIN 332 – D M'+r[0],'désignation à porter au plan',1)+tile('Pour bout d\'arbre','Ø '+r[1]+' à '+r[2],'au-dessus de '+r[1]+', jusqu\'à '+r[2]+' mm')+tile('Ø de perçage',r[3],'mm, avant taraudage')+tile('Profondeur de filet t1',r[4],'mm mini')+tile('Profondeur de perçage t2',r[5],'mm mini');
+    $('nVals').innerHTML=tile('Centre taraudé','DIN 332 – D M'+r[0],'désignation à porter au plan',1)+(r[1]?tile('Pour bout d\'arbre','Ø '+r[1]+' à '+r[2],'au-dessus de '+r[1]+', jusqu\'à '+r[2]+' mm'):'')+tile('Ø de perçage',r[3],'mm, avant taraudage')+tile('Profondeur de filet t1',r[4],'mm mini')+tile('Profondeur de perçage t2',r[5],'mm mini')+tile('Ø du lamage d\'entrée',r[6],r[7]?'mm, sur '+r[7]+' mm de profondeur':'mm');
     $('nPic').innerHTML='<svg viewBox="0 0 400 220" role="img" aria-label="Centre taraudé"><rect x="60" y="20" width="320" height="180" style="fill:var(--soft)"/><polygon points="60,70 86,85 250,85 262,110 250,135 86,135 60,150" style="fill:var(--surf);stroke:var(--ink)" stroke-width="2.5" stroke-linejoin="round"/><line x1="86" y1="78" x2="200" y2="78" style="stroke:var(--ink)" stroke-width="1"/><line x1="86" y1="142" x2="200" y2="142" style="stroke:var(--ink)" stroke-width="1"/><line x1="30" y1="110" x2="390" y2="110" style="stroke:var(--mut)" stroke-dasharray="14 3 2 3"/>'+T(140,114,'M'+r[0],'red')+T(140,170,'t1 = '+r[4],'ink')+T(170,192,'t2 = '+r[5],'ink')+T(270,114,'Ø'+r[3],'mut','start')+'</svg>'}
   try{localStorage.setItem('mcs-deg',JSON.stringify(sd))}catch(e){}
 }
