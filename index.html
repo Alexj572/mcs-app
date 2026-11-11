@@ -16,26 +16,56 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0f1b3d;--bg2:#162040;--bg3:#1e2d55;--border:#2a3d6e;--text:#e8ecf4;--text1:#e8ecf4;--text2:#8fa0c8;--accent:#4a90e8;--accent2:#3578d0;--mcs-blue:#2952b3;--mcs-blue2:#4a78e8;--mcs-purple:#6c3db0;--mcs-purple2:#8855d8;--green:#1e7e3a;--green2:#28a04a;--red:#c0281e;--mcs-red:#c0281e;--mcs-red2:#e03020;--blue:#2952b3;--blue2:#4a78e8;--purple:#6c3db0;--radius:14px;--shadow:0 6px 32px rgba(0,0,0,.5)}
-html.light{--bg:#f0f4ff;--bg2:#ffffff;--bg3:#e4eaf8;--border:#c8d4ee;--text:#1a2550;--text1:#1a2550;--text2:#5a6a9a;--accent:#2952b3;--accent2:#1e3d8a;--mcs-blue:#2952b3;--mcs-blue2:#3a6ad4;--shadow:0 4px 20px rgba(41,82,179,.12)}
-html.light body{background:linear-gradient(160deg,#dce6ff 0%,#eef2ff 50%,#dce6ff 100%)}
-html.light .card{background:rgba(255,255,255,.9);border-color:var(--border)}
-html.light header{background:rgba(240,244,255,.97)}
+/* ── THÈME CLAIR « atelier » : fond gris-bleu doux, cartes non blanches, contrastes ≥ 4,5:1 ── */
+html.light{--bg:#dfe4ec;--bg2:#eef1f5;--bg3:#d5dce7;--border:#b3bdcd;--field:#f6f7fa;--field-border:#717d92;--text:#131b2e;--text1:#131b2e;--text2:#46516a;--accent:#234a9e;--accent2:#1b3a80;--mcs-blue:#2952b3;--mcs-blue2:#3561c4;--blue:#2952b3;--blue2:#3561c4;--green:#17663a;--green2:#1f8a44;--red:#b42318;--mcs-red:#b42318;--mcs-red2:#c8321f;--shadow:0 2px 12px rgba(20,35,70,.12);color-scheme:light}
+html.light body{background:var(--bg)}
+html.light .card{background:var(--bg2);border-color:var(--border);backdrop-filter:none}
+html.light header{background:var(--bg2);border-bottom-color:var(--border)}
+html.light .header-nav-btn{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+html.light .header-nav-btn:hover{background:var(--border)}
+html.light .header-page-title{color:var(--text)}
 html.light nav{background:var(--bg2)}
+html.light nav button.active{color:var(--accent)}
 html.light .modal{background:var(--bg2)}
-html.light .login-box{background:rgba(255,255,255,.95)}
-html.light input,html.light select,html.light textarea{background:rgba(41,82,179,.06);border-color:var(--border);color:var(--text1)}
+html.light .modal-overlay{background:rgba(19,27,46,.55)}
+html.light #login-page{background:var(--bg)}
+html.light .login-box{background:none}
+html.light .login-logo h1,html.light .home-logo h1{color:var(--text)}
+html.light .login-logo p,html.light .home-logo p{color:var(--text2)}
+html.light .login-box .card{background:var(--bg2);border-color:var(--border);backdrop-filter:none}
+html.light input,html.light select,html.light textarea{background:var(--field);border-color:var(--field-border)!important;color:var(--text1)}
+html.light input:focus,html.light select:focus,html.light textarea:focus{border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(35,74,158,.25)}
+html.light ::placeholder{color:#5d6679;opacity:1}
+html.light select option{background:var(--field);color:var(--text1)}
+html.light input[type=date]::-webkit-calendar-picker-indicator{filter:none}
 html.light .stat-card{background:var(--bg2)}
-html.light .toast-item{background:var(--bg2)}
+html.light .toast-item{background:var(--bg2);color:var(--text);border-left-width:5px}
 html.light .fiches-table tr:hover td{background:var(--bg3)}
 html.light .home-page{background:none}
+html.light .home-btn.blue{background:linear-gradient(135deg,#2952b3 0%,#3561c4 100%)}
+html.light .home-btn.blue2{background:linear-gradient(135deg,#1a4a9e 0%,#2a5cb0 100%)}
+html.light .home-btn.teal{background:linear-gradient(135deg,#145a68 0%,#1b7385 100%)}
+html.light .home-btn.purple{background:linear-gradient(135deg,#5b2f9c 0%,#6e3fbf 100%)}
+html.light .home-btn.green{background:linear-gradient(135deg,#17663a 0%,#1d7a46 100%)}
+html.light .home-btn.orange{background:linear-gradient(135deg,#8f480c 0%,#a4540f 100%)}
+html.light .home-btn:hover{box-shadow:0 8px 24px rgba(20,35,70,.25)}
+html.light .home-btn-text span{color:#eef2f8}
+html.light .home-card-label{color:#fff}
+html.light #theme-toggle-btn{background:var(--bg2)!important;border-color:var(--field-border)!important;color:var(--text)!important}
+html.light .home-ver{color:var(--text2)!important}
 html.light #bottom-nav{display:none!important}
-html.light 
 html.light .bn-btn.active{color:var(--accent)}
 html.light .bn-btn.active::before{background:var(--accent)}
 html.light #fab-btn{background:linear-gradient(135deg,var(--mcs-blue2),var(--mcs-blue))}
-html.light .mobile-fiche-card{background:rgba(255,255,255,.9);border-color:var(--border)}
+html.light .mobile-fiche-card{background:var(--bg2);border-color:var(--border)}
+html.light .mobile-fiche-card:active{background:var(--bg3)}
 html.light .mobile-fiche-name{color:var(--text1)}
-html.light .mobile-fiche-meta{color:var(--text2)}
+html.light .mobile-fiche-meta,html.light .mobile-fiche-date,html.light .mobile-fiche-ref{color:var(--text2)!important}
+html.light .color-swatch.selected{border-color:var(--text)}
+html.light .bar-fill{color:#fff}
+html.light .machine-card:hover{box-shadow:0 8px 24px rgba(20,35,70,.18)}
+html.light .home-logo img,html.light .login-logo img{box-shadow:0 4px 16px rgba(20,35,70,.18)}
+html.light ::-webkit-scrollbar-thumb{background:var(--field-border)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Barlow',sans-serif;background:linear-gradient(160deg,#0d1a3e 0%,#1a2a5e 50%,#0d1a3e 100%);background-attachment:fixed;color:var(--text);min-height:100vh}
 .hidden{display:none!important}
@@ -528,6 +558,21 @@ function toggleTheme(){
   // Rafraîchir l'icône si on est sur Paramètres
   const btn=document.getElementById('theme-toggle-btn');
   if(btn)btn.textContent=localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair';
+}
+// Couleurs « métier » (machines, rôles) : en mode clair, texte assombri jusqu'à 4,5:1 sur fond clair ; le mode sombre garde la couleur d'origine
+function _rgb(c){let h=String(c||'').trim().replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');if(!/^[0-9a-f]{6}$/i.test(h))return null;const n=parseInt(h,16);return[n>>16,n>>8&255,n&255]}
+function _lum(r,g,b){const f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(r)+.7152*f(g)+.0722*f(b)}
+function txtC(c){
+  if(!document.documentElement.classList.contains('light'))return c;
+  const p=_rgb(c);if(!p)return c;let [r,g,b]=p;
+  for(let k=0;k<30&&_lum(r,g,b)>.105;k++){r*=.92;g*=.92;b*=.92}
+  return '#'+[r,g,b].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('');
+}
+// Texte posé sur une couleur (barres de stats) : en clair, blanc ou foncé selon ce qui contraste le mieux
+function onC(c){
+  if(!document.documentElement.classList.contains('light'))return '';
+  const p=_rgb(c);if(!p)return '';const L=_lum(...p);
+  return 'color:'+((1.05/(L+.05))>=((L+.05)/(_lum(19,27,46)+.05))?'#fff':'#131b2e');
 }
 // Appliquer le thème sauvegardé au chargement
 applyTheme(localStorage.getItem('mcs-theme')||'dark');
@@ -1089,7 +1134,7 @@ function renderHome(){
         ${localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair'}
       </button>
     </div>
-    <div style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 12</div>
+    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 13</div>
   </div>`;
 }
 
@@ -1102,7 +1147,7 @@ function renderDevis(){
 // ── USINAGE ───────────────────────────────────────────
 function renderUsinage(){
   return`<div style="width:100%;height:calc(100vh - 100px);display:flex;flex-direction:column;overflow:hidden">
-    <iframe id="usinage-frame" name="usinage-frame" src="MCS_Usinage.html?v=13" style="flex:1;border:none;width:100%;min-height:600px" title="Aide à l'usinage" allow="same-origin"></iframe>
+    <iframe id="usinage-frame" name="usinage-frame" src="MCS_Usinage.html?v=14" style="flex:1;border:none;width:100%;min-height:600px" title="Aide à l'usinage" allow="same-origin"></iframe>
   </div>`;
 }
 function printDevis(){
@@ -1130,8 +1175,8 @@ function renderMachines(){
           <button class="mc-btn" onclick="event.stopPropagation();confirmDelMachine('${m.id}')">🗑️</button>
         </div>
         <div class="mc-icon" style="color:${m.color}">🏭</div>
-        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:${m.color}">${m.nom}</h3>
-        <div style="font-size:13px;opacity:.8;color:${m.color}">${m.type}</div>
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:${txtC(m.color)}">${m.nom}</h3>
+        <div style="font-size:13px;opacity:.8;color:${txtC(m.color)}">${m.type}</div>
         <div class="mc-count">${cnt} fiche${cnt>1?'s':''}</div>
       </div>`}).join('')}
     <div class="add-machine-card" onclick="openAddMachine()"><span style="font-size:30px">➕</span><span style="font-size:14px;font-weight:600">Nouvelle machine</span></div>
@@ -1212,7 +1257,7 @@ function renderFichesList(filter){
   return`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
     <div style="display:flex;align-items:center;gap:14px">
       ${machine?`<button class="back-btn" onclick="goTo('machines')">← Retour</button>`:''}
-      <div><h1 class="page-title"${machine?` style="color:${machine.color}"`:''}>${machine?machine.nom:'Toutes les Fiches'}</h1>
+      <div><h1 class="page-title"${machine?` style="color:${txtC(machine.color)}"`:''}>${machine?machine.nom:'Toutes les Fiches'}</h1>
       <p class="page-sub">${machine?machine.type+' — ':''} <span id="fiches-count">${list.length}</span> fiche(s)</p></div>
     </div>
     <button class="btn btn-primary" onclick="goTo('fiche-new',${mid?`{machineId:'${mid}'}`:'null'})">+ Nouvelle fiche</button>
@@ -1327,7 +1372,7 @@ function renderTablePaged(list){
   ${paged.map(f=>{const m=getMachine(f.machineId)||{color:'#888',nom:'?'};return`<tr onclick="goTo('fiche-view','${f.id}')">
     <td style="padding:0;width:4px"><div style="width:4px;height:100%;min-height:48px;background:${m.color};border-radius:4px 0 0 4px"></div></td>
     <td><strong>${f.designation||'—'}</strong><br><span style="color:var(--text2);font-size:12px">${f.planRef||'—'}</span></td>
-    <td><span class="machine-badge" style="background:${m.color}30;color:${m.color};border:1px solid ${m.color}50">${m.nom}</span></td>
+    <td><span class="machine-badge" style="background:${m.color}30;color:${txtC(m.color)};border:1px solid ${m.color}50">${m.nom}</span></td>
     <td>${f.client||'—'}</td><td>${f.matiere||'—'}</td><td style="white-space:nowrap">${fmt(f.date)}</td>
     <td onclick="event.stopPropagation()" style="white-space:nowrap">
       <button class="btn btn-ghost btn-sm" onclick="goTo('fiche-edit','${f.id}')">✏️</button>
@@ -1341,12 +1386,12 @@ function renderTablePaged(list){
       <div class="mobile-fiche-left" style="background:${m.color}"></div>
       <div class="mobile-fiche-body">
         <div class="mobile-fiche-name">${f.designation||f.planRef||'Sans titre'}</div>
-        ${f.designation&&f.planRef?`<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">N° ${f.planRef}</div>`:''}
+        ${f.designation&&f.planRef?`<div class="mobile-fiche-ref" style="font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">N° ${f.planRef}</div>`:''}
         <div class="mobile-fiche-meta">${f.client||''}${f.matiere?' · '+f.matiere:''}</div>
 
       </div>
       <div class="mobile-fiche-right">
-        <div class="mobile-fiche-badge" style="background:${m.color}30;color:${m.color};border:1px solid ${m.color}50">${m.nom}</div>
+        <div class="mobile-fiche-badge" style="background:${m.color}30;color:${txtC(m.color)};border:1px solid ${m.color}50">${m.nom}</div>
         <div class="mobile-fiche-date">${fmt(f.date)}</div>
         ${canDo('editFiche')?`<button style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;padding:2px;cursor:pointer" onclick="event.stopPropagation();goTo('fiche-edit','${f.id}')">✏️</button>`:''}
       </div>
@@ -1897,9 +1942,9 @@ function renderUsersSection(){
       <div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:36px;height:36px;border-radius:50%;background:${u.role==='admin'?'#e74c3c':'#3498db'};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px">${u.name[0]}</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:${txtC(u.role==='admin'?'#e74c3c':'#3498db')};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px">${u.name[0]}</div>
             <div>
-              <div style="font-weight:700;font-size:14px">${u.name} <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:${u.role==='admin'?'#e74c3c22':'#3498db22'};color:${u.role==='admin'?'#e74c3c':'#3498db'};margin-left:4px">${u.role}</span></div>
+              <div style="font-weight:700;font-size:14px">${u.name} <span style="font-size:11px;padding:2px 8px;border-radius:20px;background:${u.role==='admin'?'#e74c3c22':'#3498db22'};color:${txtC(u.role==='admin'?'#e74c3c':'#3498db')};margin-left:4px">${u.role}</span></div>
               <div style="font-size:12px;color:var(--text2)">ID : ${u.id}</div>
             </div>
           </div>
@@ -2035,7 +2080,7 @@ function renderFicheView(id){
     <div style="display:flex;align-items:center;gap:14px">
       <button class="back-btn" onclick="goTo('fiches',{machineId:'${f.machineId}'})">← Retour</button>
       <div><h2 style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800">${f.designation||f.planRef||'Sans titre'}</h2>
-      <div style="color:${m.color};font-size:14px">${m.nom} · ${m.type}</div>
+      <div style="color:${txtC(m.color)};font-size:14px">${m.nom} · ${m.type}</div>
       <div style="color:var(--text2);font-size:12px;margin-top:2px">Réf : <strong style="color:var(--text1)">${getFicheRef(f.id)}</strong></div></div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;min-width:0;max-width:100%">
@@ -2179,10 +2224,10 @@ function renderStats(){
   </div>
   <div class="charts-grid">
     <div class="chart-card"><h4>Fiches par Machine</h4>
-      ${fpm.length?fpm.map(x=>`<div class="bar-item"><div class="bar-label" title="${x.name}">${x.name}</div><div class="bar-track"><div class="bar-fill" style="width:${x.count/maxFPM*100}%;background:${x.color}">${x.count||''}</div></div><div class="bar-val">${x.count}</div></div>`).join(''):'<p style="color:var(--text2)">Aucune donn\u00e9e</p>'}
+      ${fpm.length?fpm.map(x=>`<div class="bar-item"><div class="bar-label" title="${x.name}">${x.name}</div><div class="bar-track"><div class="bar-fill" style="width:${x.count/maxFPM*100}%;background:${x.color};${onC(x.color)}">${x.count||''}</div></div><div class="bar-val">${x.count}</div></div>`).join(''):'<p style="color:var(--text2)">Aucune donn\u00e9e</p>'}
     </div>
     <div class="chart-card"><h4>Mati\u00e8res utilis\u00e9es</h4>
-      ${matList.length?matList.map((m,i)=>`<div class="bar-item"><div class="bar-label">${m[0]}</div><div class="bar-track"><div class="bar-fill" style="width:${m[1]/matList[0][1]*100}%;background:${matColors[i]}">${m[1]||''}</div></div><div class="bar-val">${m[1]}</div></div>`).join(''):'<p style="color:var(--text2)">Aucune donn\u00e9e</p>'}
+      ${matList.length?matList.map((m,i)=>`<div class="bar-item"><div class="bar-label">${m[0]}</div><div class="bar-track"><div class="bar-fill" style="width:${m[1]/matList[0][1]*100}%;background:${matColors[i]};${onC(matColors[i])}">${m[1]||''}</div></div><div class="bar-val">${m[1]}</div></div>`).join(''):'<p style="color:var(--text2)">Aucune donn\u00e9e</p>'}
     </div>
     <div class="chart-card"><h4>Fiches cr\u00e9\u00e9es par mois</h4>
       ${months.length?months.map(m=>`<div class="bar-item"><div class="bar-label">${m}</div><div class="bar-track"><div class="bar-fill" style="width:${fichesByMonth[m]/maxFM*100}%;background:var(--accent)">${fichesByMonth[m]||''}</div></div><div class="bar-val">${fichesByMonth[m]}</div></div>`).join(''):'<p style="color:var(--text2)">Aucune donn\u00e9e</p>'}
@@ -2219,7 +2264,7 @@ function renderSettings(){
       <div style="background:${m.color}18;border:1px solid ${m.color}50;border-radius:12px;padding:16px;position:relative">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
           <div style="width:14px;height:14px;border-radius:50%;background:${m.color};flex-shrink:0"></div>
-          <strong style="color:${m.color};font-size:15px">${m.nom}</strong>
+          <strong style="color:${txtC(m.color)};font-size:15px">${m.nom}</strong>
         </div>
         <div style="font-size:12px;color:var(--text2);margin-bottom:10px">${m.type} · ${cnt} fiche${cnt>1?'s':''}</div>
         <div style="display:flex;gap:6px">
