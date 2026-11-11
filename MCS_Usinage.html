@@ -170,7 +170,6 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
 <section class="wrap quick" id="quick">
   <form class="qrow" id="qForm"><input id="qIn" type="search" enterkeyhint="search" autocomplete="off" placeholder="Recherche : M12x1.25 · G1/2 · 1/4 NPT · 25H7 · circlip 30 · clavette 30" aria-label="Recherche directe"><button type="submit" class="btn">Aller</button><button type="button" class="btn ghost" id="cfgBtn" aria-label="Réglages d'atelier">⚙</button></form>
   <p class="note" id="qMsg" style="margin:0" hidden></p>
-  <div class="qlist" id="qFav" hidden></div><div class="qlist" id="qRec" hidden></div>
 </section>
 
 
@@ -194,7 +193,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   </section>
 
   <section class="card">
-    <button type="button" class="star" data-m="fil" style="float:right;margin-left:8px"></button><p class="fiche-t" id="ft"></p><p class="fiche-s" id="fs"></p>
+    <p class="fiche-t" id="ft"></p><p class="fiche-s" id="fs"></p>
     <div class="vals" id="vals"></div>
     <p class="note" id="vnote"></p>
     <p class="verif" id="verif"></p>
@@ -203,7 +202,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="fil">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="fiBox" data-m="fil" hidden><input class="ofIn" type="text" maxlength="30" placeholder="N° pièce / OF" aria-label="N° de pièce ou OF pour la fiche"><button type="button" class="btn fiBtn">📋 Fiche de réglage</button></span><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
     <p class="note" id="dlMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="dessin"></div>
   </section>
@@ -230,14 +229,14 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     </div>
   </section>
   <section class="card">
-    <button type="button" class="star" data-m="cc" style="float:right;margin-left:8px"></button><p class="fiche-t" id="ccT"></p><p class="fiche-s" id="ccS"></p>
+    <p class="fiche-t" id="ccT"></p><p class="fiche-s" id="ccS"></p>
     <div class="vals" id="ccVals"></div>
     <p class="verif" id="ccVerif"></p>
   </section>
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="cc">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="fiBox" data-m="cc" hidden><input class="ofIn" type="text" maxlength="30" placeholder="N° pièce / OF" aria-label="N° de pièce ou OF pour la fiche"><button type="button" class="btn fiBtn">📋 Fiche de réglage</button></span><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
     <p class="note" id="ccMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="ccDessin"></div>
   </section>
@@ -259,7 +258,6 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   </section>
   <p class="card" id="tErr" hidden>Indiquez un Ø nominal entre 1 et 500 mm.</p>
   <div id="tOut" style="display:grid;gap:14px">
-    <div class="bar" style="margin:0"><p class="fiche-t" id="tTitle" style="flex:1"></p><button type="button" class="star" data-m="tol"></button></div>
     <div class="tcards" id="tCards"></div>
     <section class="card"><h2>Où tombent les deux pièces</h2>
       <div class="viz"><div><div id="tZones"></div><div id="tGauge"></div></div><div><div id="tPic"></div><p class="note" id="tPicN" style="text-align:center"></p></div></div>
@@ -270,7 +268,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     </section>
     <section class="card"><div class="bar"><h2>Plan A4</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="tol">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="fiBox" data-m="tol" hidden><input class="ofIn" type="text" maxlength="30" placeholder="N° pièce / OF" aria-label="N° de pièce ou OF pour la fiche"><button type="button" class="btn fiBtn">📋 Fiche de réglage</button></span><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span class="zt">Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
     <p class="note" id="tMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="tDessin"></div></section>
   </div>
@@ -284,7 +282,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   </section>
   <p class="card" id="kaErr" hidden>La table DIN 6885 couvre les arbres de Ø 6 à Ø 200 mm.</p>
   <section class="card" id="kaOut">
-    <button type="button" class="star" data-m="cla" style="float:right;margin-left:8px"></button><p class="fiche-t" id="kaT"></p><p class="fiche-s" id="kaS"></p>
+    <p class="fiche-t" id="kaT"></p><p class="fiche-s" id="kaS"></p>
     <div class="viz"><div class="vals" id="kaVals" style="align-content:start"></div><div><div class="gbox" id="kaPic"></div><p class="note" style="text-align:center">Coupe de l'arbre dans son moyeu, clavette en haut.</p></div></div>
     <p class="verif" id="kaVerif"></p>
     <p class="note">La longueur de la clavette dépend du couple à passer : elle n'est pas donnée ici, elle vient du plan.</p>
@@ -294,8 +292,6 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <section class="card">
     <h2>Vitesse de broche et avance</h2>
     <div class="seg" id="kMode"><button type="button" data-v="t">Tournage<small>la pièce tourne</small></button><button type="button" data-v="o">Outil tournant<small>fraise, foret</small></button></div>
-    <div id="kMachB" style="margin-top:10px" hidden><span class="lab">Machine</span><div class="chips" id="kMach"></div></div>
-    <p class="note" id="kMachN">Ajoutez vos machines dans ⚙ Réglages (en haut) pour retrouver leur maxi broche d'un clic.</p>
     <div class="row" style="margin-top:12px">
       <div><label class="lab" for="kD" id="kDl">Ø usiné (mm)</label><input id="kD" type="number" step="0.1" min="0" inputmode="decimal"></div>
       <div><label class="lab" for="kVc">Vc (m/min)</label><input id="kVc" type="number" step="1" min="0" inputmode="decimal"></div>
@@ -370,15 +366,13 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 8</p>
+<p class="ver">Aide à l'usinage · version 9</p>
 <div id="pr"></div>
 <div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
   <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
   <p class="note" id="cfgInfo" style="margin:0 0 10px"></p>
   <div class="row"><div><label class="lab" for="cfgSur">Surépaisseur avant filetage (mm)</label><input id="cfgSur" type="number" step="0.01" min="0" max="1" inputmode="decimal"></div>
     <div><label class="lab" for="cfgPar">Nom dans le cartouche des plans</label><input id="cfgPar" type="text" maxlength="14"></div></div>
-  <span class="lab">Machines : nom, maxi broche, maxi outil tournant (tr/min)</span><div id="cfgM"></div>
-  <button type="button" class="btn ghost" id="cfgAdd">+ Ajouter une machine</button>
   <div class="bar" style="margin:14px 0 0"><span id="cfgMsg" class="note" style="flex:1;margin:0"></span><button type="button" class="btn" id="cfgSave">Enregistrer</button></div>
 </div></div>
 <div id="zv" hidden role="dialog" aria-label="Plan agrandi"><div id="zc"></div><div id="zb"><button type="button" id="zP" aria-label="Zoomer">+</button><button type="button" id="zM" aria-label="Dézoomer">−</button><button type="button" id="zF" aria-label="Voir le plan entier">⤢</button><button type="button" id="zX" aria-label="Fermer">✕</button></div></div>
@@ -1076,28 +1070,9 @@ renderCla();
 
 /* ================= ACCÈS RAPIDE : recherche, favoris, récents, fiche, réglages ================= */
 (()=>{
-const jget=(k,d)=>{try{const j=JSON.parse(localStorage.getItem(k));return j==null?d:j}catch(e){return d}}, jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let FAV=jget('mcs-fav',[]), REC=jget('mcs-rec',[]); if(!Array.isArray(FAV))FAV=[]; if(!Array.isArray(REC))REC=[];
-const SNAP={fil:()=>cur&&{m:'fil',t:cur.nom+(cur.ext?' ext.':' int.'),s:JSON.parse(JSON.stringify(st))},
-  cc:()=>curCC&&{m:'cc',t:'Circlip '+(curCC.ext?'arbre':'alésage')+' Ø'+curCC.d1,s:{type:sc.type,d:sc.d,pos:sc.pos}},
-  tol:()=>curTol&&{m:'tol',t:'Ø'+stl.D+' '+stl.hl+stl.hg+'/'+stl.sl+stl.sg,s:Object.assign({},stl)},
-  cla:()=>curCla&&{m:'cla',t:'Clavette Ø'+curCla.d+' '+CFIT[sk.fit][0].toLowerCase(),s:Object.assign({},sk)}};
+const jset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const GO={fil:s=>{Object.assign(st,s);st.sp=Object.assign({d:'30',p:'1.5',u:'mm',a:'60'},s.sp||{});fillSizes();render()},cc:s=>{Object.assign(sc,s);fillCC();renderCC()},tol:s=>{Object.assign(stl,s);fillTol();renderTol()},cla:s=>{Object.assign(sk,s);renderCla()}};
-const key=e=>e.m+'|'+e.t;
-function lists(){
-  const chips=(L,ic)=>L.map(e=>'<button type="button" data-k="'+esc(key(e))+'">'+ic+esc(e.t)+'</button>').join('');
-  $('qFav').hidden=!FAV.length; $('qFav').innerHTML='<b>Favoris</b>'+chips(FAV,'★ ');
-  $('qRec').hidden=!REC.length; $('qRec').innerHTML='<b>Récents</b>'+chips(REC,'');
-  document.querySelectorAll('.star').forEach(b=>{const e=SNAP[b.dataset.m](),on=!!e&&FAV.some(f=>key(f)===key(e));b.setAttribute('aria-pressed',on);b.textContent=on?'★ Favori':'☆ Favori'});
-}
-const timers={};
-function after(m){ if(m==='tol')$('tTitle').textContent=curTol?SNAP.tol().t:''; lists();
-  clearTimeout(timers[m]); timers[m]=setTimeout(()=>{const e=SNAP[m]();if(!e||mod!==m)return;REC=[e].concat(REC.filter(x=>key(x)!==key(e))).slice(0,10);jset('mcs-rec',REC);lists()},2500); }
-const r0=render, r1=renderCC, r2=renderTol, r3=renderCla; renderCla=function(){r3();after('cla')};
-render=function(){r0();after('fil')}; renderCC=function(){r1();after('cc')}; renderTol=function(){r2();after('tol')};
 const jump=e=>{GO[e.m](JSON.parse(JSON.stringify(e.s)));showMod(e.m);window.scrollTo(0,0)};
-$('quick').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b)return;const x=FAV.concat(REC).find(f=>key(f)===b.dataset.k);if(x)jump(x)});
-document.querySelectorAll('.star').forEach(b=>b.addEventListener('click',()=>{const e=SNAP[b.dataset.m]();if(!e)return;const i=FAV.findIndex(f=>key(f)===key(e));if(i>=0)FAV.splice(i,1);else FAV=[e].concat(FAV).slice(0,30);jset('mcs-fav',FAV);lists()}));
 
 /* ----- recherche directe ----- */
 const nf=s=>s.trim().replace(/["”″]|pouces?|''/g,'').trim().replace(/\s+/g,' ').replace(/^(\d+) (\d+\/\d+)$/,'$1.$2');
@@ -1140,46 +1115,21 @@ $('qForm').addEventListener('submit',e=>{e.preventDefault();const q=$('qIn').val
   if(r&&!r.err){msg.hidden=true;$('qIn').value='';$('qIn').blur();jump(r)}
   else{msg.hidden=false;msg.textContent=r?r.err:'Pas trouvé. Exemples : M12x1.25 · G1/2 · Rc 3/4 · 1/4 NPT · 1/2-13 UNC · Tr20x4 · 25H7 · 30 H7/g6 · circlip 30 · clavette 30.'}});
 
-/* ----- fiche de réglage (impression A4 portrait) ----- */
-const OF=document.querySelectorAll('.ofIn'); let ofv=''; try{ofv=sessionStorage.getItem('mcs-of')||''}catch(e){}
-OF.forEach(i=>{i.value=ofv;i.addEventListener('input',()=>{ofv=i.value;OF.forEach(o=>{if(o!==i)o.value=ofv});try{sessionStorage.setItem('mcs-of',ofv)}catch(e){}})});
-function fiche(m){
-  const T={fil:()=>[$('ft').textContent,$('fs').textContent,lastSvg,[cur.con?['Cône : points à programmer','<table>'+$('coneT').innerHTML+'</table><p>'+esc($('coneN').textContent)+'</p>']:0,$('ctrl').innerHTML?['Contrôle','<table>'+$('ctrl').innerHTML+'</table><p>'+esc($('cnote').textContent)+'</p>']:0],$('verif').textContent],
-    cc:()=>[$('ccT').textContent,$('ccS').textContent,svgCC,[['Gorge : points à programmer','<table>'+$('ccProg').innerHTML+'</table><p>'+esc($('ccN').textContent)+'</p>']],$('ccVerif').textContent],
-    tol:()=>['Ajustement '+SNAP.tol().t,curTol.kind,svgTol,[],'']}[m]();
-  if(!T[2])return; const cell=(a,b)=>'<tr><td>'+a+'</td><td>'+esc(b||'')+'</td></tr>';
-  $('pr').className='fiche';
-  $('pr').innerHTML='<div class="fih"><img src="'+document.querySelector('.logo img').src+'" alt=""><div><b>FICHE DE RÉGLAGE</b><span>'+esc(T[0])+'</span><small>'+esc(T[1])+'</small></div><table>'+cell('N° pièce / OF',ofv)+cell('Machine','')+cell('Date',new Date().toLocaleDateString('fr-FR'))+cell('Opérateur','')+'</table></div>'
-    +'<div class="fip">'+T[2]+'</div>'+T[3].filter(Boolean).map(s=>'<h3>'+s[0]+'</h3>'+s[1]).join('')
-    +''
-    +(T[4]?'<p class="fiv">'+esc(T[4])+'</p>':'')+'<p class="fiv">Visa réglage : ____________________  Visa contrôle : ____________________</p>';
-  setTimeout(()=>window.print(),80);
-}
-if(!window.claude)document.querySelectorAll('.fiBox').forEach(b=>{b.hidden=false;b.querySelector('.fiBtn').addEventListener('click',()=>fiche(b.dataset.m))});
-
 /* ----- réglages d'atelier ----- */
 const host=(()=>{try{return window.parent!==window&&window.parent.db&&window.parent.fbDoc?window.parent:null}catch(e){return null}})();
 const admin=()=>{try{return !host||!host.mcsIsAdmin||!!host.mcsIsAdmin()}catch(e){return true}};
-const clean=j=>({sur:j&&+j.sur>=0&&+j.sur<=1?+j.sur:.1,par:String(j&&j.par||'MCS Usinage').slice(0,14),mach:(j&&Array.isArray(j.mach)?j.mach:[]).filter(x=>x&&x.nom).slice(0,12).map(x=>({nom:String(x.nom).slice(0,20),mx:+x.mx||0,mo:+x.mo||0}))});
-function machChips(){const b=$('kMach');b.innerHTML=CFG.mach.map((x,i)=>'<button type="button" data-i="'+i+'">'+esc(x.nom)+'</button>').join('');$('kMachB').hidden=!CFG.mach.length;$('kMachN').hidden=!!CFG.mach.length;$('kMachN').textContent='Ajoutez vos machines dans ⚙ Réglages (en haut) pour retrouver leur maxi broche d\'un clic.'}
-function apply(j){CFG=clean(j);jset('mcs-cfg',CFG);render();renderCC();renderTol();machChips()}
-$('kMach').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const x=CFG.mach[+b.dataset.i],o=$('kMode').querySelector('[aria-pressed="true"]').dataset.v==='o',v=o?x.mo:x.mx;
-  if(!v){$('kMachN').hidden=false;$('kMachN').textContent='Pas de maxi '+(o?'outil tournant':'broche')+' renseigné pour '+x.nom+'.';return}
-  $('kMachN').hidden=true;$('kMx').value=v;$('kMx').dispatchEvent(new Event('input',{bubbles:true}))});
-const mrow=x=>'<div class="mrow"><input class="mN" type="text" maxlength="20" placeholder="Nom de la machine" aria-label="Nom de la machine" value="'+esc(x.nom||'')+'"><input class="mB" type="number" min="0" step="100" inputmode="numeric" placeholder="Maxi broche" aria-label="Maxi broche en tr/min" value="'+(x.mx||'')+'"><input class="mO" type="number" min="0" step="100" inputmode="numeric" placeholder="Maxi outil tournant" aria-label="Maxi outil tournant en tr/min" value="'+(x.mo||'')+'"><button type="button" class="btn ghost mDel" aria-label="Retirer cette machine">✕</button></div>';
-function openCfg(){const ad=admin();$('cfgSur').value=CFG.sur;$('cfgPar').value=CFG.par;$('cfgM').innerHTML=CFG.mach.map(mrow).join('');$('cfgMsg').textContent='';
+const clean=j=>({sur:j&&+j.sur>=0&&+j.sur<=1?+j.sur:.1,par:String(j&&j.par||'MCS Usinage').slice(0,14)});
+function apply(j){CFG=clean(j);jset('mcs-cfg',CFG);render();renderCC();renderTol()}
+function openCfg(){const ad=admin();$('cfgSur').value=CFG.sur;$('cfgPar').value=CFG.par;$('cfgMsg').textContent='';
   $('cfgInfo').textContent=!ad?'Seul l\'administrateur peut modifier ces réglages.':host?'Ces réglages sont enregistrés dans MCS App : ils valent pour tous les postes.':'Ces réglages sont enregistrés sur cet appareil.';
-  $('cfg').querySelectorAll('input,#cfgAdd,#cfgSave,.mDel').forEach(el=>el.disabled=!ad);$('cfg').hidden=false}
+  $('cfg').querySelectorAll('input,#cfgSave').forEach(el=>el.disabled=!ad);$('cfg').hidden=false}
 $('cfgBtn').onclick=openCfg; $('cfgX').onclick=()=>{$('cfg').hidden=true};
-$('cfgAdd').onclick=()=>{if($('cfgM').children.length<12)$('cfgM').insertAdjacentHTML('beforeend',mrow({}))};
-$('cfgM').addEventListener('click',e=>{const b=e.target.closest('.mDel');if(b)b.parentNode.remove()});
 $('cfgSave').onclick=async()=>{const sur=parseFloat($('cfgSur').value);if(!(sur>=0&&sur<=1)){$('cfgMsg').textContent='Surépaisseur : entre 0 et 1 mm.';return}
-  const j=clean({sur,par:$('cfgPar').value.trim(),mach:[...$('cfgM').children].map(r=>({nom:r.querySelector('.mN').value.trim(),mx:r.querySelector('.mB').value,mo:r.querySelector('.mO').value}))});
+  const j=clean({sur,par:$('cfgPar').value.trim()});
   apply(j); if(!host){$('cfgMsg').textContent='Enregistré sur cet appareil.';return}
   $('cfgMsg').textContent='Enregistrement…';
   try{await host.fbSetDoc(host.fbDoc(host.db,'settings','usinage'),j);$('cfgMsg').textContent='Enregistré pour tous les postes.'}
   catch(e){$('cfgMsg').textContent='Enregistré sur cet appareil seulement : la base de MCS App a refusé l\'écriture.'}};
-machChips(); lists(); $('tTitle').textContent=curTol?SNAP.tol().t:'';
 if(host)(async()=>{try{const s=await host.fbGetDoc(host.fbDoc(host.db,'settings','usinage'));if(s.exists())apply(s.data())}catch(e){}})();
 })();
 
