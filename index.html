@@ -384,7 +384,7 @@ document.dispatchEvent(new Event('firebaseReady'));
     <button onclick="goTo('fiches')" id="nav-fiches">📄 Gestion des fiches</button>
     <button onclick="goTo('stats')" id="nav-stats">📊 Stats</button>
     <button onclick="goTo('devis')" id="nav-devis" class="hidden">💰 Devis Pièce</button>
-    <button onclick="goTo('usinage')" id="nav-usinage">🔧 Usinage</button>
+    <button onclick="goTo('usinage')" id="nav-usinage" class="hidden">🔧 Usinage</button>
     <div class="nav-spacer"></div>
     <button onclick="goTo('settings')" id="nav-settings" class="nav-settings hidden">⚙️ Paramètres</button>
   </nav>
@@ -548,6 +548,9 @@ async function calcStorageSize(){
   }catch(e){console.warn('calcStorageSize',e);cloudStorageBytes=null;}
 }
 function canDo(perm){if(!currentUser)return false;if(currentUser.role==='admin')return true;return !!(currentUser.perms&&currentUser.perms[perm]);}
+// Accès aux onglets : Statistiques reste ouvert tant que l'admin ne l'a pas décoché, Usinage est fermé tant qu'il ne l'a pas coché
+function canTab(perm){if(!currentUser)return false;if(currentUser.role==='admin')return true;const p=currentUser.perms||{};return perm==='accessStats'?p[perm]!==false:!!p[perm];}
+function applyTabAccess(){[['nav-usinage','accessUsinage'],['nav-stats','accessStats'],['bn-stats','accessStats']].forEach(([id,p])=>{const b=document.getElementById(id);if(b)b.classList.toggle('hidden',!canTab(p));});}
 
 // ── FIREBASE USERS CRUD ───────────────────────────────
 async function svUsers_load(){
@@ -747,6 +750,7 @@ async function doLogin(){
   if(navSettings){if(found.role==='admin')navSettings.classList.remove('hidden');else navSettings.classList.add('hidden');}
   const navDevis=document.getElementById('nav-devis');
   if(navDevis){if(found.role==='admin'||(found.perms&&found.perms.accessDevis))navDevis.classList.remove('hidden');else navDevis.classList.add('hidden');}
+  applyTabAccess();
   // Bottom nav settings visibility
   const bnSettings=document.getElementById('bn-settings');
   if(bnSettings){if(found.role==='admin')bnSettings.classList.remove('hidden');else bnSettings.classList.add('hidden');}
@@ -758,6 +762,7 @@ async function doLogin(){
 }
 function doLogout(){
   const nd=document.getElementById('nav-devis');if(nd)nd.classList.add('hidden');
+  const nu=document.getElementById('nav-usinage');if(nu)nu.classList.add('hidden');
   currentUser=null;
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login-page').classList.remove('hidden');
@@ -816,9 +821,9 @@ function _navigateTo(page,data){
   if(page==='home'){const b=document.getElementById('nav-home');if(b)b.classList.add('active')}
   else if(page==='fiche-new'){const b=document.getElementById('nav-fiche');if(b)b.classList.add('active')}
   else if(page==='fiches'||page==='fiche-view'||page==='fiche-edit'){const b=document.getElementById('nav-fiches');if(b)b.classList.add('active')}
-  else if(page==='stats'){const b=document.getElementById('nav-stats');if(b)b.classList.add('active')}
+  else if(page==='stats'){if(!canTab('accessStats')){toast('Accès non autorisé','error');return;}const b=document.getElementById('nav-stats');if(b)b.classList.add('active')}
   else if(page==='devis'){if(!canDo('accessDevis')){toast('Accès non autorisé','error');return;}const b=document.getElementById('nav-devis');if(b)b.classList.add('active')}
-  else if(page==='usinage'){const b=document.getElementById('nav-usinage');if(b)b.classList.add('active')}
+  else if(page==='usinage'){if(!canTab('accessUsinage')){toast('Accès non autorisé','error');return;}const b=document.getElementById('nav-usinage');if(b)b.classList.add('active')}
   else if(page==='settings'){
     if(!currentUser||currentUser.role!=='admin'){toast("Accès réservé à l'administrateur",'error');return;}
     const b=document.getElementById('nav-settings');if(b)b.classList.add('active');
@@ -867,14 +872,14 @@ function renderHome(){
         <div class="home-btn-icon">📋</div>
         <div class="home-btn-text"><strong>Fiches</strong><span>Consulter les fiches de production</span></div>
       </button>
-      <button class="home-btn teal" onclick="goTo('stats')">
+      ${canTab('accessStats')?`<button class="home-btn teal" onclick="goTo('stats')">
         <div class="home-btn-icon">📊</div>
         <div class="home-btn-text"><strong>Statistiques</strong><span>Analyse de la production</span></div>
-      </button>
-      <button class="home-btn purple" onclick="goTo('usinage')">
+      </button>`:''}
+      ${canTab('accessUsinage')?`<button class="home-btn purple" onclick="goTo('usinage')">
         <div class="home-btn-icon">🔧</div>
         <div class="home-btn-text"><strong>Usinage</strong><span>Filetages, gorges, tolérances ISO</span></div>
-      </button>
+      </button>`:''}
       ${canDo('accessDevis')?`<button class="home-btn orange" onclick="goTo('devis')">
         <div class="home-btn-icon">💰</div>
         <div class="home-btn-text"><strong>Devis Pièce</strong><span>Calculer un devis</span></div>
@@ -1672,7 +1677,7 @@ async function confirmClearHistory(ficheId){
 
 // ── GESTION UTILISATEURS (admin) ──────────────────────
 function renderUsersSection(){
-  const permsLabels={createFiche:'Créer des fiches',editFiche:'Modifier des fiches',deleteFiche:'Supprimer des fiches',exportData:'Exporter les données',accessDevis:'Accès Devis Pièce'};
+  const permsLabels={createFiche:'Créer des fiches',editFiche:'Modifier des fiches',deleteFiche:'Supprimer des fiches',exportData:'Exporter les données',accessStats:'Onglet Statistiques',accessDevis:'Onglet Devis Pièce',accessUsinage:'Onglet Usinage'};
   return`<div class="card" style="margin-bottom:20px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div class="section-title" style="margin-bottom:0;border-bottom:none;padding-bottom:0">👥 Gestion des utilisateurs</div>
@@ -1697,7 +1702,7 @@ function renderUsersSection(){
         ${u.role!=='admin'?`<div style="display:flex;flex-wrap:wrap;gap:8px">
           ${Object.entries(permsLabels).map(([k,v])=>`
           <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;user-select:none">
-            <input type="checkbox" ${(u.perms&&u.perms[k])?'checked':''} onchange="togglePerm('${u.id}','${k}',this.checked)" style="accent-color:var(--accent)">
+            <input type="checkbox" ${(k==='accessStats'?!(u.perms&&u.perms[k]===false):(u.perms&&u.perms[k]))?'checked':''} onchange="togglePerm('${u.id}','${k}',this.checked)" style="accent-color:var(--accent)">
             ${v}
           </label>`).join('')}
         </div>`:`<div style="font-size:12px;color:var(--text2);font-style:italic">Accès complet — toutes les permissions</div>`}
@@ -1715,6 +1720,7 @@ function togglePerm(userId, perm, val){
     currentUser.perms=JSON.parse(JSON.stringify(u.perms));
     const navDevis=document.getElementById('nav-devis');
     if(navDevis){if(currentUser.role==='admin'||currentUser.perms.accessDevis)navDevis.classList.remove('hidden');else navDevis.classList.add('hidden');}
+    applyTabAccess();
     if(currentPage==='home')document.getElementById('main').innerHTML=renderHome();
   }
   saveUsers().then(()=>toast('Permission mise à jour'));
