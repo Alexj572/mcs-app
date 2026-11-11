@@ -64,6 +64,8 @@ select,input{width:100%;min-height:46px;font-family:var(--mono);font-size:1.1rem
 .paper svg{display:block;width:100%;height:auto}
 .zhint{font-size:.85rem;color:var(--mut);margin:0 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.zhint span{flex:1;min-width:150px}
 .paper{touch-action:pan-y}
+#pr{display:none}
+@media print{@page{size:A4 landscape;margin:6mm}html,body{background:#fff!important;padding:0!important;margin:0!important}body>*:not(#pr){display:none!important}#pr{display:block}#pr svg{display:block;width:100%;height:auto;max-height:196mm}}
 .ver{text-align:center;font-size:.75rem;color:var(--mut);margin:0;padding:6px 0 18px}
 #zv{position:fixed;inset:0;z-index:60;background:#ffffff;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #zc{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
@@ -175,7 +177,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="fil">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint"><button type="button" class="btn zoomBtn">🔍 Agrandir le plan</button><span>ou touchez le plan. Dans le plan agrandi : pincez pour zoomer, glissez pour déplacer.</span></p>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span>Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
     <p class="note" id="dlMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="dessin"></div>
   </section>
@@ -209,7 +211,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="cc">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint"><button type="button" class="btn zoomBtn">🔍 Agrandir le plan</button><span>ou touchez le plan. Dans le plan agrandi : pincez pour zoomer, glissez pour déplacer.</span></p>
+    <p class="zhint"><button type="button" class="btn prBtn" hidden>🖨 Imprimer le plan</button><span>Touchez le plan pour l'agrandir, puis pincez pour zoomer.</span></p>
     <p class="note" id="ccMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="ccDessin"></div>
   </section>
@@ -241,7 +243,8 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     </section>
   </div>
 </main>
-<p class="ver">Aide à l'usinage · version 5</p>
+<p class="ver">Aide à l'usinage · version 6</p>
+<div id="pr"></div>
 <div id="zv" hidden role="dialog" aria-label="Plan agrandi"><div id="zc"></div><div id="zb"><button type="button" id="zP" aria-label="Zoomer">+</button><button type="button" id="zM" aria-label="Dézoomer">−</button><button type="button" id="zF" aria-label="Voir le plan entier">⤢</button><button type="button" id="zX" aria-label="Fermer">✕</button></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -734,7 +737,7 @@ fillTol(); renderTol();
   document.querySelectorAll('.paper').forEach(p=>{p.addEventListener('click',()=>open(p));
     p.addEventListener('touchstart',e=>{if(e.touches.length>1){e.preventDefault();open(p)}},{passive:false});
     p.addEventListener('gesturestart',e=>{e.preventDefault();open(p)})});
-  document.querySelectorAll('.zoomBtn').forEach(b=>b.addEventListener('click',()=>open(b.closest('section').querySelector('.paper'))));
+  if(!window.claude)document.querySelectorAll('.prBtn').forEach(b=>{b.hidden=false;b.addEventListener('click',()=>{const s=b.closest('section').querySelector('.paper svg');if(!s)return;$('pr').innerHTML=s.outerHTML;setTimeout(()=>window.print(),50)})});
   const close=()=>{zv.hidden=true;zc.innerHTML='';P.clear()};
   $('zX').onclick=close; $('zF').onclick=fit; $('zP').onclick=()=>zoom(1.5,zv.clientWidth/2,zv.clientHeight/2); $('zM').onclick=()=>zoom(1/1.5,zv.clientWidth/2,zv.clientHeight/2);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!zv.hidden)close()});
