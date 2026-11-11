@@ -400,7 +400,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 12</p>
+<p class="ver">Aide à l'usinage · version 13</p>
 <div id="pr"></div>
 <div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
   <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
@@ -499,7 +499,6 @@ function cyl(o,ext){
     r.rep=[['D','Ø à fond de filet nominal',f3(o.Dint)],['D2','Ø sur flancs nominal',f3(o.d2)],['D1','Ø d\'alésage mini',f3(o.D1)],['P','Pas',f3(o.P)],['h','Profondeur de filet',f3(o.hi)]];
     r.ctrl=[['Ø d\'alésage après filetage',win?rng(lo,lo+win):f3(lo)+' (nominal)'],['Tampon ENTRE','sur toute la longueur'],['Tampon N\'ENTRE PAS','2 filets maxi = '+f2(2*o.P)]];
     r.gauge=['CONTRÔLE AU TAMPON','ENTRE : toute la longueur · N\'ENTRE PAS : 2 filets maxi ('+f2(2*o.P)+' mm)'];
-    if(o.drill>0) r.ctrl.push(['Foret si taraudage','Ø '+f2(o.drill)]);
     r.cnote=!win?'Pas de tolérance chiffrée pour ce filetage : contrôle final au tampon.':o.top?'Plaquette arasante : le Ø d\'alésage mesuré après filetage suit le Ø sur flancs. Contrôle final au tampon.':'Contrôle final au tampon ou avec la vis.';
   }
   r.top=o.top;
@@ -509,9 +508,9 @@ function cyl(o,ext){
 
 /* ---------- Calcul d'une fiche ---------- */
 const VERIF={m:[1,'Tolérances 6g / 6H contrôlées par les formules ISO 965.'],g:[1,'Diamètres et tolérances contrôlés contre une table ISO 228-1.'],
-  npt:[1,'Ø sur flancs E0, engagement à la main L1 et longueur L2 recoupés sur trois tables ASME B1.20.1. Forets dans les plages d\'un fabricant de tarauds jusqu\'à 3" ; pas de foret donné au-delà, les sources ne concordent pas.'],
-  r:[1,'Ø au plan de jauge, longueurs de jauge, tolérances d\'entrée bague / tampon et longueurs utiles recoupés sur deux tables ISO 7-1. Pas de foret donné : les fabricants ne donnent pas la même valeur.'],
-  bsw:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance ni de foret affichés : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],bsf:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance ni de foret affichés : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],
+  npt:[1,'Ø sur flancs E0, engagement à la main L1 et longueur L2 recoupés sur trois tables ASME B1.20.1.'],
+  r:[1,'Ø au plan de jauge, longueurs de jauge, tolérances d\'entrée bague / tampon et longueurs utiles recoupés sur deux tables ISO 7-1.'],
+  bsw:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance affichée : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],bsf:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance affichée : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],
   tr:[1,'Diamètres et jeu au fond contrôlés (ISO 2904). Tolérances 4h / 4H recoupées sur deux éditions de l\'ISO 2903.'],acme:[1,'Limites 2G recoupées sur une table publiée et sur les règles de tolérance de l\'ASME B1.5.'],
   rd:[1,'Ø nominaux de la vis et de l\'écrou recoupés sur deux tables DIN 405. Pas de tolérance affichée (DIN 405-2 non reprise) : contrôle à la bague ou au tampon.'],pg:[1,'Ø extérieur et Ø du noyau recoupés sur trois tables DIN 40430. Pas de tolérance affichée : contrôle à la bague ou au tampon.'],sp:[1,'Filetage hors série : cotes et tolérances calculées avec les formules de la norme (ISO 965 en métrique, ASME B1.1 en pouce), les mêmes que pour les tailles normalisées. En 55°, pas de tolérance affichée.']};
 function calc(fam,i,pasSel,ext,sp){ const r=calc0(fam,i,pasSel,ext,sp); if(!r)return r;
@@ -555,7 +554,7 @@ function calc0(fam,i,pasSel,ext,sp){
   if(ext){ r.rep=[['E0','Ø sur flancs au petit bout',f3(E0)],['E1','Ø sur flancs à L1 (plan de jauge)',f3(E1)],['L1','Engagement à la main',f2(L1)],['L2','Longueur de filet utile',f2(L2)],['D',fam==='npt'?'Ø extérieur du tube':'Ø extérieur au plan de jauge',f3(D)],['P','Pas',f3(P)]];
     r.cl=['E0','E1','D']; r.clv=[E0,E1,D]; r.cnote='Bague vissée à la main : le bout de la pièce doit affleurer la face de la bague, dans la tolérance ci-dessus.';
   }else{ r.rep=[['E1','Ø sur flancs à l\'entrée',f3(E1)],['E0','Ø sur flancs à la profondeur L1',f3(E0)],['L1','Engagement à la main',f2(L1)],['L2','Longueur de filet utile',f2(L2)],['P','Pas',f3(P)]];
-    r.cl=['E1','E0','']; r.clv=[E1,E0]; r.ctrl=drill?[['Foret avant taraud conique (perçage cylindrique)','Ø '+f2(drill)]]:[]; r.cnote='Tampon vissé à la main : le cran du tampon doit affleurer la face de la pièce, dans la tolérance ci-dessus.'; }
+    r.cl=['E1','E0','']; r.clv=[E1,E0]; r.ctrl=[]; r.cnote='Tampon vissé à la main : le cran du tampon doit affleurer la face de la pièce, dans la tolérance ci-dessus.'; }
   const gt=npt?P:(D>60?(ext?1.5*P:3.5):(ext?P:1.25*P)), gl=ext?'Entrée de la bague':'Entrée du tampon';
   r.ctrl.unshift([gl+' (longueur vissée à la main)',f2(L1)+' ± '+f2(gt)],[gl+', mini à maxi',f2(L1-gt)+' à '+f2(L1+gt)]);
   r.gauge=[gl.toUpperCase(),f2(L1)+' ± '+f2(gt)+' mm  ('+f2(L1-gt)+' à '+f2(L1+gt)+'), vissée à la main'];
