@@ -62,7 +62,9 @@ select,input{width:100%;min-height:46px;font-family:var(--mono);font-size:1.1rem
 .paper{background:#fff;border:1px solid var(--line);border-radius:6px;overflow-x:auto}
 .paper{cursor:zoom-in}
 .paper svg{display:block;width:100%;height:auto}
-.zhint{font-size:.85rem;color:var(--mut);margin:0 0 8px}
+.zhint{font-size:.85rem;color:var(--mut);margin:0 0 8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.zhint span{flex:1;min-width:150px}
+.paper{touch-action:pan-y}
+.ver{text-align:center;font-size:.75rem;color:var(--mut);margin:0;padding:6px 0 18px}
 #zv{position:fixed;inset:0;z-index:60;background:#ffffff;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #zc{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
 #zc svg{display:block;width:1188px;height:840px}
@@ -173,7 +175,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="fil">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint">Touchez le plan pour l'agrandir et zoomer.</p>
+    <p class="zhint"><button type="button" class="btn zoomBtn">🔍 Agrandir le plan</button><span>ou touchez le plan. Dans le plan agrandi : pincez pour zoomer, glissez pour déplacer.</span></p>
     <p class="note" id="dlMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="dessin"></div>
   </section>
@@ -207,7 +209,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
   <section class="card">
     <div class="bar"><h2>Plan A4 à l'échelle</h2>
       <span class="dlBox" hidden><button type="button" class="btn dlBtn" data-m="cc">Télécharger le plan en PDF</button></span></div>
-    <p class="zhint">Touchez le plan pour l'agrandir et zoomer.</p>
+    <p class="zhint"><button type="button" class="btn zoomBtn">🔍 Agrandir le plan</button><span>ou touchez le plan. Dans le plan agrandi : pincez pour zoomer, glissez pour déplacer.</span></p>
     <p class="note" id="ccMsg" style="margin:0 0 8px"></p>
     <div class="paper" id="ccDessin"></div>
   </section>
@@ -239,6 +241,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     </section>
   </div>
 </main>
+<p class="ver">Aide à l'usinage · version 5</p>
 <div id="zv" hidden role="dialog" aria-label="Plan agrandi"><div id="zc"></div><div id="zb"><button type="button" id="zP" aria-label="Zoomer">+</button><button type="button" id="zM" aria-label="Dézoomer">−</button><button type="button" id="zF" aria-label="Voir le plan entier">⤢</button><button type="button" id="zX" aria-label="Fermer">✕</button></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -727,7 +730,11 @@ fillTol(); renderTol();
   const fit=()=>{const w=zv.clientWidth,h=zv.clientHeight,s=Math.min(w/1188,h/840);Z={s,x:(w-1188*s)/2,y:(h-840*s)/2};ap()};
   const zoom=(f,cx,cy)=>{const s=Math.max(.15,Math.min(14,Z.s*f));f=s/Z.s;Z.x=cx-(cx-Z.x)*f;Z.y=cy-(cy-Z.y)*f;Z.s=s;ap()};
   const mid=()=>{const a=[...P.values()];return a.length<2?null:{x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2,d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}};
-  document.querySelectorAll('.paper').forEach(p=>p.addEventListener('click',()=>{const s=p.querySelector('svg');if(!s)return;zc.innerHTML=s.outerHTML;zv.hidden=false;fit()}));
+  const open=p=>{const s=p&&p.querySelector('svg');if(!s||!zv.hidden)return;zc.innerHTML=s.outerHTML;zv.hidden=false;fit()};
+  document.querySelectorAll('.paper').forEach(p=>{p.addEventListener('click',()=>open(p));
+    p.addEventListener('touchstart',e=>{if(e.touches.length>1){e.preventDefault();open(p)}},{passive:false});
+    p.addEventListener('gesturestart',e=>{e.preventDefault();open(p)})});
+  document.querySelectorAll('.zoomBtn').forEach(b=>b.addEventListener('click',()=>open(b.closest('section').querySelector('.paper'))));
   const close=()=>{zv.hidden=true;zc.innerHTML='';P.clear()};
   $('zX').onclick=close; $('zF').onclick=fit; $('zP').onclick=()=>zoom(1.5,zv.clientWidth/2,zv.clientHeight/2); $('zM').onclick=()=>zoom(1/1.5,zv.clientWidth/2,zv.clientHeight/2);
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!zv.hidden)close()});

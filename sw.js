@@ -1,5 +1,5 @@
 // MCS App — Service Worker v1.5
-const CACHE_NAME = 'mcs-app-v4';
+const CACHE_NAME = 'mcs-app-v5';
 const FIREBASE_HOSTS = ['firestore.googleapis.com','firebasestorage.googleapis.com','identitytoolkit.googleapis.com'];
 
 // Ressources à mettre en cache immédiatement
@@ -18,7 +18,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return Promise.allSettled(
-        STATIC_ASSETS.map(url => cache.add(url).catch(() => {}))
+        STATIC_ASSETS.map(url => cache.add(new Request(url, {cache: 'reload'})).catch(() => {}))
       );
     })
   );
@@ -47,6 +47,24 @@ self.addEventListener('fetch', event => {
           status: 503,
           headers: {'Content-Type':'application/json'}
         })
+      )
+    );
+    return;
+  }
+
+  // Pages de l'appli → réseau d'abord (toujours la dernière version), cache seulement hors ligne
+  const isPage = event.request.method === 'GET' && url.origin === self.location.origin &&
+    (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/'));
+  if (isPage) {
+    event.respondWith(
+      fetch(event.request.url, {cache: 'no-store'}).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        }
+        return response;
+      }).catch(() =>
+        caches.match(event.request, {ignoreSearch: true}).then(c => c || caches.match('./index.html'))
       )
     );
     return;
