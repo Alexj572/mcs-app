@@ -110,7 +110,7 @@ select,input{width:100%;min-height:46px;font-family:var(--mono);font-size:1.1rem
   h2{font-size:.9rem;margin-bottom:8px} .lab{font-size:.72rem;margin:8px 0 4px}
   .seg{gap:5px} .seg button{font-size:.95rem;min-height:38px;min-width:0;padding:3px 9px}
   .seg button small{font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #fam{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  #fam{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))} #fam button[data-v="sp"]{grid-column:1/-1}
   select,input{min-height:40px;font-size:1rem;padding:5px 8px}
   .row{gap:8px} .row>div{flex:1 1 128px}
   .fiche-t{font-size:1.35rem} .fiche-s{font-size:.8rem;margin-bottom:8px}
@@ -409,7 +409,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 15</p>
+<p class="ver">Aide à l'usinage · version 16</p>
 <div id="pr"></div>
 <div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
   <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
@@ -428,7 +428,7 @@ let CFG={sur:.1,par:'MCS Usinage',mach:[]};
 try{const j=JSON.parse(localStorage.getItem('mcs-cfg'));if(j&&typeof j==='object')CFG=Object.assign(CFG,j)}catch(e){}
 
 /* ---------- Données normatives ---------- */
-const FAM=[['m','M','métrique, pas gros et fins'],['un','UN','UNC · UNF · UNEF · 8UN…'],['g','G','BSP cylindrique'],['r','R / Rc','BSPT conique'],['npt','NPT','NPTF, conique US'],['bsw','BSW','Whitworth gros'],['bsf','BSF','Whitworth fin'],['tr','Tr','trapézoïdal'],['acme','ACME','trapézoïdal US'],['rd','Rd','filet rond'],['pg','Pg','presse-étoupe'],['sp','Spécial','Ø et pas libres']];
+const FAM=[['m','M','métrique, pas gros et fins'],['un','UN','UNC · UNF · UNEF · 8UN…'],['g','G','BSP cylindrique'],['r','R / Rc','BSPT conique'],['npt','NPT','conique US, avec pâte'],['nptf','NPTF','Dryseal, conique US'],['bsw','BSW','Whitworth gros'],['bsf','BSF','Whitworth fin'],['tr','Tr','trapézoïdal'],['acme','ACME','trapézoïdal US'],['rd','Rd','filet rond'],['pg','Pg','presse-étoupe'],['sp','Spécial','Ø et pas libres']];
 // ISO 261 : Ø -> pas (le premier est le pas gros)
 const MP={1.6:[.35],2:[.4,.25],2.5:[.45,.35],3:[.5,.35],3.5:[.6],4:[.7,.5],5:[.8,.5],6:[1,.75],7:[1,.75],8:[1.25,1,.75],9:[1.25,1,.75],10:[1.5,1.25,1,.75],11:[1.5,1,.75],12:[1.75,1.5,1.25,1],14:[2,1.5,1.25,1],15:[1.5,1],16:[2,1.5,1],17:[1.5,1],18:[2.5,2,1.5,1],20:[2.5,2,1.5,1],22:[2.5,2,1.5,1],24:[3,2,1.5,1],25:[2,1.5,1],26:[1.5],27:[3,2,1.5,1],28:[2,1.5,1],30:[3.5,3,2,1.5,1],32:[2,1.5],33:[3.5,3,2,1.5],35:[1.5],36:[4,3,2,1.5],38:[1.5],39:[4,3,2,1.5],40:[3,2,1.5],42:[4.5,4,3,2,1.5],45:[4.5,4,3,2,1.5],48:[5,4,3,2,1.5],50:[3,2,1.5],52:[5,4,3,2,1.5],55:[4,3,2,1.5],56:[5.5,4,3,2,1.5],58:[4,3,2,1.5],60:[5.5,4,3,2,1.5],62:[4,3,2,1.5],64:[6,4,3,2,1.5],65:[4,3,2,1.5],68:[6,4,3,2,1.5],70:[6,4,3,2,1.5],72:[6,4,3,2,1.5],75:[4,3,2,1.5],76:[6,4,3,2,1.5],80:[6,4,3,2,1.5],85:[6,4,3,2],90:[6,4,3,2],95:[6,4,3,2],100:[6,4,3,2]};
 const COARSE={1.6:.35,2:.4,2.5:.45,3:.5,3.5:.6,4:.7,5:.8,6:1,7:1,8:1.25,9:1.25,10:1.5,11:1.5,12:1.75,14:2,16:2,18:2.5,20:2.5,22:2.5,24:3,27:3,30:3.5,33:3.5,36:4,39:4,42:4.5,45:4.5,48:5,52:5,56:5.5,60:5.5,64:6,68:6};
@@ -460,6 +460,10 @@ const GG=[['1/16',28,7.723,.214,.107,.282,6.8],['1/8',28,9.728,.214,.107,.282,8.
 const RR=[['1/16',28,7.723,4.0,6.5,6.4],['1/8',28,9.728,4.0,6.5,8.4],['1/4',19,13.157,6.0,9.7,11.2],['3/8',19,16.662,6.4,10.1,14.75],['1/2',14,20.955,8.2,13.2,18.25],['3/4',14,26.441,9.5,14.5,23.75],['1',11,33.249,10.4,16.8,30.0],['1.1/4',11,41.910,12.7,19.1,38.5],['1.1/2',11,47.803,12.7,19.1,44.5],['2',11,59.614,15.9,23.4,56.0],['2.1/2',11,75.184,17.5,26.7,0],['3',11,87.884,20.6,29.8,0],['4',11,113.030,25.4,35.8,0]];
 // ASME B1.20.1 (pouces) : [désignation, TPI, D, E0, L1, L2, foret mm]
 const NPT=[['1/16',27,.3125,.27118,.16,.2611,6.3],['1/8',27,.405,.36351,.1615,.2639,8.7],['1/4',18,.54,.47739,.2278,.4018,11.1],['3/8',18,.675,.61201,.24,.4078,14.7],['1/2',14,.84,.75843,.32,.5337,18.3],['3/4',14,1.05,.96768,.339,.5457,23.4],['1',11.5,1.315,1.21363,.4,.6828,29.4],['1.1/4',11.5,1.66,1.55713,.42,.7068,38.1],['1.1/2',11.5,1.9,1.79609,.42,.7235,44.1],['2',11.5,2.375,2.26902,.436,.7565,56.4],['2.1/2',8,2.875,2.71953,.682,1.1375,66.7],['3',8,3.5,3.34062,.766,1.2,82.6],['3.1/2',8,4.0,3.8375,.821,1.25,0],['4',8,4.5,4.33438,.844,1.3,0],['5',8,5.563,5.39073,.937,1.4063,0],['6',8,6.625,6.44609,.958,1.5125,0]];
+// ASME B1.20.3, Dryseal (pouces) : [désignation, TPI, D, E0, L1, L2, L1 + L3]
+const NPTF=[['1/16',27,.3125,.27118,.16,.2611,.2711],['1/8',27,.405,.36351,.1615,.2639,.2726],['1/4',18,.54,.47739,.2278,.4018,.3945],['3/8',18,.675,.61201,.24,.4078,.4067],['1/2',14,.84,.75843,.32,.5337,.5343],['3/4',14,1.05,.96768,.339,.5457,.5533],['1',11.5,1.315,1.21363,.4,.6828,.6609],['1.1/4',11.5,1.66,1.55713,.42,.7068,.6809],['1.1/2',11.5,1.9,1.79609,.42,.7235,.6809],['2',11.5,2.375,2.26902,.436,.7565,.6969],['2.1/2',8,2.875,2.71953,.682,1.1375,1.057],['3',8,3.5,3.34062,.766,1.2,1.141]];
+// ASME B1.20.3 : troncatures (pouces) [sommet mini, sommet maxi, fond mini, fond maxi]
+const TRF={27:[.0017,.0035,.0035,.0052],18:[.0026,.0043,.0043,.0061],14:[.0026,.0043,.0043,.0061],11.5:[.0035,.0052,.0052,.0078],8:[.0052,.0069,.0069,.0095]};
 // DIN 103 : [d, pas] ; tolérances 4h sur d et 4H sur D1 (µm)
 const TRP={8:[1.5],9:[2,1.5],10:[2,1.5],11:[3,2],12:[3,2],14:[3,2],16:[4,2],18:[4,2],20:[4,2],22:[5,3,8],24:[5,3,8],26:[5,3,8],28:[5,3,8],30:[6,3,10],32:[6,3,10],34:[6,3,10],36:[6,3,10],38:[7,3,10],40:[7,3,10],42:[7,3,10],44:[7,3,12],46:[8,3,12],48:[8,3,12],50:[8,3,12],52:[8,3,12],55:[9,3,14],60:[9,3,14],65:[10,4,16],70:[10,4,16],75:[10,4,16],80:[10,4,16],90:[12,4,18],100:[12,4,20]};
 const TRd={1.5:150,2:180,3:236,4:300,5:335,6:375,7:425,8:450,9:500,10:530,12:600,14:670,16:710,18:800,20:850}, TRD1={1.5:190,2:236,3:315,4:375,5:450,6:500,7:560,8:630,9:670,10:710,12:800,14:900,16:1000,18:1120,20:1180};
@@ -518,6 +522,7 @@ function cyl(o,ext){
 /* ---------- Calcul d'une fiche ---------- */
 const VERIF={m:[1,'Tolérances 6g / 6H contrôlées par les formules ISO 965.'],g:[1,'Diamètres et tolérances contrôlés contre une table ISO 228-1.'],
   npt:[1,'Ø sur flancs E0, engagement à la main L1 et longueur L2 recoupés sur trois tables ASME B1.20.1.'],
+  nptf:[1,'E0, E1, L1, L2, L1 + L3 et troncatures du sommet et du fond (ASME B1.20.3) recoupés sur au moins deux sources et par les formules de la norme.'],
   r:[1,'Ø au plan de jauge, longueurs de jauge, tolérances d\'entrée bague / tampon et longueurs utiles recoupés sur deux tables ISO 7-1.'],
   bsw:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance affichée : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],bsf:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance affichée : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],
   tr:[1,'Diamètres et jeu au fond contrôlés (ISO 2904). Tolérances 4h / 4H recoupées sur deux éditions de l\'ISO 2903.'],acme:[1,'Limites 2G recoupées sur une table publiée et sur les règles de tolérance de l\'ASME B1.5.'],
@@ -551,13 +556,15 @@ function calc0(fam,i,pasSel,ext,sp){
     const mt=!tpi&&mTol(d,P)&&mTol(d,P).Td2?mTol(d,P):null;
     return cyl(v60(tpi?'Ø '+f3(d)+' – '+tpi+' filets · 60°':'M'+d+' × '+P+' spécial',mt?'Métrique hors série · tolérance '+(ext?'6g':'6H')+' (ISO 965)':'60° hors série · tolérance calculée selon ASME B1.1 classe '+(ext?'2A':'2B'),d,P,tpi,mt||unTol(d/K,P/K,9*P/K),dr(d-P)),ext); }
   // coniques
-  const r={ext,con:1,ctrl:[],note:''}; let P,h,E0,E1,L1,L2,D,drill,tpi,cap=null;
+  const r={ext,con:1,ctrl:[],note:''}; let P,h,E0,E1,L1,L2,D,drill,tpi,cap=null,Hs,fc,fr,L13,T;
   if(fam==='npt'){ const L=NPT[i]; tpi=L[1]; P=K/tpi; h=.8*P; D=L[2]*K; E0=L[3]*K; L1=L[4]*K; L2=L[5]*K; E1=E0+L1/16; drill=L[6]; cap=D;
-    r.nom=L[0].replace('.',' ')+'" – '+tpi+' NPT'; r.sub='Conique 60°, conicité 1:16 (ASME B1.20.1) · mêmes cotes de base en NPTF · valeurs en mm'; r.ang=60; r.prof='npt';
+    r.nom=L[0].replace('.',' ')+'" – '+tpi+' NPT'; r.sub='Conique 60°, conicité 1:16 (ASME B1.20.1) · étanchéité par pâte ou ruban · valeurs en mm'; r.ang=60; r.prof='npt';
+  }else if(fam==='nptf'){ const L=NPTF[i]; tpi=L[1]; T=TRF[tpi]; P=K/tpi; Hs=.866025*P; fc=(T[0]+T[1])/2*K; fr=(T[2]+T[3])/2*K; h=Hs-fc-fr; D=L[2]*K; E0=L[3]*K; L1=L[4]*K; L2=L[5]*K; L13=L[6]*K; E1=E0+L1/16; drill=null; cap=D;
+    r.nom=L[0].replace('.',' ')+'" – '+tpi+' NPTF'; r.sub='Dryseal, conique 60°, conicité 1:16 (ASME B1.20.3) · étanche sans pâte · classes 1 et 2 : mêmes cotes · valeurs en mm'; r.ang=60; r.prof='npt'; r.pc=2*fc*Math.tan(Math.PI/6)/P;
   }else{ const L=RR[i]; tpi=L[1]; P=K/tpi; h=.6403*P; L1=L[3]; L2=L[4]; D=L[2]; E1=D-h; E0=E1-L1/16; drill=null;
     r.nom=(ext?'R ':'Rc ')+L[0].replace('.',' '); r.sub='BSPT conique, Whitworth 55°, conicité 1:16 (ISO 7-1)'; r.ang=55; r.prof='w55'; }
-  const top0=ext?E0+h:E1-h;
-  Object.assign(r,{P,tpi,depth:h,pr:.5,L:L2,L1,x0:top0,dir:ext?-1:1,cone:{top0,ext,cap:ext?cap:null,Ldef:L2}});
+  const nptf=fam==='nptf', top0=nptf?(ext?E0+Hs-2*fc:E1-Hs+2*fc):ext?E0+h:E1-h;
+  Object.assign(r,{P,tpi,depth:h,pr:.5,L:nptf&&!ext?L13:L2,L1,x0:top0,dir:ext?-1:1,cone:{top0,ext,cap:ext?cap:null,Ldef:nptf&&!ext?L13:L2}});
   const nf=x=>(x/P).toFixed(1)+' filets', npt=fam==='npt';
   r.vals=[ext?['Ø haut du filet à Z0 (petit bout)',f3(top0),'mm, profil théorique']:['Ø d\'alésage à Z0 (entrée)',f3(top0),'pointe du filet à Z0 : '+f3(top0+2*h)],[npt?'Engagement à la main · L1':'Longueur de jauge, serrage main',f2(L1),'mm · '+nf(L1)],[npt?'Longueur de filetage standard · L2':'Longueur de filetage utile',f2(L2),'mm · '+nf(L2)+(npt?(ext?' · hors tout L4 = '+f2(L2+3.47*P):' · mini L1 + 3 filets = '+f2(L1+3*P)):'')],['Pas',f3(P),tpi+' filets au pouce'],['Profondeur de filet',f3(h),'mm au rayon']];
   if(ext){ r.rep=[['E0','Ø sur flancs au petit bout',f3(E0)],['E1','Ø sur flancs à L1 (plan de jauge)',f3(E1)],['L1','Engagement à la main',f2(L1)],['L2','Longueur de filet utile',f2(L2)],['D',fam==='npt'?'Ø extérieur du tube':'Ø extérieur au plan de jauge',f3(D)],['P','Pas',f3(P)]];
@@ -568,6 +575,13 @@ function calc0(fam,i,pasSel,ext,sp){
   r.ctrl.unshift([gl+' (longueur vissée à la main)',f2(L1)+' ± '+f2(gt)],[gl+', mini à maxi',f2(L1-gt)+' à '+f2(L1+gt)]);
   r.gauge=[gl.toUpperCase(),f2(L1)+' ± '+f2(gt)+' mm  ('+f2(L1-gt)+' à '+f2(L1+gt)+'), vissée à la main'];
   r.note='Conicité 1:16 au diamètre : 0.0625 mm par mm, demi-angle 1°47′24″. Avec une plaquette arasante, laissez 0.05 à 0.15 au Ø sur le cône avant filetage.';
+  if(nptf){ const lim=(a,b)=>'limites '+rng(a,b), tr=(a,b)=>f3(a*K)+' à '+f3(b*K), gl=ext?'Bague':'Tampon', g2=ext?'L2':'L3';
+    r.vals=[ext?['Ø haut du filet à Z0 (petit bout)',f3(top0),lim(E0+Hs-2*T[1]*K,E0+Hs-2*T[0]*K)]:['Ø d\'alésage à Z0 (entrée)',f3(top0),lim(E1-Hs+2*T[0]*K,E1-Hs+2*T[1]*K)],['Engagement à la main · L1',f2(L1),'mm · '+nf(L1)],
+      ext?['Longueur de filetage · L2',f2(L2),'mm · '+nf(L2)]:['Longueur filetée complète mini · L1 + L3',f2(L13),'mm · '+nf(L13)],['Pas',f3(P),tpi+' filets au pouce'],['Profondeur de filet',f3(h),'mm au rayon · '+(ext?'Ø fond':'Ø pointe')+' à Z0 : '+f3(ext?top0-2*h:top0+2*h)]];
+    r.ctrl=[[gl+' L1 vissé'+(ext?'e':'')+' à la main, ± 1 tour',f2(L1)+' ± '+f2(P)],[gl+' L1, mini à maxi',f2(L1-P)+' à '+f2(L1+P)],[gl+' '+g2+' : même lecture que L1, ± ½ tour','± '+f2(P/2)],['Troncature au sommet',tr(T[0],T[1])],['Troncature au fond',tr(T[2],T[3])]];
+    r.gauge=[(ext?'BAGUES':'TAMPONS')+' L1 ET '+g2,'L1 ± 1 tour : '+f2(L1-P)+' à '+f2(L1+P)+' mm · '+g2+' : même lecture que L1 à ± ½ tour'];
+    r.cnote='Dryseal : '+(ext?'la bague L1 seule ne suffit pas, la bague L2':'le tampon L1 seul ne suffit pas, le tampon L3')+' contrôle la conicité et le filet au-delà de L1. Classe 1 : sommets et fonds tenus par l\'outil. Classe 2 : sommets et fonds contrôlés en plus (calibres à 6 crans ou projecteur). L\'étanchéité sans pâte vient du contact des sommets et des fonds.';
+    r.note+=' Différence avec le NPT : troncatures à tolérance plus étroite, fond plus tronqué que le sommet, pour que sommets et fonds portent au serrage (étanche sans pâte) ; contrôle plus sévère (L1, '+g2+', sommets et fonds). Les variantes PTF-SAE SHORT, NPSF et NPSI ne sont pas traitées ici.'; }
   return r;
 }
 
@@ -627,7 +641,7 @@ function plan(r){
   const cap=r.cone&&r.cone.cap?r.cone.cap/2:1e9;
   const tip=z=>Math.min(cap,tip0+sg*k*(-z)), root=z=>tip0+sg*k*(-z)-sg*h;
   const PR={iso:[.125,2],isoi:[.25,2],w55:[.167,12],npt:[.04,1.5],tr:[.366,1],acme:[.3707,1],rd:[.366,26],pg:[.1,5]}[r.prof];
-  const c=PR[0], rf=Math.max(.02,1-c-2*(h/P)*Math.tan(r.ang*Math.PI/360)), run=(1-c-rf)/2;
+  const c=r.pc||PR[0], rf=Math.max(.02,1-c-2*(h/P)*Math.tan(r.ang*Math.PI/360)), run=(1-c-rf)/2;
   const teeth=(n)=>{const p=[[0,root(0)]];for(let i=0;i<n;i++){const z0=-i*P,a=z0-rf/2*P,b=a-run*P,cc=b-c*P,e=z0-P+rf/2*P;p.push([a,root(a)],[b,tip(b)],[cc,tip(cc)],[e,root(e)])}p.push([-n*P,root(-n*P)]);return p};
   const rp=(S,cmd,rad)=>{let d=cmd+S[0][0].toFixed(1)+','+S[0][1].toFixed(1);for(let i=1;i<S.length-1;i++){const p=S[i],a=S[i-1],b=S[i+1],la=Math.hypot(p[0]-a[0],p[1]-a[1]),lb=Math.hypot(b[0]-p[0],b[1]-p[1]),q=Math.min(rad,la/2,lb/2);
     if(q<.4||!la||!lb){d+=' L'+p[0].toFixed(1)+','+p[1].toFixed(1);continue}
@@ -721,7 +735,7 @@ function plan(r){
 const st={fam:'m',i:'10',pas:'1.5',cote:'ext',lf:'',cA:'',sp:{d:'30',p:'1.5',u:'mm',a:'60'}};
 try{const s=JSON.parse(localStorage.getItem('mcs-fil4')||'{}');Object.assign(st,s);st.sp=Object.assign({d:'30',p:'1.5',u:'mm',a:'60'},s.sp||{})}catch(e){}
 const save=()=>{try{localStorage.setItem('mcs-fil4',JSON.stringify(st))}catch(e){}};
-const LIST={bsw:BSW,bsf:BSF,acme:ACME,g:GG,r:RR,npt:NPT};
+const LIST={bsw:BSW,bsf:BSF,acme:ACME,g:GG,r:RR,npt:NPT,nptf:NPTF};
 
 function fillSizes(){
   const sp=st.fam==='sp'; $('szBox').hidden=sp; $('spRow').hidden=!sp;
@@ -1489,7 +1503,9 @@ function find(q){
     if(m[2]){const p=+dec(m[2]);if(!TRP[m[1]].includes(p))return{err:'Pas '+p+' inexistant pour Tr '+m[1]+'. Pas disponibles : '+TRP[m[1]].join(' · ')+'.'};return F('tr',m[1],p)}return F('tr',m[1],TRP[m[1]][0])}
   if(m=l.match(/^pg\s*(\d+(?:[.,]\d+)?)$/)){const j=idx(PG,dec(m[1]),'Pg');return j.err?j:F('pg',j)}
   if(m=l.match(/^rd\s*(\d+)/)){const j=RD.findIndex(t=>t[0]===+m[1]);return j<0?{err:'Rd '+m[1]+' absent de la table.'}:F('rd',j)}
-  if(/npt/.test(l)){const n=nf(l.replace(/nptf?/,'')),j=idx(NPT,n,'NPT');return j.err?j:F('npt',j)}
+  if(/npt/.test(l)){const f=/nptf/.test(l),L=f?NPTF:NPT,lab=f?'NPTF':'NPT';let s=l.replace(/nptf?/,'').trim().replace(/^(\d+)\s*-\s*(\d+\/\d+)/,'$1 $2'),t=0;
+    const q=s.match(/^(.+?)\s*[-x×]\s*(11 ?1\/2|\d+(?:[.,]\d+)?)$/);if(q){s=q[1];t=+dec(q[2].replace(/11 ?1\/2/,'11.5'))}
+    const j=idx(L,nf(s),lab);if(j.err)return j;if(t&&t!==L[j][1])return{err:pn(L[j][0])+' '+lab+' : '+L[j][1]+' filets au pouce, pas '+t+'.'};return F(f?'nptf':'npt',j)}
   if(m=l.match(/\b(bsw|bsf|acme)\b/)){const n=nf(l.replace(m[1],'').trim().replace(/\s*[-x×]\s*\d+(\.\d+)?\s*$/,'')),j=idx(LIST[m[1]],n,m[1].toUpperCase());return j.err?j:F(m[1],j)}
   if(m=l.match(/^(?:bsp\s*|g\s*)([\d ./]+)"?$/)){const j=idx(GG,nf(m[1]),'G');return j.err?j:F('g',j)}
   if(m=l.match(/^(?:bspt\s*|r(c)?\s*)([\d ./]+)"?$/)){const j=idx(RR,nf(m[2]),'R');return j.err?j:F('r',j,null,m[1]?'int':/bspt/.test(l)?cote:'ext')}
