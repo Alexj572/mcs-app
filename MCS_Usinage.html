@@ -110,7 +110,7 @@ select,input{width:100%;min-height:46px;font-family:var(--mono);font-size:1.1rem
   h2{font-size:.9rem;margin-bottom:8px} .lab{font-size:.72rem;margin:8px 0 4px}
   .seg{gap:5px} .seg button{font-size:.95rem;min-height:38px;min-width:0;padding:3px 9px}
   .seg button small{font-size:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #fam{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))} #fam button[data-v="sp"]{grid-column:1/-1}
+  #fam{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))} #fam button[data-v="sp"]{grid-column:span 2} #fam button[data-v="rdh"]{font-size:.84rem;white-space:nowrap;padding-inline:4px}
   select,input{min-height:40px;font-size:1rem;padding:5px 8px}
   .row{gap:8px} .row>div{flex:1 1 128px}
   .fiche-t{font-size:1.35rem} .fiche-s{font-size:.8rem;margin-bottom:8px}
@@ -409,7 +409,7 @@ th();window.addEventListener('storage',th);if(window.self!==window.top)d.classLi
     <p class="note" id="vFr"></p>
   </section>
 </main>
-<p class="ver">Aide à l'usinage · version 16</p>
+<p class="ver">Aide à l'usinage · version 17</p>
 <div id="pr"></div>
 <div id="cfg" class="modal" hidden role="dialog" aria-label="Réglages d'atelier"><div class="mbox card">
   <div class="bar"><h2>Réglages d'atelier</h2><button type="button" class="btn ghost" id="cfgX" aria-label="Fermer">✕</button></div>
@@ -428,7 +428,7 @@ let CFG={sur:.1,par:'MCS Usinage',mach:[]};
 try{const j=JSON.parse(localStorage.getItem('mcs-cfg'));if(j&&typeof j==='object')CFG=Object.assign(CFG,j)}catch(e){}
 
 /* ---------- Données normatives ---------- */
-const FAM=[['m','M','métrique, pas gros et fins'],['un','UN','UNC · UNF · UNEF · 8UN…'],['g','G','BSP cylindrique'],['r','R / Rc','BSPT conique'],['npt','NPT','conique US, avec pâte'],['nptf','NPTF','Dryseal, conique US'],['bsw','BSW','Whitworth gros'],['bsf','BSF','Whitworth fin'],['tr','Tr','trapézoïdal'],['acme','ACME','trapézoïdal US'],['rd','Rd','filet rond'],['pg','Pg','presse-étoupe'],['sp','Spécial','Ø et pas libres']];
+const FAM=[['m','M','métrique, pas gros et fins'],['un','UN','UNC · UNF · UNEF · 8UN…'],['g','G','BSP cylindrique'],['r','R / Rc','BSPT conique'],['npt','NPT','conique US, avec pâte'],['nptf','NPTF','Dryseal, conique US'],['bsw','BSW','Whitworth gros'],['bsf','BSF','Whitworth fin'],['tr','Tr','trapézoïdal'],['acme','ACME','trapézoïdal US'],['rd','Rd','filet rond'],['rdh','Rd crochet','DIN 15403, levage'],['pg','Pg','presse-étoupe'],['sp','Spécial','Ø et pas libres']];
 // ISO 261 : Ø -> pas (le premier est le pas gros)
 const MP={1.6:[.35],2:[.4,.25],2.5:[.45,.35],3:[.5,.35],3.5:[.6],4:[.7,.5],5:[.8,.5],6:[1,.75],7:[1,.75],8:[1.25,1,.75],9:[1.25,1,.75],10:[1.5,1.25,1,.75],11:[1.5,1,.75],12:[1.75,1.5,1.25,1],14:[2,1.5,1.25,1],15:[1.5,1],16:[2,1.5,1],17:[1.5,1],18:[2.5,2,1.5,1],20:[2.5,2,1.5,1],22:[2.5,2,1.5,1],24:[3,2,1.5,1],25:[2,1.5,1],26:[1.5],27:[3,2,1.5,1],28:[2,1.5,1],30:[3.5,3,2,1.5,1],32:[2,1.5],33:[3.5,3,2,1.5],35:[1.5],36:[4,3,2,1.5],38:[1.5],39:[4,3,2,1.5],40:[3,2,1.5],42:[4.5,4,3,2,1.5],45:[4.5,4,3,2,1.5],48:[5,4,3,2,1.5],50:[3,2,1.5],52:[5,4,3,2,1.5],55:[4,3,2,1.5],56:[5.5,4,3,2,1.5],58:[4,3,2,1.5],60:[5.5,4,3,2,1.5],62:[4,3,2,1.5],64:[6,4,3,2,1.5],65:[4,3,2,1.5],68:[6,4,3,2,1.5],70:[6,4,3,2,1.5],72:[6,4,3,2,1.5],75:[4,3,2,1.5],76:[6,4,3,2,1.5],80:[6,4,3,2,1.5],85:[6,4,3,2],90:[6,4,3,2],95:[6,4,3,2],100:[6,4,3,2]};
 const COARSE={1.6:.35,2:.4,2.5:.45,3:.5,3.5:.6,4:.7,5:.8,6:1,7:1,8:1.25,9:1.25,10:1.5,11:1.5,12:1.75,14:2,16:2,18:2.5,20:2.5,22:2.5,24:3,27:3,30:3.5,33:3.5,36:4,39:4,42:4.5,45:4.5,48:5,52:5,56:5.5,60:5.5,64:6,68:6};
@@ -469,6 +469,8 @@ const TRP={8:[1.5],9:[2,1.5],10:[2,1.5],11:[3,2],12:[3,2],14:[3,2],16:[4,2],18:[
 const TRd={1.5:150,2:180,3:236,4:300,5:335,6:375,7:425,8:450,9:500,10:530,12:600,14:670,16:710,18:800,20:850}, TRD1={1.5:190,2:236,3:315,4:375,5:450,6:500,7:560,8:630,9:670,10:710,12:800,14:900,16:1000,18:1120,20:1180};
 // DIN 405 : [d, filets au pouce]
 const RD=[[8,10],[10,10],[12,10],[14,8],[16,8],[18,8],[20,8],[22,8],[24,8],[26,8],[28,8],[30,8],[32,8],[36,8],[40,6],[44,6],[48,6],[52,6],[55,6],[60,6],[65,6],[70,6],[80,6],[90,6],[100,6]];
+// DIN 15403 (déc. 1969), crochets de levage : [d, pas (h dans la norme), section du noyau mm², jeu axial maxi]
+const RDH=[[50,6,1479,.1],[56,6,1917,.1],[64,8,2393,.1],[72,8,3137,.1],[80,10,3739,.2],[90,10,4902,.2],[100,12,5917,.2],[110,12,7359,.2],[125,14,9434,.2],[140,16,11767,.3],[160,18,15438,.3],[180,20,19607,.3],[200,22,24273,.3],[225,24,30977,.3],[250,28,37737,.3],[280,32,47067,.3],[320,36,61751,.3]];
 // DIN 40430 : [désignation, d, TPI, d1]
 const PG=[['7',12.5,20,11.28],['9',15.2,18,13.86],['11',18.6,18,17.26],['13.5',20.4,18,19.06],['16',22.5,18,21.16],['21',28.3,16,26.78],['29',37.0,16,35.48],['36',47.0,16,45.48],['42',54.0,16,52.48],['48',59.3,16,57.78]];
 
@@ -519,6 +521,37 @@ function cyl(o,ext){
   return r;
 }
 
+/* ---------- Filet rond des crochets de levage (DIN 15403, profil DIN 20400) ---------- */
+// Formules de la norme (h = pas) : t1 = 0,55 h · t2 = 0,27234 h · r1 = 0,22104 h · r2 = 0,15359 h · d1 = d − 1,1 h · d2 = D2 = d − 0,5 h · D = d + 0,1 h · D1 = d − h
+function rdh(i,ext){ const L=RDH[i],d=L[0],P=L[1],d1=d-1.1*P,d2=d-.5*P,D=d+.1*P,D1=d-P,t1=.55*P,t2=.27234*P,r1=.22104*P,r2=.15359*P,ja=String(L[3]);
+  const tl=(x,h)=>{const e=c11(x,h);return [x+e[0],x+e[1]]}, A=ext?tl(d,0):tl(D1,1), B=ext?tl(d1,0):tl(D,1), aim=(A[0]+A[1])/2, x2=ext?aim-2*t1:aim+2*t1, cl=ext?'c11':'C11';
+  const r={ext,P,tpi:null,ang:30,nom:'Rd '+d+' × '+P,sub:'Filet rond 30° de crochet de levage (DIN 15403) · profil DIN 20400 · '+(ext?'tige de crochet, c11':'écrou de crochet, C11'),
+    depth:t1,x0:aim,dir:ext?-1:1,prof:'rdh',tol:A,hl:'t1',top:0};
+  const pas=['Pas',f3(P),'mm · noté h dans la norme'], prof=['Profondeur de filet · t1',f3(t1),'mm au rayon · 0.55 × pas'], port=['Profondeur portante · t2',f3(t2),'mm au rayon · hauteur de contact des flancs'], jeu=['Jeu axial maxi',ja+' mm','écrou vissé sur sa tige : contrôle des flancs'];
+  if(ext){
+    r.vals=[['Ø extérieur à tourner · haut du filet d',f3(aim),'c11 : '+rng(A[0],A[1])],['Ø à fond de filet · d1',f3(x2),'c11 : '+rng(B[0],B[1])+' · prolongement de la tige à ce Ø'],pas,prof,port,
+      ['Rayon au fond · r1',f3(r1),'fond du filet de la tige (Ø d1), tangent aux flancs'],['Rayon au sommet · r2',f3(r2),'raccorde le sommet plat de la tige (Ø d) aux flancs'],['Ø sur flancs · d2',f3(d2),'nominal, égal au D2 de l\'écrou'],['Section du noyau',L[2]+' mm²','au Ø d1 nominal = '+f3(d1)],jeu];
+    r.labs=[['d',d],['d2',d2],['d1',d1]];
+    r.rep=[['d','Ø extérieur nominal',f3(d)],['d2','Ø sur flancs nominal',f3(d2)],['d1','Ø à fond de filet nominal',f3(d1)],['P','Pas',f3(P)],['t1','Profondeur de filet',f3(t1)]];
+    r.ctrl=[['Ø d avant filetage (c11)',rng(A[0],A[1])],['Prolongement de la tige à Ø d1 (c11)',rng(B[0],B[1])],['Jeu axial maxi, écrou vissé',ja],['Portée des flancs, à vide','≥ 50 %']];
+    r.prow=[['Ø haut du filet · d (c11)',f3(aim)+'   limites '+rng(A[0],A[1])],['Ø fond de filet · d1 (c11)',f3(x2)+'   prolongement à d1 : '+rng(B[0],B[1])],['Pas',f3(P)+'   noté h dans la norme'],['Profondeur t1 · portante t2',f3(t1)+' · '+f3(t2)+'   mm au rayon'],
+      ['Rayons','r1 = '+f3(r1)+' au fond · r2 = '+f3(r2)+' au sommet'],['Ø sur flancs d2 · section du noyau',f3(d2)+' · '+L[2]+' mm²']];
+  }else{
+    r.vals=[['Ø d\'alésage fini · D1',f3(aim),'C11 : '+rng(A[0],A[1])],['Ø de filetage · pointe du filet D',f3(x2),'alésage + 2 × t1 · C11 : '+rng(B[0],B[1])],pas,prof,port,
+      ['Rayon au fond · r1',f3(r1),'fond du filet de l\'écrou (Ø D), tangent aux flancs'],['Rayon au sommet · r2',f3(r2),'raccorde le sommet plat de l\'écrou (Ø D1) aux flancs'],['Ø sur flancs · D2',f3(d2),'nominal, égal au d2 de la tige'],jeu];
+    r.labs=[['D1',D1],['D2',d2],['D',D]];
+    r.rep=[['D','Ø à fond de filet nominal',f3(D)],['D2','Ø sur flancs nominal',f3(d2)],['D1','Ø d\'alésage nominal',f3(D1)],['P','Pas',f3(P)],['t1','Profondeur de filet',f3(t1)]];
+    r.ctrl=[['Ø D1 avant filetage (C11)',rng(A[0],A[1])],['Prolongement de l\'écrou à Ø D (C11)',rng(B[0],B[1])],['Jeu axial maxi, écrou vissé',ja],['Portée des flancs, à vide','≥ 50 %']];
+    r.prow=[['Ø d\'alésage · D1 (C11)',f3(aim)+'   limites '+rng(A[0],A[1])],['Ø pointe du filet · D (C11)',f3(x2)+'   prolongement à D : '+rng(B[0],B[1])],['Pas',f3(P)+'   noté h dans la norme'],['Profondeur t1 · portante t2',f3(t1)+' · '+f3(t2)+'   mm au rayon'],
+      ['Rayons','r1 = '+f3(r1)+' au fond · r2 = '+f3(r2)+' au sommet'],['Ø sur flancs D2',f3(d2)]];
+  }
+  r.gauge=['CONTRÔLE','jeu axial maxi '+ja+' mm, écrou vissé sur sa tige (appairés)']; r.prow.push(r.gauge);
+  r.cnote='Avant filetage : tige usinée à d et d1 en c11, écrou à D et D1 en C11 ; pour d1 et D, prévoir sur la tige et sur l\'écrou un prolongement à ce Ø, toléré de même. Tige et écrou se filètent avec le même réglage de pas et le même outil de forme : écarts d\'angle de flanc et de pas identiques sur les deux. Écrous non interchangeables : chaque écrou est usiné et contrôlé avec sa tige. La tolérance du Ø sur flancs se contrôle par le jeu axial, écrou vissé sur la tige. À vide, portée des flancs régulière et d\'au moins 50 %. Sortie de filet sans entaille. L\'écrou doit se visser librement. Pièce de levage : la matière, le traitement et le contrôle de la tige relèvent de la norme du crochet (DIN 15401 / DIN 15402).';
+  r.note='Différence avec le Rd DIN 405 : pas en mm (environ d / 9) au lieu de filets au pouce ; profondeur 0.55 × pas au lieu de 0.5 × pas ; sommet plat raccordé aux flancs par r2 et fond en arc r1, au lieu des arcs pleins du DIN 405 ; même angle de 30°. Plaquette de forme arasante : '+(ext?'on programme le Ø au sommet d, la plaquette donne le fond d1.':'on programme la pointe du filet D à partir de l\'alésage D1.');
+  r.vfin=' Contrôlez la première paire tige + écrou (jeu axial, portée des flancs) avant de lancer la série.';
+  r.pfin='Cotes en mm. Contrôler la première paire tige + écrou (jeu axial maxi, portée ≥ 50 %) avant série.';
+  return r; }
+
 /* ---------- Calcul d'une fiche ---------- */
 const VERIF={m:[1,'Tolérances 6g / 6H contrôlées par les formules ISO 965.'],g:[1,'Diamètres et tolérances contrôlés contre une table ISO 228-1.'],
   npt:[1,'Ø sur flancs E0, engagement à la main L1 et longueur L2 recoupés sur trois tables ASME B1.20.1.'],
@@ -526,6 +559,7 @@ const VERIF={m:[1,'Tolérances 6g / 6H contrôlées par les formules ISO 965.'],
   r:[1,'Ø au plan de jauge, longueurs de jauge, tolérances d\'entrée bague / tampon et longueurs utiles recoupés sur deux tables ISO 7-1.'],
   bsw:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance affichée : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],bsf:[1,'Ø nominaux et pas recoupés sur deux tables. Pas de tolérance affichée : aucune table BS 84 publiée trouvée pour les recouper. Contrôle à la bague ou au tampon.'],
   tr:[1,'Diamètres et jeu au fond contrôlés (ISO 2904). Tolérances 4h / 4H recoupées sur deux éditions de l\'ISO 2903.'],acme:[1,'Limites 2G recoupées sur une table publiée et sur les règles de tolérance de l\'ASME B1.5.'],
+  rdh:[1,'Cotes de la DIN 15403 (1969) recalculées par ses formules. Ø et profondeurs recoupés sur deux tables DIN 20400 (même profil), série sur la DIN 15401-2, rayons par la géométrie du profil. c11 / C11 : ISO 286, deux tables publiées.'],
   rd:[1,'Ø nominaux de la vis et de l\'écrou recoupés sur deux tables DIN 405. Pas de tolérance affichée (DIN 405-2 non reprise) : contrôle à la bague ou au tampon.'],pg:[1,'Ø extérieur et Ø du noyau recoupés sur trois tables DIN 40430. Pas de tolérance affichée : contrôle à la bague ou au tampon.'],sp:[1,'Filetage hors série : cotes et tolérances calculées avec les formules de la norme (ISO 965 en métrique, ASME B1.1 en pouce), les mêmes que pour les tailles normalisées. En 55°, pas de tolérance affichée.']};
 function calc(fam,i,pasSel,ext,sp){ const r=calc0(fam,i,pasSel,ext,sp); if(!r)return r;
   let v=VERIF[fam]; if(fam==='un'){const s=pasSel.split('|')[1]; v=s==='UNC'||s==='UNF'?[1,'Tolérances 2A / 2B calculées selon ASME B1.1, recoupées sur les tailles courantes.']:[1,'Limites 2A / 2B recoupées sur une table ASME B1.1 (UNEF, UNS, 8UN). Ø d\'alésage arrondi au millième de pouce comme la norme.'];}
@@ -548,6 +582,7 @@ function calc0(fam,i,pasSel,ext,sp){
     return cyl({nom:pn(L[0])+' – '+L[1]+' ACME',sub:'Trapézoïdal 29° usage général (ASME B1.5) · classe 2G · valeurs en mm',P,tpi:L[1],ang:29,pe:'acme',pi:'acme',d:D,d2:D-.5*P,he:h,hi:h,D1:D-P,Dint:D+2*c,rl:'d1',tol:{Td:Math.max(.05*P,.005*K),TD1:Math.max(.05*P,.005*K)}},ext); }
   if(fam==='rd'){ const d=RD[i][0],P=K/RD[i][1];
     return cyl({nom:'Rd '+d+' × 1/'+RD[i][1],sub:'Filet rond 30° (DIN 405) · '+RD[i][1]+' filets au pouce',P,tpi:RD[i][1],ang:30,pe:'rd',pi:'rd',d,d2:d-.5*P,he:.5*P,hi:.5*P,D1:d-.9*P,Dint:d+.1*P,rl:'d3',tol:null},ext); }
+  if(fam==='rdh') return rdh(i,ext);
   if(fam==='pg'){ const L=PG[i],P=K/L[2],h=(L[1]-L[3])/2;
     return cyl({nom:'Pg '+L[0],sub:'Presse-étoupe 80° (DIN 40430) · '+L[2]+' filets au pouce',P,tpi:L[2],ang:80,pe:'pg',pi:'pg',d:L[1],d2:L[1]-h,he:h,hi:h,D1:L[3],Dint:L[1],rl:'d1',tol:null,top:0},ext); }
   if(fam==='sp'){ const d=+sp.d, tpi=sp.u==='tpi'?+sp.p:null, P=tpi?K/tpi:+sp.p;
@@ -586,6 +621,13 @@ function calc0(fam,i,pasSel,ext,sp){
 }
 
 /* ---------- Plan A4 paysage, à l'échelle ---------- */
+// DIN 15403 : profil exact, z = 0 au milieu d'un creux. Fond : arc r1 tangent aux flancs à 30°. Sommet : plat raccordé aux flancs par deux arcs r2.
+function rdhT(n,P,h,r0,sg){ const a=Math.PI/12,ta=Math.tan(a),R1=.22104*P,R2=.15359*P,g0=(.25-.3*ta)*P,sc=g0+(h-R2)*ta+R2/Math.cos(a),hp=[],N=12;
+  for(let j=0;j<=N;j++){const t=-Math.PI/2+j/N*5*Math.PI/12;hp.push([R1*Math.cos(t),R1+R1*Math.sin(t)])}
+  for(let j=0;j<=N;j++){const t=11*Math.PI/12-j/N*5*Math.PI/12;hp.push([sc+R2*Math.cos(t),h-R2+R2*Math.sin(t)])}
+  hp.push([P/2,h]); const full=hp.concat(hp.slice(0,-1).reverse().map(q=>[P-q[0],q[1]])), p=[];
+  for(let i=0;i<n;i++) full.forEach((q,j)=>{if(i&&!j)return; p.push([-i*P-q[0],r0+sg*q[1]])});
+  return p; }
 const SCALES=[50,20,10,5,2,1,.5,.2,.1], scTxt=s=>s>=1?s+' : 1':'1 : '+Math.round(1/s);
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 let lastSvg='';
@@ -640,9 +682,9 @@ function plan(r){
   const U=4,W=1188,H=840,ink=DK.ink, ext=r.ext, P=r.P, h=r.depth, k=r.con?1/32:0, sg=ext?1:-1, tip0=r.x0/2, Lf=r.Lf;
   const cap=r.cone&&r.cone.cap?r.cone.cap/2:1e9;
   const tip=z=>Math.min(cap,tip0+sg*k*(-z)), root=z=>tip0+sg*k*(-z)-sg*h;
-  const PR={iso:[.125,2],isoi:[.25,2],w55:[.167,12],npt:[.04,1.5],tr:[.366,1],acme:[.3707,1],rd:[.366,26],pg:[.1,5]}[r.prof];
+  const PR={iso:[.125,2],isoi:[.25,2],w55:[.167,12],npt:[.04,1.5],tr:[.366,1],acme:[.3707,1],rd:[.366,26],rdh:[.3660254,0],pg:[.1,5]}[r.prof];
   const c=r.pc||PR[0], rf=Math.max(.02,1-c-2*(h/P)*Math.tan(r.ang*Math.PI/360)), run=(1-c-rf)/2;
-  const teeth=(n)=>{const p=[[0,root(0)]];for(let i=0;i<n;i++){const z0=-i*P,a=z0-rf/2*P,b=a-run*P,cc=b-c*P,e=z0-P+rf/2*P;p.push([a,root(a)],[b,tip(b)],[cc,tip(cc)],[e,root(e)])}p.push([-n*P,root(-n*P)]);return p};
+  const teeth=r.prof==='rdh'?n=>rdhT(n,P,h,root(0),sg):(n)=>{const p=[[0,root(0)]];for(let i=0;i<n;i++){const z0=-i*P,a=z0-rf/2*P,b=a-run*P,cc=b-c*P,e=z0-P+rf/2*P;p.push([a,root(a)],[b,tip(b)],[cc,tip(cc)],[e,root(e)])}p.push([-n*P,root(-n*P)]);return p};
   const rp=(S,cmd,rad)=>{let d=cmd+S[0][0].toFixed(1)+','+S[0][1].toFixed(1);for(let i=1;i<S.length-1;i++){const p=S[i],a=S[i-1],b=S[i+1],la=Math.hypot(p[0]-a[0],p[1]-a[1]),lb=Math.hypot(b[0]-p[0],b[1]-p[1]),q=Math.min(rad,la/2,lb/2);
     if(q<.4||!la||!lb){d+=' L'+p[0].toFixed(1)+','+p[1].toFixed(1);continue}
     d+=' L'+(p[0]+(a[0]-p[0])*q/la).toFixed(1)+','+(p[1]+(a[1]-p[1])*q/la).toFixed(1)+' Q'+p[0].toFixed(1)+','+p[1].toFixed(1)+' '+(p[0]+(b[0]-p[0])*q/lb).toFixed(1)+','+(p[1]+(b[1]-p[1])*q/lb).toFixed(1)}
@@ -691,7 +733,7 @@ function plan(r){
   g+=K.pk('M'+xD+','+yb.toFixed(1)+rp(S2,' L',rad2))+K.pf(MV(xE,Yd(root(zD)))+wv(xE,Yd(root(zD)),xE,yb)+wv(xE,yb,xD,yb));
   K.occupy(xE,yb,xD,Yd(tip0));
   // h : à droite de la face
-  const xh=xD+32; g+=Ln(xD+3,Yd(tip0),xh+7,Yd(tip0))+Ln(xD+3,Yd(root(0)),xh+7,Yd(root(0)))+K.dimVs(xh,Yd(tip0),Yd(root(0)),'h = '+f3(h));
+  const xh=xD+32; g+=Ln(xD+3,Yd(tip0),xh+7,Yd(tip0))+Ln(xD+3,Yd(root(0)),xh+7,Yd(root(0)))+K.dimVs(xh,Yd(tip0),Yd(root(0)),(r.hl||'h')+' = '+f3(h));
   // P : entre deux sommets, côté air, texte au-dessus de la ligne
   const tc=i=>-(i+rf/2+run+c/2)*P, yP=Yd(tip0)-sg*(ext?30:40);
   if(nd>1) g+=Ln(xd(tc(0)),Yd(tip(tc(0)))-sg*3,xd(tc(0)),yP-sg*7)+Ln(xd(tc(1)),Yd(tip(tc(1)))-sg*3,xd(tc(1)),yP-sg*7)+K.dimH(xd(tc(1)),xd(tc(0)),yP,'P = '+f3(P),'r');
@@ -705,6 +747,12 @@ function plan(r){
     [-1,1].forEach(sx=>{const a=pt(sx,Dc/Math.cos(ha)+2),b=pt(sx,Ra+6);g+=Ln(a[0],a[1],b[0],b[1])});
     g+=`<path d="M${f(p1[0])},${f(p1[1])} A${f(Ra)},${f(Ra)} 0 0 ${ext?1:0} ${f(p2[0])},${f(p2[1])}" fill="none" stroke="${ink}" stroke-width="${DK.fin}"${al>=26?' '+DK.AR:''}/>`+Tx(ax,ty,s,'middle',DK.S,0,1);
     break; }
+  if(r.prof==='rdh'){ // repères des rayons sur le creux et la dent de gauche, textes côté air
+    const a=Math.PI/12,R1=.22104*P,R2=.15359*P,sc=(.25-.3*Math.tan(a))*P+(h-R2)*Math.tan(a)+R2/Math.cos(a),r0=root(0),pq=(s,u)=>[xd(zD+s),Yd(r0+sg*u)];
+    const lab=(p,s,c)=>{const q=c.find(v=>K.fits(v[0],v[1],s,v[2],DK.S,0,1))||c[0];return Ln(p[0],p[1],q[2]==='end'?q[0]+3:q[0]-3,q[1]-4.5,'marker-start="url(#pa1)"')+Tx(q[0],q[1],s,q[2],DK.S,0,1)};
+    const t1=-50*Math.PI/180,t2=128*Math.PI/180,p1=pq(R1*Math.cos(t1),R1+R1*Math.sin(t1)),p2=pq(sc+R2*Math.cos(t2),h-R2+R2*Math.sin(t2)),y1=Yd(r0+sg*.3*h)+4.5,y2=Yd(tip0)-sg*16+4.5;
+    g+=lab(p1,'r1 = '+f3(R1),[[xE-12,y1,'end'],[xE-12,y1+sg*16,'end'],[xE-12,y1-sg*16,'end'],[xE-40,y1,'end']]);
+    g+=lab(p2,'r2 = '+f3(R2),[[xE-12,y2,'end'],[xE-12,y2-sg*16,'end'],[xE-12,y2-sg*32,'end'],[xE-40,y2-sg*16,'end']]); }
   if(k){ const ym=(Yd(tip0)+Yd(tip(zD)))/2;
     g+=Ln(xD,Yd(tip0),xE-34,Yd(tip0),'stroke-dasharray="5,3"')+Ln(xD,Yd(tip0),xE-34,Yd(tip0+sg*k*(-zD+34/m2)));
     const c1=[[xE-40,ym+4.5,'end',0],[xE-40,ym-sg*30,'end',0]], q=c1.find(v=>K.fits(v[0],v[1],'1°47′24″',v[2],DK.S,0,1)&&K.fits(v[0],v[1]+(ext?-15:16),'pente sur l\'axe',v[2],DK.s,0,0))||c1[0];
@@ -714,7 +762,7 @@ function plan(r){
   if(k) g+=Tx(900,506,'Conicité 1:16 au diamètre : 0.0625 mm par mm · angle au sommet 3°34′48″','middle',DK.s);
 
   // ----- Tableau des cotes -----
-  const rows=r.vals.map(v=>[v[0],v[1]+(v[2]?'   '+v[2]:'')]).concat(r.coneRows||[],r.gauge?[r.gauge]:[]), ty0=650, rh=18;
+  const rows=r.prow||r.vals.map(v=>[v[0],v[1]+(v[2]?'   '+v[2]:'')]).concat(r.coneRows||[],r.gauge?[r.gauge]:[]), ty0=650, rh=18;
   g+=Tx(64,ty0-8,'COTES À PROGRAMMER (mm)','start',12,0,1)+`<rect x="60" y="${ty0}" width="580" height="${rows.length*rh}" fill="none" stroke="${ink}" stroke-width="1"/>`+Ln(310,ty0,310,ty0+rows.length*rh);
   rows.forEach((v,i)=>{const y=ty0+i*rh; if(i)g+=Ln(60,y,640,y); g+=K.txW(66,y+13,v[0],'start',11,0,238)+K.txW(316,y+13,v[1],'start',11,1,318)});
 
@@ -726,7 +774,7 @@ function plan(r){
   g+=K.txW(cx0+160,cy0+28,r.nom,'start',20,1,322)+Tx(cx0+160,cy0+50,ext?'Filetage extérieur':'Filetage intérieur','start',13);
   g+=K.txW(cx0+10,cy0+82,sub[0]||'','start',12,1,470)+K.txW(cx0+10,cy0+101,sub.slice(1).join(' · '),'start',11,0,470);
   [['ÉCHELLE',scTxt(S)],['DÉTAIL B',scTxt(Sd)],['DATE',new Date().toLocaleDateString('fr-FR')],['ÉTABLI PAR',CFG.par]].forEach((v,i)=>{g+=Tx(cx0+8+i*122,cy0+127,v[0],'start',9.5)+K.txW(cx0+8+i*122,cy0+149,v[1],'start',14,1,108)});
-  g+=K.txW(48,816,(r.vok?'VALEURS CONTRÔLÉES — ':'À CONFIRMER SUR LA PREMIÈRE PIÈCE — ')+r.verif.split(' Choix d')[0],'start',10,1,1096)+K.txW(48,831,(r.top?'Choix d\'atelier à valider : tolérance du haut du filet = celle des flancs (plaquette arasante), surépaisseur '+f2(CFG.sur)+' avant filetage. ':'')+'Cotes en mm. Contrôler la première pièce à la bague ou au tampon avant série.','start',10,0,1096);
+  g+=K.txW(48,816,(r.vok?'VALEURS CONTRÔLÉES — ':'À CONFIRMER SUR LA PREMIÈRE PIÈCE — ')+r.verif.split(' Choix d')[0],'start',10,1,1096)+K.txW(48,831,(r.top?'Choix d\'atelier à valider : tolérance du haut du filet = celle des flancs (plaquette arasante), surépaisseur '+f2(CFG.sur)+' avant filetage. ':'')+(r.pfin||'Cotes en mm. Contrôler la première pièce à la bague ou au tampon avant série.'),'start',10,0,1096);
   return lastSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Arial,Helvetica,sans-serif">${DK.defs()}
   <rect width="${W}" height="${H}" fill="#fff"/>${g}</svg>`;
 }
@@ -745,6 +793,7 @@ function fillSizes(){
   else if(f==='un') h=UND.map(d=>`<option value="${esc(d)}">${esc(pn(d))}</option>`);
   else if(f==='tr') h=Object.keys(TRP).map(d=>`<option value="${d}">Tr ${d}</option>`);
   else if(f==='rd') h=RD.map((t,j)=>`<option value="${j}">Rd ${t[0]} × 1/${t[1]}</option>`);
+  else if(f==='rdh') h=RDH.map((t,j)=>`<option value="${j}">Rd ${t[0]} × ${t[1]}</option>`);
   else if(f==='pg') h=PG.map((t,j)=>`<option value="${j}">Pg ${t[0]}</option>`);
   else if(f==='g'||f==='r') h=LIST[f].map((t,j)=>`<option value="${j}">${f==='g'?'G ':'R '}${t[0].replace('.',' ')}</option>`);
   else h=LIST[f].map((t,j)=>`<option value="${j}">${esc(pn(t[0]))} – ${t[1]}</option>`);
@@ -773,7 +822,7 @@ function render(){
   $('ft').textContent=r.nom+(r.ext?' — extérieur':' — intérieur'); $('fs').textContent=r.sub;
   $('vals').innerHTML=r.vals.map((v,j)=>`<div class="val${j?'':' k'}"><b>${v[0]}</b><span>${v[1]}</span><i>${v[2]}</i></div>`).join('');
   $('vnote').textContent=r.note; $('vnote').hidden=!r.note;
-  $('verif').className='verif'+(r.vok?'':' ko'); $('verif').innerHTML='<b>'+(r.vok?'Valeurs contrôlées':'À confirmer sur la première pièce')+'</b>'+esc(r.verif)+' Contrôlez toujours la première pièce à la bague ou au tampon avant de lancer la série.';
+  $('verif').className='verif'+(r.vok?'':' ko'); $('verif').innerHTML='<b>'+(r.vok?'Valeurs contrôlées':'À confirmer sur la première pièce')+'</b>'+esc(r.verif)+(r.vfin||' Contrôlez toujours la première pièce à la bague ou au tampon avant de lancer la série.');
   $('coneCard').hidden=!r.con;
   if(r.con){ const c=r.cone, L=r.Lf, a=+st.cA>0?+st.cA:0, sg=c.ext?1:-1, X=z=>c.top0+sg*z/16, of=c.ext?0:2*r.depth, op=c.ext?'Tournage du cône':'Alésage du cône', th=c.ext?'haut du filet':'pointe du filet';
     $('cA').value=st.cA; $('cA').placeholder='0';
@@ -795,7 +844,7 @@ $('sz').onchange=e=>{st.i=e.target.value;st.lf='';fillPas();render()};
 $('pas').onchange=e=>{st.pas=e.target.value;render()};
 $('lf').oninput=e=>{st.lf=e.target.value;render()}; $('cA').oninput=e=>{st.cA=e.target.value;render()};
 [['spD','d'],['spP','p'],['spU','u'],['spA','a']].forEach(([id,k])=>{$(id).oninput=e=>{st.sp[k]=e.target.value;render()}});
-fillSizes(); render();
+fillSizes(); if(st.fam!=='rdh') render(); // rdh : c11 / C11 viennent du module Tolérances, rendu après sa déclaration
 
 
 /* ================= MODULE CIRCLIPS ET GORGES ================= */
@@ -957,6 +1006,10 @@ const SHL=['d','e','f','g','h','js','j','k','m','n','p','r','s'], HOL=['D','E','
 const grS=l=>l==='j'?[5,6,7]:l==='h'||l==='js'?[4,5,6,7,8,9,10,11,12,13]:[4,5,6,7,8,9,10,11];
 const grH=l=>l==='J'?[6,7,8]:l==='K'?[5,6,7,8]:l==='H'||l==='JS'?[5,6,7,8,9,10,11,12,13]:[5,6,7,8,9,10,11];
 const ri=D=>TR_.findIndex(x=>D<=x), si=D=>SUB.findIndex(x=>D<=x);
+// Écart fondamental des positions c (arbre, es = −valeur) et C (alésage, EI = +valeur), µm, au-dessus de 30 mm : [jusqu'à, valeur]
+const FCC=[[40,120],[50,130],[65,140],[80,150],[100,170],[120,180],[140,200],[160,210],[180,230],[200,240],[225,260],[250,280],[280,300],[315,330],[355,360],[400,400]];
+function c11(D,hole){const e=FCC.find(x=>D<=x[0])[1],t=ITT[11][ri(D)];return hole?[e/1000,(e+t)/1000]:[-(e+t)/1000,-e/1000]}
+if(st.fam==='rdh') render();
 function fdS(l,D){return l==='r'?FR[si(D)]:l==='s'?FS[si(D)]:FD[l][ri(D)]}
 function devS(l,g,D){ const t=ITT[g][ri(D)];
   if(l==='h')return [-t,0]; if(l==='js')return [-t/2,t/2];
@@ -1502,6 +1555,13 @@ function find(q){
   if(m=l.match(/^tr\s*(\d+)\s*(?:[x×*]\s*(\d+(?:[.,]\d+)?))?$/)){if(!TRP[m[1]])return{err:'Tr '+m[1]+' absent de la table.'};
     if(m[2]){const p=+dec(m[2]);if(!TRP[m[1]].includes(p))return{err:'Pas '+p+' inexistant pour Tr '+m[1]+'. Pas disponibles : '+TRP[m[1]].join(' · ')+'.'};return F('tr',m[1],p)}return F('tr',m[1],TRP[m[1]][0])}
   if(m=l.match(/^pg\s*(\d+(?:[.,]\d+)?)$/)){const j=idx(PG,dec(m[1]),'Pg');return j.err?j:F('pg',j)}
+  { const kw=/15403|crochet/.test(l), q=l.replace(/din\s*15403|15403|crochets?|levage|[ée]crou|\btige|\bde\b/g,' ').replace(/\s+/g,' ').trim(), t=q.match(/^(?:rd\s*)?(\d+)\s*(?:[x×*]\s*(\d+))?$/);
+    const c2=/[ée]crou/.test(l)?'int':/\btige/.test(l)?'ext':cote;
+    if(kw&&!q)return F('rdh',4,null,c2);
+    if(t&&(kw||/^rd/.test(q))){const j=RDH.findIndex(x=>x[0]===+t[1]),ok=j>=0&&(!t[2]||RDH[j][1]===+t[2]);
+      if(kw){if(j<0)return{err:'Rd '+t[1]+' absent de la DIN 15403 (Rd 50 à Rd 320).'};if(!ok)return{err:'Rd '+t[1]+' DIN 15403 : pas '+RDH[j][1]+' mm, pas '+t[2]+'.'};return F('rdh',j,null,c2)}
+      if(t[2]&&ok)return F('rdh',j,null,c2);
+      if(j>=0&&!RD.some(x=>x[0]===+t[1]))return t[2]?{err:'Rd '+t[1]+' DIN 15403 : pas '+RDH[j][1]+' mm, pas '+t[2]+'.'}:F('rdh',j,null,c2);}}
   if(m=l.match(/^rd\s*(\d+)/)){const j=RD.findIndex(t=>t[0]===+m[1]);return j<0?{err:'Rd '+m[1]+' absent de la table.'}:F('rd',j)}
   if(/npt/.test(l)){const f=/nptf/.test(l),L=f?NPTF:NPT,lab=f?'NPTF':'NPT';let s=l.replace(/nptf?/,'').trim().replace(/^(\d+)\s*-\s*(\d+\/\d+)/,'$1 $2'),t=0;
     const q=s.match(/^(.+?)\s*[-x×]\s*(11 ?1\/2|\d+(?:[.,]\d+)?)$/);if(q){s=q[1];t=+dec(q[2].replace(/11 ?1\/2/,'11.5'))}
