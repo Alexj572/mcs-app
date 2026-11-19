@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Compteur de pièces</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Compteur de pièces : photo, comptage automatique, correction au doigt. Même thème que l'aide à l'usinage. */
+:root{
+  --bg:#cfd6e1; --bgg:none; --surf:#eef1f5; --fld:#f6f7fa; --ink:#131b2e; --mut:#46516a; --line:#a3afc2; --fline:#677389;
+  --pri:#2952b3; --pri2:#3561c4; --acc:#234a9e; --onpri:#ffffff; --soft:#d5dce7; --red:#b42318; --ok:#17663a;
+  --shadow:0 2px 12px rgba(20,35,70,.12); --view:#1b2333; color-scheme:light;
+  --head:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
+  --body:'Barlow','Segoe UI',Roboto,Arial,sans-serif;
+  --mono:'DM Mono',Consolas,'Roboto Mono','Courier New',monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1b3d; --bgg:linear-gradient(160deg,#0d1a3e 0%,#1a2a5e 50%,#0d1a3e 100%); --surf:#162040; --fld:#101a38; --ink:#e8ecf4; --mut:#8fa0c8; --line:#2a3d6e; --fline:#3a5088;
+  --pri:#2952b3; --pri2:#4a78e8; --acc:#8fb0ff; --onpri:#ffffff; --soft:#1e2d55; --red:#ff6b5b; --ok:#4cc27e;
+  --shadow:0 6px 32px rgba(0,0,0,.5); --view:#0a1128; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0f1b3d; --bgg:linear-gradient(160deg,#0d1a3e 0%,#1a2a5e 50%,#0d1a3e 100%); --surf:#162040; --fld:#101a38; --ink:#e8ecf4; --mut:#8fa0c8; --line:#2a3d6e; --fline:#3a5088;
+  --pri:#2952b3; --pri2:#4a78e8; --acc:#8fb0ff; --onpri:#ffffff; --soft:#1e2d55; --red:#ff6b5b; --ok:#4cc27e;
+  --shadow:0 6px 32px rgba(0,0,0,.5); --view:#0a1128; color-scheme:dark }
+
+*{box-sizing:border-box}
+button,.btn,summary,input{touch-action:manipulation}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);background-image:var(--bgg);background-attachment:fixed;min-height:100%;color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.4;overflow-x:hidden}
+header{background:var(--surf);border-bottom:1px solid var(--red)}
+.emb header{display:none}
+.wrap{max-width:900px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.logo{background:#fff;border-radius:6px;padding:3px 8px;height:48px;display:flex;align-items:center;font-family:var(--head);font-weight:700;color:#2952b3;font-size:1.5rem;letter-spacing:.06em}
+h1{font-family:var(--head);font-weight:700;font-size:1.7rem;letter-spacing:.04em;text-transform:uppercase;margin:0;line-height:1}
+header p{margin:2px 0 0;color:var(--mut);font-size:.9rem}
+main.wrap{padding-block:16px 40px;display:grid;gap:14px}
+.card{background:var(--surf);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px;min-width:0}
+h2{font-family:var(--head);font-weight:600;font-size:1.05rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:0 0 10px}
+.lab{font-family:var(--head);font-weight:600;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:14px 0 6px;display:block}
+.lab:first-child{margin-top:0}
+.btn{font-family:var(--head);font-weight:600;font-size:1.15rem;letter-spacing:.04em;min-height:52px;padding:6px 18px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--onpri);cursor:pointer;box-shadow:0 4px 12px rgba(41,82,179,.3);display:inline-flex;align-items:center;justify-content:center;gap:10px;text-align:center;-webkit-tap-highlight-color:transparent}
+.btn.ghost{background:var(--surf);color:var(--ink);border:1.5px solid var(--fline);box-shadow:none}
+.btn.big{min-height:64px;font-size:1.35rem;width:100%}
+.btn svg{width:26px;height:26px;flex:none}
+.btn[aria-pressed="true"]{background:linear-gradient(135deg,var(--pri),var(--pri2));color:var(--onpri);border-color:var(--pri)}
+.btn:disabled{opacity:.45;cursor:default}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.photo{display:grid;gap:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button{font-family:var(--head);font-weight:600;font-size:1.2rem;letter-spacing:.03em;min-height:64px;padding:6px 10px;border:1.5px solid var(--line);background:var(--surf);color:var(--ink);border-radius:10px;cursor:pointer;min-width:0;line-height:1.1}
+.seg button small{display:block;font-family:var(--body);font-weight:400;font-size:.78rem;letter-spacing:0;color:var(--mut);margin-top:3px}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--pri),var(--pri2));border-color:var(--pri);color:var(--onpri)}
+.seg button[aria-pressed="true"] small{color:var(--onpri);opacity:.9}
+.seg.three,.seg.m3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.seg.m3 button{font-size:1.08rem;padding:6px 6px;min-height:72px}
+.seg.m3 button small{font-size:.74rem}
+.lines{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.lines li{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto auto;gap:6px;align-items:center;padding:4px 4px 4px 10px;border:1px solid var(--line);border-radius:10px;background:var(--fld)}
+.lines .ln{font-family:var(--head);font-weight:600;font-size:1.05rem;letter-spacing:.03em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lines .lc{font-family:var(--mono);font-size:1.35rem;min-width:3ch;text-align:right;color:var(--ink)}
+.lines .lc small{font-size:.8rem;color:var(--mut)}
+.lines button{touch-action:manipulation;width:48px;height:48px;border-radius:10px;border:1.5px solid var(--fline);background:var(--surf);color:var(--ink);font-size:1.4rem;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.lines button.del{color:var(--red)}
+.msg button{margin-top:8px;width:100%}
+.seg.three button{min-height:52px;font-size:1rem}
+input[type=number]{width:100%;min-height:52px;font-family:var(--mono);font-size:1.3rem;padding:6px 12px;border:1.5px solid var(--fline);border-radius:8px;background:var(--fld);color:var(--ink)}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.res{display:grid;gap:10px}
+.total{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.total b{font-family:var(--mono);font-weight:500;font-size:4.2rem;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.total span{font-family:var(--head);font-weight:600;font-size:1.6rem;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
+.sub{color:var(--mut);font-size:.95rem;margin:0}
+.ecart{font-family:var(--head);font-weight:700;font-size:1.3rem;letter-spacing:.03em;padding:8px 12px;border-radius:8px;border:2px solid currentColor;margin:0}
+.ecart.ok{color:var(--ok)} .ecart.ko{color:var(--red)}
+#iExp::placeholder{font-family:var(--body);font-size:1rem}
+.attendu{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px;align-items:center}
+.viewer{position:relative;border-radius:10px;overflow:hidden;background:var(--view);border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.viewer canvas{display:block;width:100%;touch-action:none}
+.zb{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:8px}
+.zb button{width:48px;height:48px;border-radius:12px;border:1px solid rgba(255,255,255,.55);background:rgba(10,17,40,.72);color:#fff;font-size:1.5rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.zb button svg{width:24px;height:24px}
+.busy{position:absolute;left:0;right:0;top:0;padding:10px 12px;background:rgba(10,17,40,.82);color:#fff;font-family:var(--head);font-weight:600;font-size:1.15rem;letter-spacing:.05em}
+.busy i{display:block;height:4px;margin-top:6px;border-radius:2px;background:linear-gradient(90deg,transparent,#8fb0ff,transparent);background-size:40% 100%;background-repeat:no-repeat;animation:bz 1s linear infinite}
+@keyframes bz{from{background-position:-40% 0}to{background-position:140% 0}}
+@media(prefers-reduced-motion:reduce){.busy i{animation:none;background:#8fb0ff}}
+.mode{position:absolute;left:8px;bottom:8px;right:64px;padding:8px 10px;border-radius:8px;background:rgba(10,17,40,.82);color:#fff;font-size:.95rem;font-weight:600}
+.tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tools .btn{font-size:1.05rem;padding:6px 8px;min-width:0}
+.hint{font-size:.9rem;color:var(--mut);margin:0}
+.msg{margin:0;padding:10px 12px;border-radius:8px;border:1px solid var(--line);border-left:5px solid var(--red);font-size:.95rem}
+details.fin>summary{cursor:pointer;min-height:52px;display:flex;align-items:center;gap:8px;font-family:var(--head);font-weight:600;font-size:1.1rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);list-style:none}
+details.fin>summary::-webkit-details-marker{display:none}
+details.fin>summary::before{content:'▸';color:var(--mut)}
+details.fin[open]>summary::before{content:'▾'}
+.rng{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.rng small{color:var(--mut);font-size:.85rem}
+input[type=range]{width:100%;height:44px;accent-color:var(--pri2);margin:0}
+.val{font-family:var(--mono);font-size:1rem;color:var(--ink);min-width:3.5ch;text-align:right}
+.aide{font-size:.95rem}
+.aide ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.aide p{margin:10px 0 0}
+.aide b{font-weight:600}
+.ver{text-align:center;font-size:.75rem;color:var(--mut);margin:0;padding:6px 0 18px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media(max-width:640px){
+  body{font-size:15px}
+  .emb .wrap{padding-left:8px;padding-right:8px}
+  main.wrap{padding-block:10px 28px;gap:10px}
+  .card{padding:12px}
+  .total b{font-size:3.6rem}
+}
+@media(max-width:360px){ .seg button{font-size:1.05rem} .tools .btn{font-size:.95rem} }
+@media(min-width:700px){ .tools{grid-template-columns:repeat(4,minmax(0,1fr))} }
+</style>
+
+<script>
+(function(){var d=document.documentElement;function th(){var t='dark';try{t=localStorage.getItem('mcs-theme')==='light'?'light':'dark'}catch(e){}d.setAttribute('data-theme',t)}
+th();window.addEventListener('storage',th);if(window.self!==window.top)d.classList.add('emb');})();
+</script>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="logo">MCS</div>
+  <div><h1>Compteur de pièces</h1><p>Photo des pièces à plat : la page les compte, vous corrigez d'un doigt.</p></div>
+</div></header>
+
+<main class="wrap">
+  <section class="card photo" aria-labelledby="t1">
+    <h2 id="t1">1. Photo des pièces</h2>
+    <label class="btn big" id="bCam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="4"/></svg>Prendre une photo<input id="fCam" class="vh" type="file" accept="image/*" capture="environment"></label>
+    <label class="btn ghost big" id="bFile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.6"/></svg>Choisir une image<input id="fFile" class="vh" type="file" accept="image/*"></label>
+    <p class="hint">Si l'appareil photo ne s'ouvre pas : prenez la photo avec le téléphone puis « Choisir une image ».</p>
+    <span class="lab">2. Type de pièces</span>
+    <div class="seg m3" id="segMode" role="group" aria-label="Type de pièces">
+      <button type="button" data-v="round" aria-pressed="true">Pièces rondes<small>bagues, rondelles, billes</small></button>
+      <button type="button" data-v="shapes" aria-pressed="false">Formes variées<small>écrous, raccords en vrac</small></button>
+      <button type="button" data-v="rows" aria-pressed="false">Pièces rangées<small>serrées en rangs : un trait par rang</small></button>
+    </div>
+  </section>
+
+  <section class="card res" id="cRes" hidden aria-labelledby="t3">
+    <h2 id="t3">3. Résultat</h2>
+    <div class="total" aria-live="polite"><b id="nTot">0</b><span id="nTotU">pièces</span></div>
+    <p class="sub" id="nDet">Aucune correction à la main</p>
+    <div class="viewer" id="viewer">
+      <canvas id="cv" aria-label="Photo avec un repère numéroté sur chaque pièce comptée"></canvas>
+      <div class="zb">
+        <button type="button" id="zIn" aria-label="Zoomer">+</button>
+        <button type="button" id="zOut" aria-label="Dézoomer">−</button>
+        <button type="button" id="zFit" aria-label="Voir toute la photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div>
+      <div class="busy" id="busy" hidden>Comptage…<i></i></div>
+      <div class="mode" id="modeMsg" hidden></div>
+    </div>
+    <p class="hint" id="hint">Touchez un repère pour le retirer. Touchez ailleurs pour ajouter une pièce. Deux doigts pour zoomer.</p>
+    <div class="tools">
+      <button type="button" class="btn ghost" id="bUndo" disabled>Annuler</button>
+      <button type="button" class="btn ghost" id="bZone" aria-pressed="false">Zone à compter</button>
+      <button type="button" class="btn ghost" id="bAll" hidden>Toute l'image</button>
+      <button type="button" class="btn ghost" id="bRef" aria-pressed="false" hidden>Pièce de référence</button>
+      <button type="button" class="btn ghost" id="bRefX" hidden>Sans référence</button>
+    </div>
+    <ul class="lines" id="lineList" hidden aria-label="Traits tracés"></ul>
+    <p class="msg" id="warn" hidden></p>
+    <div class="msg" id="rowsTip" hidden>Pièces serrées en rangées : la zone encadrée n'est pas comptée.<button type="button" class="btn" id="bRows">Compter par rangées</button></div>
+    <div class="attendu">
+      <div><label class="lab" for="iExp" style="margin-top:0">Quantité attendue</label><input id="iExp" type="number" inputmode="numeric" min="0" step="1" placeholder="facultatif"></div>
+      <p class="ecart" id="ecart" hidden></p>
+    </div>
+    <button type="button" class="btn big" id="bNew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="4"/></svg>Nouvelle photo</button>
+  </section>
+
+  <section class="card">
+    <details class="fin" id="dFin">
+      <summary>Réglages fins</summary>
+      <span class="lab">Sensibilité</span>
+      <div class="rng"><small>Moins</small><input id="rSens" type="range" min="0" max="100" step="1" value="50" aria-label="Sensibilité"><small>Plus</small></div>
+      <p class="hint">Plus : prend les pièces peu contrastées. Moins : ignore les reflets et les taches du fond.</p>
+      <span class="lab">Les pièces sont</span>
+      <div class="seg three" id="segPol" role="group" aria-label="Couleur des pièces par rapport au fond">
+        <button type="button" data-v="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-v="dark" aria-pressed="false">Plus sombres que le fond</button>
+        <button type="button" data-v="light" aria-pressed="false">Plus claires que le fond</button>
+      </div>
+      <span class="lab">Taille mini d'une pièce</span>
+      <div class="rng"><small>Petite</small><input id="rMin" type="range" min="5" max="80" step="5" value="30" aria-label="Taille mini en pourcentage d'une pièce"><span class="val" id="vMin">30 %</span></div>
+      <p class="hint">En % de la taille d'une pièce normale. Ce qui est plus petit est ignoré (poussières, copeaux).</p>
+      <button type="button" class="btn ghost" id="bDef" style="margin-top:12px;width:100%">Revenir aux réglages d'origine</button>
+    </details>
+  </section>
+
+  <section class="card aide" aria-labelledby="tA">
+    <h2 id="tA">Bien prendre la photo</h2>
+    <ul>
+      <li>Pièces <b>à plat</b>, jamais empilées. Elles peuvent se toucher, pas faire un tas.</li>
+      <li><b>Fond uni et contrasté</b> : plateau noir mat pour les pièces brillantes, carton blanc pour les pièces sombres.</li>
+      <li>Téléphone <b>bien au-dessus</b>, parallèle à la table. Toutes les pièces dans la photo.</li>
+      <li>Lumière <b>douce</b>, sans reflet ni ombre forte. Évitez le flash.</li>
+      <li>Bord du plateau dans la photo ? Utilisez <b>Zone à compter</b>.</li>
+      <li>Pièces <b>rangées serrées</b> (en bac, en colonnes) : mode <b>Pièces rangées</b>, un trait au doigt par rangée, de la première à la dernière pièce.</li>
+      <li>Toujours un coup d'œil sur les repères avant de valider.</li>
+    </ul>
+    <p><b>Limite :</b> pour du vrac en tas ou des pièces qui se chevauchent beaucoup, vérifiez chaque repère ou comptez à la balance.</p>
+  </section>
+  <p class="ver">Comptage fait sur le téléphone. Aucune photo n'est envoyée.</p>
+</main>
+
+<script id="algo" type="text/plain">
+'use strict';
+/* ===== Comptage : traitement d'image classique, sans bibliothèque ===== */
+function otsu(h, n) {
+  var tot = 0, sum = 0, i;
+  for (i = 0; i < n; i++) { tot += h[i]; sum += i * h[i]; }
+  var sB = 0, wB = 0, best = -1, th = 0;
+  for (i = 0; i < n; i++) {
+    wB += h[i]; if (!wB) continue;
+    var wF = tot - wB; if (!wF) break;
+    sB += i * h[i];
+    var d = sB / wB - (sum - sB) / wF, v = wB * wF * d * d;
+    if (v > best) { best = v; th = i; }
+  }
+  return th + 0.5;
+}
+function histMedian(h, off, n, cnt) {
+  var half = cnt / 2, acc = 0;
+  for (var i = 0; i < n; i++) { acc += h[off + i]; if (acc >= half) return i; }
+  return n - 1;
+}
+function grayOf(rgba, W, H) {
+  var n = W * H, g = new Float32Array(n), rn = new Float32Array(n), gn = new Float32Array(n), sat = new Float32Array(n);
+  for (var i = 0, p = 0; i < n; i++, p += 4) {
+    var R = rgba[p], Gc = rgba[p + 1], B = rgba[p + 2], S = R + Gc + B + 3;
+    g[i] = 0.299 * R + 0.587 * Gc + 0.114 * B; rn[i] = (R + 1) / S; gn[i] = (Gc + 1) / S;
+    sat[i] = Math.max(R, Gc, B) - Math.min(R, Gc, B);
+  }
+  g.rn = rn; g.gn = gn; // teinte (sans la luminosité) : sert si le fond est coloré
+  g.sat = sat; // saturation : le métal brillant est peu coloré
+  return g;
+}
+function crop(g, W, x0, y0, w, h) {
+  var o = new Float32Array(w * h);
+  for (var y = 0; y < h; y++) o.set(g.subarray((y + y0) * W + x0, (y + y0) * W + x0 + w), y * w);
+  return o;
+}
+function blur3(s, w, h) {
+  var t = new Float32Array(w * h), o = new Float32Array(w * h), x, y, i;
+  for (y = 0; y < h; y++) {
+    i = y * w;
+    t[i] = (2 * s[i] + s[i + 1]) / 3;
+    for (x = 1; x < w - 1; x++) t[i + x] = (s[i + x - 1] + s[i + x] + s[i + x + 1]) / 3;
+    t[i + w - 1] = (2 * s[i + w - 1] + s[i + w - 2]) / 3;
+  }
+  for (x = 0; x < w; x++) o[x] = (2 * t[x] + t[x + w]) / 3;
+  for (y = 1; y < h - 1; y++) for (x = 0, i = y * w; x < w; x++, i++) o[i] = (t[i - w] + t[i] + t[i + w]) / 3;
+  for (x = 0, i = (h - 1) * w; x < w; x++, i++) o[i] = (2 * t[i] + t[i - w]) / 3;
+  return o;
+}
+/* Fond estimé par cases : médiane des pixels "fond" de chaque case, cases vides comblées, lissage, interpolation. */
+function bgGrid(f, w, h, cand, init, pct, jump) {
+  var cs = Math.max(10, Math.round(Math.max(w, h) / 20));
+  var gx = Math.ceil(w / cs), gy = Math.ceil(h / cs), nc = gx * gy;
+  var hist = new Int32Array(nc * 256), cnt = new Int32Array(nc), tot = new Int32Array(nc);
+  var x, y, i, c, v;
+  for (y = 0; y < h; y += 2) {
+    var row = ((y / cs) | 0) * gx;
+    for (x = 0; x < w; x += 2) {
+      c = row + ((x / cs) | 0); tot[c]++; i = y * w + x;
+      if (pct || cand[i]) { v = f[i]; v = v < 0 ? 0 : v > 255 ? 255 : v | 0; hist[c * 256 + v]++; cnt[c]++; }
+    }
+  }
+  var G = new Float32Array(nc), ok = new Uint8Array(nc), any = 0;
+  for (c = 0; c < nc; c++) if (cnt[c] >= Math.max(6, 0.06 * tot[c])) { G[c] = histMedian(hist, c * 256, 256, pct ? cnt[c] * pct * 2 : cnt[c]); ok[c] = 1; any++; }
+  if (pct) { // une case bien plus claire que ses voisines = couverte par une grosse pièce : on prend la valeur des voisines
+    for (var pass3 = 0; pass3 < 2; pass3++) {
+      var Gn = G.slice();
+      for (var cy3 = 0; cy3 < gy; cy3++) for (var cx3 = 0; cx3 < gx; cx3++) {
+        var nb3 = [];
+        for (var d3y = -1; d3y <= 1; d3y++) for (var d3x = -1; d3x <= 1; d3x++) { var X3 = cx3 + d3x, Y3 = cy3 + d3y; if ((d3x || d3y) && X3 >= 0 && Y3 >= 0 && X3 < gx && Y3 < gy) nb3.push(G[Y3 * gx + X3]); }
+        var md3 = median(nb3), c3 = cy3 * gx + cx3;
+        if (G[c3] > md3 + Math.max(10, jump || 0)) Gn[c3] = md3;
+      }
+      G = Gn;
+    }
+  }
+  if (!any) { for (c = 0; c < nc; c++) { G[c] = init; ok[c] = 1; } }
+  var guard = 0;
+  while (any < nc && guard++ < 200) {
+    var ok2 = ok.slice();
+    for (var cy = 0; cy < gy; cy++) for (var cx = 0; cx < gx; cx++) {
+      c = cy * gx + cx; if (ok[c]) continue;
+      var s = 0, k = 0;
+      for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+        var xx = cx + dx, yy = cy + dy; if (xx < 0 || yy < 0 || xx >= gx || yy >= gy) continue;
+        var q = yy * gx + xx; if (ok[q]) { s += G[q]; k++; }
+      }
+      if (k) { G[c] = s / k; ok2[c] = 1; any++; }
+    }
+    ok = ok2;
+  }
+  // lissage 3x3
+  var G2 = new Float32Array(nc);
+  for (var cy2 = 0; cy2 < gy; cy2++) for (var cx2 = 0; cx2 < gx; cx2++) {
+    var s2 = 0, k2 = 0;
+    for (var dy2 = -1; dy2 <= 1; dy2++) for (var dx2 = -1; dx2 <= 1; dx2++) {
+      var x2 = cx2 + dx2, y2 = cy2 + dy2; if (x2 < 0 || y2 < 0 || x2 >= gx || y2 >= gy) continue;
+      var wgt = (dx2 || dy2) ? 1 : 2; s2 += G[y2 * gx + x2] * wgt; k2 += wgt;
+    }
+    G2[cy2 * gx + cx2] = s2 / k2;
+  }
+  // interpolation bilinéaire
+  var B = new Float32Array(w * h), xi = new Int32Array(w), xt = new Float32Array(w);
+  for (x = 0; x < w; x++) { var fx = (x + 0.5) / cs - 0.5; if (fx < 0) fx = 0; if (fx > gx - 1) fx = gx - 1; xi[x] = Math.min(gx - 2, fx | 0); if (gx === 1) xi[x] = 0; xt[x] = gx === 1 ? 0 : fx - xi[x]; }
+  for (y = 0; y < h; y++) {
+    var fy = (y + 0.5) / cs - 0.5; if (fy < 0) fy = 0; if (fy > gy - 1) fy = gy - 1;
+    var iy = gy === 1 ? 0 : Math.min(gy - 2, fy | 0), ty = gy === 1 ? 0 : fy - iy, iy2 = gy === 1 ? 0 : iy + 1;
+    for (x = 0; x < w; x++) {
+      var a = xi[x], b = gx === 1 ? 0 : a + 1, tx = xt[x];
+      var top = G2[iy * gx + a] * (1 - tx) + G2[iy * gx + b] * tx;
+      var bot = G2[iy2 * gx + a] * (1 - tx) + G2[iy2 * gx + b] * tx;
+      B[y * w + x] = top * (1 - ty) + bot * ty;
+    }
+  }
+  return B;
+}
+/* Morphologie binaire (carré de rayon r) : v=1 dilatation, v=0 érosion (hors image = sans effet) */
+function morph(m, w, h, r, v) {
+  if (r <= 0) return m;
+  var t = new Uint8Array(w * h), o = new Uint8Array(w * h), x, y, i, run, nv = 1 - v;
+  var last = new Int32Array(w).fill(-1e9);
+  for (y = 0; y < h; y++) {
+    i = y * w; run = -1e9;
+    for (x = 0; x < w; x++, i++) { if (m[i] === v) run = x; t[i] = x - run <= r ? v : nv; }
+    run = 1e9; i = y * w + w - 1;
+    for (x = w - 1; x >= 0; x--, i--) { if (m[i] === v) run = x; if (run - x <= r) t[i] = v; }
+  }
+  for (y = 0, i = 0; y < h; y++) for (x = 0; x < w; x++, i++) { if (t[i] === v) last[x] = y; o[i] = y - last[x] <= r ? v : nv; }
+  last.fill(1e9);
+  for (y = h - 1; y >= 0; y--) for (x = 0, i = y * w; x < w; x++, i++) { if (t[i] === v) last[x] = y; if (last[x] - y <= r) o[i] = v; }
+  return o;
+}
+function dilate(m, w, h, r) { return morph(m, w, h, r, 1); }
+function erode(m, w, h, r) { return morph(m, w, h, r, 0); }
+function invert(m) { var o = new Uint8Array(m.length); for (var i = 0; i < m.length; i++) o[i] = m[i] ? 0 : 1; return o; }
+/* Étiquetage des zones connexes (union-find, 2 passes) */
+function label(m, w, h, c8) {
+  var L = new Int32Array(w * h), par = new Int32Array(1024), n = 0, x, y, i;
+  function find(a) { while (par[a] !== a) { par[a] = par[par[a]]; a = par[a]; } return a; }
+  function uni(a, b) { a = find(a); b = find(b); if (a !== b) { if (a < b) par[b] = a; else par[a] = b; } }
+  for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+    i = y * w + x; if (!m[i]) continue;
+    var l = 0, nb;
+    if (x > 0 && (nb = L[i - 1])) l = nb;
+    if (y > 0) {
+      if ((nb = L[i - w])) { if (l) uni(l, nb); else l = nb; }
+      if (c8) {
+        if (x > 0 && (nb = L[i - w - 1])) { if (l) uni(l, nb); else l = nb; }
+        if (x < w - 1 && (nb = L[i - w + 1])) { if (l) uni(l, nb); else l = nb; }
+      }
+    }
+    if (!l) { n++; if (n >= par.length) { var p2 = new Int32Array(par.length * 2); p2.set(par); par = p2; } par[n] = n; l = n; }
+    L[i] = l;
+  }
+  var map = new Int32Array(n + 1), k = 0;
+  for (i = 1; i <= n; i++) { var r = find(i); if (r === i) map[i] = ++k; }
+  for (i = 1; i <= n; i++) map[i] = map[find(i)];
+  for (i = 0; i < L.length; i++) if (L[i]) L[i] = map[L[i]];
+  return { L: L, n: k };
+}
+function stats(L, n, w, h) {
+  var a = new Int32Array(n + 1), x0 = new Int32Array(n + 1).fill(1e9), y0 = new Int32Array(n + 1).fill(1e9), x1 = new Int32Array(n + 1).fill(-1), y1 = new Int32Array(n + 1).fill(-1);
+  var sx = new Float64Array(n + 1), sy = new Float64Array(n + 1), sxx = new Float64Array(n + 1), syy = new Float64Array(n + 1), sxy = new Float64Array(n + 1), border = new Uint8Array(n + 1);
+  for (var y = 0, i = 0; y < h; y++) for (var x = 0; x < w; x++, i++) {
+    var l = L[i]; if (!l) continue;
+    a[l]++; sx[l] += x; sy[l] += y; sxx[l] += x * x; syy[l] += y * y; sxy[l] += x * y;
+    if (x < x0[l]) x0[l] = x; if (x > x1[l]) x1[l] = x; if (y < y0[l]) y0[l] = y; if (y > y1[l]) y1[l] = y;
+    if (x === 0 || y === 0 || x === w - 1 || y === h - 1) border[l] = 1;
+  }
+  return { a: a, x0: x0, y0: y0, x1: x1, y1: y1, sx: sx, sy: sy, sxx: sxx, syy: syy, sxy: sxy, border: border };
+}
+function elong(S, l) {
+  var a = S.a[l], mx = S.sx[l] / a, my = S.sy[l] / a;
+  var cxx = S.sxx[l] / a - mx * mx + 1 / 12, cyy = S.syy[l] / a - my * my + 1 / 12, cxy = S.sxy[l] / a - mx * my;
+  var tr = cxx + cyy, det = cxx * cyy - cxy * cxy, disc = Math.sqrt(Math.max(0, tr * tr / 4 - det));
+  var l1 = tr / 2 + disc, l2 = Math.max(1e-6, tr / 2 - disc);
+  return Math.sqrt(l1 / l2);
+}
+/* Bouchage des trous : trou rond ou petit = intérieur de pièce (bague, écrou, reflet) ; vide entre pièces = laissé. */
+function fillHoles(m, w, h, maxArea) {
+  var inv = invert(m), lb = label(inv, w, h, false), S = stats(lb.L, lb.n, w, h);
+  var fill = new Uint8Array(lb.n + 1), out = new Uint8Array(m), l;
+  for (l = 1; l <= lb.n; l++) {
+    if (S.border[l]) continue;
+    var a = S.a[l], bw = S.x1[l] - S.x0[l] + 1, bh = S.y1[l] - S.y0[l] + 1;
+    if (a <= 12) { fill[l] = 1; continue; }
+    var fr = a / (bw * bh), e = elong(S, l);
+    // trou bien rond : intérieur d'une bague, même grande (un vide entre pièces n'est jamais rond)
+    if (fr >= 0.68 && e <= 1.5 && a < 0.1 * w * h) { fill[l] = 1; continue; }
+    if (maxArea && a > maxArea) continue;
+    if ((fr >= 0.55 && e <= 3) || e >= 2.5) fill[l] = 1; // trou rond (bague, écrou) ou trait fin (reflet)
+    else if (maxArea && a < 0.04 * maxArea) fill[l] = 1;
+  }
+  for (var i = 0; i < out.length; i++) if (!out[i] && fill[lb.L[i]]) out[i] = 1;
+  return out;
+}
+/* Transformée de distance euclidienne exacte (Felzenszwalb) */
+function edt(m, w, h) {
+  var INF = 1e20, n = Math.max(w, h), f = new Float64Array(n), d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1);
+  var D = new Float32Array(w * h), x, y;
+  function dt(len) {
+    var k = 0; v[0] = 0; z[0] = -INF; z[1] = INF;
+    for (var q = 1; q < len; q++) {
+      var s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+      while (s <= z[k]) { k--; s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]); }
+      k++; v[k] = q; z[k] = s; z[k + 1] = INF;
+    }
+    k = 0;
+    for (var q2 = 0; q2 < len; q2++) { while (z[k + 1] < q2) k++; var dd = q2 - v[k]; d[q2] = dd * dd + f[v[k]]; }
+  }
+  for (x = 0; x < w; x++) {
+    for (y = 0; y < h; y++) f[y] = m[y * w + x] ? INF : 0;
+    dt(h);
+    for (y = 0; y < h; y++) D[y * w + x] = d[y];
+  }
+  for (y = 0; y < h; y++) {
+    var o = y * w;
+    for (x = 0; x < w; x++) f[x] = D[o + x];
+    dt(w);
+    for (x = 0; x < w; x++) D[o + x] = Math.sqrt(d[x]);
+  }
+  return D;
+}
+function hullOf(pts) {
+  pts.sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+  if (pts.length < 3) return { area: 0, hp: pts };
+  function cr(o, a, b) { return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); }
+  var lo = [], up = [], i;
+  for (i = 0; i < pts.length; i++) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], pts[i]) <= 0) lo.pop(); lo.push(pts[i]); }
+  for (i = pts.length - 1; i >= 0; i--) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], pts[i]) <= 0) up.pop(); up.push(pts[i]); }
+  lo.pop(); up.pop(); var hp = lo.concat(up), s = 0;
+  for (i = 0; i < hp.length; i++) { var p = hp[i], q = hp[(i + 1) % hp.length]; s += p[0] * q[1] - q[0] * p[1]; }
+  return { area: Math.abs(s) / 2, hp: hp };
+}
+function solidities(L, n, w, h, S) {
+  var pts = new Array(n + 1), sol = new Float32Array(n + 1), hulls = new Array(n + 1), y, x, l;
+  for (l = 1; l <= n; l++) pts[l] = [];
+  for (y = 0; y < h; y++) {
+    var i = y * w; x = 0;
+    while (x < w) {
+      l = L[i + x]; if (!l) { x++; continue; }
+      var xs = x; while (x < w && L[i + x] === l) x++;
+      var P = pts[l]; P.push([xs - 0.5, y - 0.5], [xs - 0.5, y + 0.5], [x - 0.5, y - 0.5], [x - 0.5, y + 0.5]);
+    }
+  }
+  for (l = 1; l <= n; l++) { var hu = hullOf(pts[l]); hulls[l] = hu; sol[l] = hu.area > 0 ? Math.min(1, S.a[l] / hu.area) : 1; }
+  sol.hulls = hulls;
+  return sol;
+}
+/* Remplit l'enveloppe convexe d'une zone (pièce ronde mal détourée : reflet ou zone sombre sur le bord) */
+function fillHull(hp, Lf, mf, l, w, h) {
+  var ymin = 1e9, ymax = -1e9, i, added = 0;
+  for (i = 0; i < hp.length; i++) { if (hp[i][1] < ymin) ymin = hp[i][1]; if (hp[i][1] > ymax) ymax = hp[i][1]; }
+  for (var y = Math.max(0, Math.ceil(ymin)); y <= Math.min(h - 1, Math.floor(ymax)); y++) {
+    var xa = 1e9, xb = -1e9;
+    for (i = 0; i < hp.length; i++) {
+      var p = hp[i], q = hp[(i + 1) % hp.length];
+      if ((p[1] <= y && q[1] > y) || (q[1] <= y && p[1] > y)) {
+        var xi = p[0] + (y - p[1]) * (q[0] - p[0]) / (q[1] - p[1]);
+        if (xi < xa) xa = xi; if (xi > xb) xb = xi;
+      }
+    }
+    for (var x = Math.max(0, Math.ceil(xa)); x <= Math.min(w - 1, Math.floor(xb)); x++) { var k = y * w + x; if (!Lf[k]) { Lf[k] = l; mf[k] = 1; added++; } }
+  }
+  return added;
+}
+/* Texture (gradient moyen à l'intérieur de la zone, sans son contour) et couleur (écart au gris) de chaque zone */
+function compFeat(L, n, g, chroma, w, h) {
+  var tex = new Float32Array(n + 1), chr = new Float32Array(n + 1), a = new Float32Array(n + 1), ti = new Float32Array(n + 1), ai = new Float32Array(n + 1);
+  for (var y = 1; y < h - 1; y++) for (var x = 1, i = y * w + 1; x < w - 1; x++, i++) {
+    var l = L[i]; if (!l) continue;
+    var gv = Math.abs(g[i + 1] - g[i - 1]) + Math.abs(g[i + w] - g[i - w]);
+    tex[l] += gv; a[l]++;
+    if (x > 2 && y > 2 && x < w - 3 && y < h - 3 && L[i - 2] === l && L[i + 2] === l && L[i - 2 * w] === l && L[i + 2 * w] === l && L[i - 1] === l && L[i + 1] === l && L[i - w] === l && L[i + w] === l) { ti[l] += gv; ai[l]++; }
+    if (chroma) chr[l] += chroma[i];
+  }
+  for (var k = 1; k <= n; k++) if (a[k]) { tex[k] = ai[k] >= 8 ? ti[k] / ai[k] : tex[k] / a[k]; chr[k] /= a[k]; }
+  return { tex: tex, chr: chr };
+}
+/* quantile pondéré : arr = [[valeur, poids], ...] */
+function wq(arr, q) {
+  arr = arr.slice().sort(function (u, v) { return u[0] - v[0]; });
+  var t = 0, i; for (i = 0; i < arr.length; i++) t += arr[i][1];
+  var acc = 0; for (i = 0; i < arr.length; i++) { acc += arr[i][1]; if (acc >= q * t) return arr[i][0]; }
+  return arr.length ? arr[arr.length - 1][0] : 0;
+}
+function median(arr) { if (!arr.length) return 0; var s = arr.slice().sort(function (a, b) { return a - b; }); var k = s.length >> 1; return s.length % 2 ? s[k] : (s[k - 1] + s[k]) / 2; }
+
+/* ===== Point d'entrée =====
+   g : niveaux de gris (Float32, W*H) ; P : {mode:'round'|'shapes', sens:0..100, pol:'auto'|'dark'|'light', minPct, roi:{x,y,w,h}|null, refArea} */
+function down(g, w, h, k) {
+  var w2 = Math.floor(w / k), h2 = Math.floor(h / k), o = new Float32Array(w2 * h2), q = 1 / (k * k);
+  for (var y = 0; y < h2; y++) for (var dy = 0; dy < k; dy++) {
+    var src = (y * k + dy) * w, dst = y * w2;
+    for (var x = 0; x < w2; x++) { var s = 0, b = src + x * k; for (var dx = 0; dx < k; dx++) s += g[b + dx]; o[dst + x] += s * q; }
+  }
+  return { g: o, w: w2, h: h2 };
+}
+function countParts(g, W, H, P) {
+  var t0 = Date.now();
+  var roi = P.roi && P.roi.w > 8 && P.roi.h > 8 ? P.roi : { x: 0, y: 0, w: W, h: H };
+  var ox = Math.max(0, Math.round(roi.x)), oy = Math.max(0, Math.round(roi.y));
+  var w = Math.min(W - ox, Math.round(roi.w)), h = Math.min(H - oy, Math.round(roi.h));
+  var Lc = crop(g, W, ox, oy, w, h), sc = 1, colour = false, Cc = null;
+  if (g.rn) { // écart à un gris neutre : sépare le métal (peu coloré) des manches, tapis, tasses...
+    var Rr = crop(g.rn, W, ox, oy, w, h), Gg = crop(g.gn, W, ox, oy, w, h); Cc = new Float32Array(w * h);
+    for (var ic = 0; ic < Cc.length; ic++) Cc[ic] = Math.hypot(Rr[ic] - 1 / 3, Gg[ic] - 1 / 3);
+  }
+  // fond franchement coloré (tapis vert, plateau rouge...) : on compte sur l'écart de teinte, insensible aux ombres
+  if (g.rn && P.pol !== 'dark' && P.pol !== 'light') {
+    var R0 = crop(g.rn, W, ox, oy, w, h), G0 = crop(g.gn, W, ox, oy, w, h), br = [], bg2 = [], bw0 = Math.max(2, Math.round(Math.min(w, h) * 0.03));
+    for (var yy = 0; yy < h; yy += 3) for (var xx = 0; xx < w; xx += 3) {
+      if (xx >= bw0 && yy >= bw0 && xx < w - bw0 && yy < h - bw0) continue;
+      br.push(R0[yy * w + xx]); bg2.push(G0[yy * w + xx]);
+    }
+    var mr = median(br), mg = median(bg2), dn = Math.hypot(mr - 1 / 3, mg - 1 / 3);
+    if (dn > 0.08) {
+      colour = true;
+      for (var ii = 0; ii < Lc.length; ii++) { var cd = 900 * Math.hypot(R0[ii] - mr, G0[ii] - mg); Lc[ii] = cd > 255 ? 255 : cd; }
+      var P2 = {}; for (var k0 in P) P2[k0] = P[k0]; P2.pol = 'light'; P = P2;
+    }
+  }
+  // grosses pièces : on travaille sur une image réduite (même résultat, bien plus rapide)
+  if (P.scale) sc = P.scale;
+  else if (Math.min(w, h) >= 240) {
+    var q = down(Lc, w, h, 4), rq = core(q.g, q.w, q.h, { mode: 'shapes', sens: P.sens, pol: P.pol, minPct: P.minPct, quick: 1 });
+    var tfull = 4 * rq.thick;
+    // garde-fou : une "pièce" qui couvre plus de 6 % de l'image = estimation douteuse, on reste en pleine définition
+    if (rq.nComp > 0 && rq.thick >= 3.5 && rq.Aref < 0.06 * q.w * q.h) sc = Math.max(1, Math.min(4, Math.floor(tfull * Math.sqrt(Math.max(5, P.minPct == null ? 30 : P.minPct) / 100) / 9)));
+  }
+  var d = sc > 1 ? down(Lc, w, h, sc) : { g: Lc, w: w, h: h };
+  var Pc = {}; for (var k in P) Pc[k] = P[k];
+  if (P.refArea > 0) Pc.refArea = P.refArea / (sc * sc);
+  Pc.chroma = Cc ? (sc > 1 ? down(Cc, w, h, sc).g : Cc) : null;
+  var r = core(d.g, d.w, d.h, Pc);
+  var M = r.markers;
+  for (var i = 0; i < M.length; i += 3) { M[i] = (M[i] + 0.5) * sc + ox; M[i + 1] = (M[i + 1] + 0.5) * sc + oy; }
+  for (i = 1; i < r.areas.length; i++) r.areas[i] *= sc * sc;
+  r.Aref *= sc * sc; r.autoRef *= sc * sc; r.rref *= sc;
+  for (i = 0; i < r.zones.length; i += 5) for (var zk = 0; zk < 4; zk++) r.zones[i + zk] = r.zones[i + zk] * sc + (zk % 2 ? oy : ox);
+  r.colour = colour; r.sc = sc; r.roi = { x: ox, y: oy, w: w, h: h, lw: d.w, lh: d.h };
+  r.tm.all = Date.now() - t0;
+  return r;
+}
+function core(L0, w, h, P) {
+  var t0 = Date.now(), tm = {};
+  var N = w * h, i, x, y, l;
+  L0 = blur3(L0, w, h);
+  // 1. polarité : le fond est la classe majoritaire sur le pourtour de la zone
+  var hist = new Float64Array(256);
+  for (i = 0; i < N; i += 2) { var v0 = L0[i] | 0; hist[v0 < 0 ? 0 : v0 > 255 ? 255 : v0]++; }
+  var tg = otsu(hist, 256), bw = Math.max(2, Math.round(Math.min(w, h) * 0.02)), nb = 0, nbHi = 0;
+  for (y = 0; y < h; y += 2) for (x = 0; x < w; x += 2) {
+    if (x >= bw && y >= bw && x < w - bw && y < h - bw) continue;
+    nb++; if (L0[y * w + x] > tg) nbHi++;
+  }
+  var autoPol = nbHi > nb / 2 ? 'dark' : 'light';
+  var pol = P.pol === 'dark' || P.pol === 'light' ? P.pol : autoPol;
+  var f = new Float32Array(N);
+  if (pol === 'light') f.set(L0); else for (i = 0; i < N; i++) f[i] = 255 - L0[i];
+  // 2. fond (éclairage non uniforme) : 2 passes
+  var cand = new Uint8Array(N), hf = new Float64Array(256);
+  for (i = 0; i < N; i += 2) { var v1 = f[i] | 0; hf[v1 < 0 ? 0 : v1 > 255 ? 255 : v1]++; }
+  var tf = otsu(hf, 256);
+  for (i = 0; i < N; i++) cand[i] = f[i] < tf ? 1 : 0;
+  var med0 = 0; { var hc = new Float64Array(256), cc = 0; for (i = 0; i < N; i += 3) if (cand[i]) { var v2 = f[i] | 0; hc[v2 < 0 ? 0 : v2]++; cc++; } med0 = histMedian(hc, 0, 256, cc); }
+  var s0 = 0, n0 = 0, s1 = 0, n1 = 0;
+  for (i = 0; i < 256; i++) { if (i < tf) { s0 += i * hf[i]; n0 += hf[i]; } else { s1 += i * hf[i]; n1 += hf[i]; } }
+  var contrast = (n1 ? s1 / n1 : 255) - (n0 ? s0 / n0 : 0);
+  var B = bgGrid(f, w, h, cand, med0, 0.2, 0.6 * contrast), r = new Float32Array(N), T = 0, sigma = 1;
+  for (var pass = 0; pass < 2; pass++) {
+    for (i = 0; i < N; i++) r[i] = f[i] - B[i];
+    var hr = new Float64Array(512);
+    for (i = 0; i < N; i += 2) { var q = Math.round(r[i]) + 256; hr[q < 0 ? 0 : q > 511 ? 511 : q]++; }
+    T = otsu(hr, 512) - 256;
+    // bruit du fond (écart absolu médian)
+    var ha = new Float64Array(256), na = 0;
+    for (i = 0; i < N; i += 3) if (r[i] < T * 0.5) { var aa = Math.abs(r[i]) | 0; ha[aa > 255 ? 255 : aa]++; na++; }
+    sigma = Math.max(1, 1.4826 * histMedian(ha, 0, 256, na));
+    if (pass === 0) {
+      var lim = Math.max(T * 0.5, 2.5 * sigma);
+      for (i = 0; i < N; i++) cand[i] = (r[i] < lim && r[i] > -Math.max(T, 4 * sigma)) ? 1 : 0;
+      B = bgGrid(f, w, h, cand, med0);
+    }
+  }
+  tm.fond = Date.now() - t0;
+  // 3. seuil
+  var sens = P.sens == null ? 50 : P.sens;
+  var k = Math.pow(2, (50 - sens) / 45) * 0.8;
+  var thr = Math.max(T * k, 4 * sigma + 2, 6);
+  // seuil à hystérésis : une zone faiblement contrastée est gardée si elle touche une zone franche
+  var low = Math.max(thr * (P.hyst != null ? P.hyst : pol === 'light' ? 0.45 : 0.8), 3.5 * sigma + 1.5, 4);
+  var m = new Uint8Array(N);
+  for (i = 0; i < N; i++) m[i] = r[i] > low ? 1 : 0;
+  var hl = label(m, w, h, true), strong = new Uint8Array(hl.n + 1), ar0 = new Int32Array(hl.n + 1);
+  for (i = 0; i < N; i++) { var li = hl.L[i]; if (li) { ar0[li]++; if (r[i] > thr) strong[li] = 1; } }
+  for (i = 0; i < N; i++) if (m[i] && !strong[hl.L[i]]) m[i] = 0;
+  function wmedArea(a, n) {
+    var arr = [], tot = 0;
+    for (var l = 1; l <= n; l++) if (a[l] >= 12) { arr.push(a[l]); tot += a[l]; }
+    if (!arr.length) return 0;
+    arr.sort(function (a, b) { return a - b; });
+    // une zone géante (sachet, bord de bac, tache) ne doit pas fixer la taille d'une pièce
+    while (arr.length > 4 && arr[arr.length - 1] > 0.25 * tot) tot -= arr.pop();
+    var acc = 0; for (var j = 0; j < arr.length; j++) { acc += arr[j]; if (acc >= tot / 2) return arr[j]; }
+    return arr[arr.length - 1];
+  }
+  // 4. première estimation de la taille d'une pièce (pour régler le nettoyage)
+  for (l = 1; l <= hl.n; l++) if (!strong[l]) ar0[l] = 0;
+  var Amed = wmedArea(ar0, hl.n);
+  var r0 = Math.sqrt(Math.max(Amed, 1) / Math.PI);
+  var rc = Math.max(1, Math.min(4, Math.round(r0 * 0.07)));
+  // 5. masque final avec morphologie à l'échelle des pièces
+  var mf = erode(dilate(m, w, h, rc), w, h, rc);
+  mf = fillHoles(mf, w, h, Amed * 1.5);
+  mf = dilate(erode(mf, w, h, rc), w, h, rc);
+  var lb = label(mf, w, h, true), S = stats(lb.L, lb.n, w, h);
+  // 5b. objets qui ne ressemblent pas aux pièces : trop unis (étiquette, bord de bac, tasse) ou d'une autre couleur (manches, clés peintes)
+  var cf = compFeat(lb.L, lb.n, L0, P.chroma, w, h), rej = new Uint8Array(lb.n + 1), nrej = 0;
+  (function () {
+    var big = Math.max(12, 0.2 * Amed), tx = [], l;
+    for (l = 1; l <= lb.n; l++) if (S.a[l] >= big) tx.push([cf.tex[l], S.a[l]]);
+    if (P.quick || (tx.length < 2 && !(P.refTex > 0))) return;
+    var pTex = P.refTex > 0 ? P.refTex : wq(tx, 0.75), cr = [];
+    for (l = 1; l <= lb.n; l++) if (S.a[l] >= big && cf.tex[l] >= 0.4 * pTex) cr.push([cf.chr[l], S.a[l]]);
+    var pChr = P.refChr >= 0 && P.refTex > 0 ? P.refChr : (cr.length ? wq(cr, 0.5) : 0);
+    // une autre famille de pièces (laiton parmi l'acier) : au moins 3 zones texturées de même couleur, on les garde
+    var grp = new Uint8Array(lb.n + 1), cand = [];
+    for (l = 1; l <= lb.n; l++) if (S.a[l] >= big && cf.tex[l] >= 0.85 * pTex && Math.abs(cf.chr[l] - pChr) > 0.035) cand.push(l);
+    for (var c1 = 0; c1 < cand.length; c1++) { var nsim = 0; for (var c2 = 0; c2 < cand.length; c2++) if (Math.abs(cf.chr[cand[c1]] - cf.chr[cand[c2]]) < 0.02) nsim++; if (nsim >= 3) grp[cand[c1]] = 1; }
+    function bad(l) { return cf.tex[l] < 0.4 * pTex || (P.chroma && Math.abs(cf.chr[l] - pChr) > 0.035 && !(P.refTex > 0 ? 0 : grp[l])); }
+    // les petites zones ne sont triées que si la photo contient de gros objets étrangers (tasse, chiffon, étiquette...) ou une pièce de référence
+    var clutter = P.refTex > 0;
+    for (l = 1; l <= lb.n && !clutter; l++) if ((S.a[l] >= 3 * Amed && bad(l)) || (S.a[l] >= 2 * Amed && P.chroma && Math.abs(cf.chr[l] - pChr) > 0.06 && !grp[l])) clutter = true;
+    for (l = 1; l <= lb.n; l++) if ((clutter || S.a[l] >= 3 * Amed) && bad(l)) { rej[l] = 1; nrej++; }
+  })();
+  if (nrej) {
+    for (i = 0; i < N; i++) if (rej[lb.L[i]]) mf[i] = 0;
+    lb = label(mf, w, h, true); S = stats(lb.L, lb.n, w, h);
+  }
+  Amed = wmedArea(S.a, lb.n) || Amed;
+  // 6. aire de référence : médiane des zones isolées (compactes, taille proche de la médiane)
+  var sol0 = solidities(lb.L, lb.n, w, h, S), sel = [];
+  for (l = 1; l <= lb.n; l++) if (S.a[l] >= 0.5 * Amed && S.a[l] <= 1.6 * Amed && sol0[l] >= 0.88) sel.push([S.a[l], S.a[l]]);
+  var Aref = sel.length ? wq(sel, 0.5) : Amed; // médiane pondérée par l'aire : les petits débris pèsent moins
+  var autoRef = Aref;
+  if (P.refArea > 0) Aref = P.refArea;
+  if (P.quick) { // épaisseur type d'une pièce (rayon du plus grand disque inscrit)
+    var Dq = edt(mf, w, h), dq = new Float32Array(lb.n + 1), th = [];
+    for (i = 0; i < N; i++) { l = lb.L[i]; if (l && Dq[i] > dq[l]) dq[l] = Dq[i]; }
+    for (l = 1; l <= lb.n; l++) if (S.a[l] >= 0.3 * autoRef) th.push(dq[l]);
+    return { Aref: autoRef, nComp: lb.n, thick: median(th) };
+  }
+  // poussières (une pièce ronde mal détourée garde sa place grâce à son enveloppe)
+  var minA = Math.max(6, (P.minPct == null ? 30 : P.minPct) / 100 * Aref);
+  var keep = new Int32Array(lb.n + 1), nk = 0;
+  for (l = 1; l <= lb.n; l++) {
+    var ha0 = sol0.hulls[l].area;
+    if (S.a[l] >= minA || (P.mode !== 'shapes' && S.a[l] >= 0.12 * Aref && ha0 >= 0.6 * Aref && ha0 <= 1.4 * Aref)) keep[l] = ++nk;
+  }
+  var Lf = new Int32Array(N);
+  for (i = 0; i < N; i++) if (lb.L[i]) Lf[i] = keep[lb.L[i]];
+  for (i = 0; i < N; i++) mf[i] = Lf[i] ? 1 : 0;
+  var S1 = stats(Lf, nk, w, h), sol = new Float32Array(nk + 1); sol.hulls = new Array(nk + 1);
+  for (l = 1; l <= lb.n; l++) if (keep[l]) { sol[keep[l]] = sol0[l]; sol.hulls[keep[l]] = sol0.hulls[l]; }
+  S = S1;
+  var rref = Math.sqrt(Math.max(Aref, 1) / Math.PI);
+  if (P.mode !== 'shapes') {
+    for (l = 1; l <= nk; l++) {
+      var hu = sol.hulls[l];
+      if (sol[l] < 0.9 && S.a[l] >= 0.3 * Aref && hu.area <= 1.35 * Aref && elong(S, l) < 1.5) S.a[l] += fillHull(hu.hp, Lf, mf, l, w, h);
+    }
+  }
+  tm.masque = Date.now() - t0;
+  // 7. transformée de distance
+  var D = edt(mf, w, h);
+  var dmax = new Float32Array(nk + 1), dmaxI = new Int32Array(nk + 1);
+  for (i = 0; i < N; i++) { l = Lf[i]; if (l && D[i] > dmax[l]) { dmax[l] = D[i]; dmaxI[l] = i; } }
+  tm.dist = Date.now() - t0;
+  var mk = [], cnt = new Int32Array(nk + 1);
+  // repères d'un amas de nn pièces : k-moyennes sur ses pixels, départ sur les pics fournis puis points les plus éloignés
+  function kmPlace(l, nn, seeds) {
+    var pts = [], step = Math.max(1, Math.round(Math.sqrt(S.a[l] / 3000))), b, kk;
+    for (y = S.y0[l]; y <= S.y1[l]; y += step) for (x = S.x0[l]; x <= S.x1[l]; x += step) if (Lf[y * w + x] === l) pts.push(x, y);
+    var np = pts.length >> 1;
+    if (!np) return;
+    var cx = [], cy = [], md = new Float64Array(np).fill(1e18);
+    for (kk = 0; kk < seeds.length && kk < nn; kk++) { cx.push(seeds[kk][0]); cy.push(seeds[kk][1]); }
+    if (!cx.length) { cx.push(dmaxI[l] % w); cy.push((dmaxI[l] / w) | 0); }
+    for (kk = 0; kk < cx.length - 1; kk++) for (b = 0; b < np; b++) { var d0x = pts[2 * b] - cx[kk], d0y = pts[2 * b + 1] - cy[kk], d0 = d0x * d0x + d0y * d0y; if (d0 < md[b]) md[b] = d0; }
+    while (cx.length < nn) {
+      var best = -1, bi = 0, lc = cx.length - 1;
+      for (b = 0; b < np; b++) { var ddx = pts[2 * b] - cx[lc], ddy = pts[2 * b + 1] - cy[lc], d2 = ddx * ddx + ddy * ddy; if (d2 < md[b]) md[b] = d2; if (md[b] > best) { best = md[b]; bi = b; } }
+      cx.push(pts[2 * bi]); cy.push(pts[2 * bi + 1]);
+    }
+    var asg = new Int32Array(np);
+    for (var it = 0; it < 15; it++) {
+      var sxk = new Float64Array(nn), syk = new Float64Array(nn), nkk = new Float64Array(nn);
+      for (b = 0; b < np; b++) {
+        var bb = 0, bd = 1e18;
+        for (kk = 0; kk < nn; kk++) { var ex = pts[2 * b] - cx[kk], ey = pts[2 * b + 1] - cy[kk], e2 = ex * ex + ey * ey; if (e2 < bd) { bd = e2; bb = kk; } }
+        asg[b] = bb; sxk[bb] += pts[2 * b]; syk[bb] += pts[2 * b + 1]; nkk[bb]++;
+      }
+      for (kk = 0; kk < nn; kk++) if (nkk[kk]) { cx[kk] = sxk[kk] / nkk[kk]; cy[kk] = syk[kk] / nkk[kk]; }
+    }
+    for (kk = 0; kk < nn; kk++) {
+      // repère posé sur un point bien à l'intérieur, proche du centre du groupe
+      var bs = -1e18, bx = cx[kk] | 0, by = cy[kk] | 0;
+      for (b = 0; b < np; b++) if (asg[b] === kk) { var px2 = pts[2 * b], py2 = pts[2 * b + 1], sc = D[py2 * w + px2] * 0.6 - Math.sqrt((px2 - cx[kk]) * (px2 - cx[kk]) + (py2 - cy[kk]) * (py2 - cy[kk])); if (sc > bs) { bs = sc; bx = px2; by = py2; } }
+      mk.push(bx, by, l);
+    }
+  }
+  if (P.mode !== 'shapes') {
+    // pièces rondes : un maximum de la distance au bord = une pièce
+    var thrD = Math.max(1.5, 0.45 * rref), cands = [];
+    for (y = 1; y < h - 1; y++) for (x = 1, i = y * w + 1; x < w - 1; x++, i++) {
+      var d0 = D[i]; if (d0 < thrD) continue;
+      if (d0 < D[i - 1] || d0 < D[i + 1] || d0 < D[i - w] || d0 < D[i + w] || d0 < D[i - w - 1] || d0 < D[i - w + 1] || d0 < D[i + w - 1] || d0 < D[i + w + 1]) continue;
+      cands.push(i);
+    }
+    cands.sort(function (a, b) { return D[b] - D[a]; });
+    var acc = new Array(nk + 1);
+    for (var c = 0; c < cands.length; c++) {
+      var p = cands[c]; l = Lf[p]; var px = p % w, py = (p / w) | 0, dp = D[p];
+      var A = acc[l] || (acc[l] = []), okp = true;
+      for (var j = 0; j < A.length; j++) {
+        var qx = A[j][0], qy = A[j][1], dd = Math.max(dp, A[j][2]) * 1.3;
+        if ((px - qx) * (px - qx) + (py - qy) * (py - qy) < dd * dd) { okp = false; break; }
+      }
+      if (okp) A.push([px, py, dp]);
+    }
+    for (l = 1; l <= nk; l++) {
+      var Al = acc[l] || [], np0 = Al.length;
+      // amas allongé ou découpé (pièces collées, ombre dans le creux) : l'aire dit combien il y en a
+      var na = Math.round(S.a[l] / Aref), el = elong(S, l);
+      var nn = Math.max(1, np0);
+      if (na > np0 && S.a[l] >= (np0 + 0.75) * Aref && (el >= 1.4 || sol[l] < 0.85)) nn = na;
+      cnt[l] = nn;
+      if (nn === np0) { for (var j2 = 0; j2 < np0; j2++) mk.push(Al[j2][0], Al[j2][1], l); }
+      else if (nn === 1) mk.push(dmaxI[l] % w, (dmaxI[l] / w) | 0, l);
+      else kmPlace(l, nn, Al);
+    }
+  } else {
+    // formes variées : zone isolée = 1 ; amas = aire / aire de référence, repères par k-moyennes
+    for (l = 1; l <= nk; l++) {
+      var nn2 = Math.max(1, Math.round(S.a[l] / Aref));
+      if (sol[l] > 0.93 && S.a[l] < 1.75 * Aref) nn2 = 1;
+      cnt[l] = nn2;
+      if (nn2 === 1) mk.push(dmaxI[l] % w, (dmaxI[l] / w) | 0, l);
+      else kmPlace(l, nn2, []);
+    }
+  }
+  // 8. contours
+  var edge = new Uint8Array(N);
+  for (y = 0; y < h; y++) for (x = 0, i = y * w; x < w; x++, i++) {
+    if (!mf[i]) continue;
+    if (x === 0 || y === 0 || x === w - 1 || y === h - 1 || !mf[i - 1] || !mf[i + 1] || !mf[i - w] || !mf[i + w]) edge[i] = 1;
+  }
+  var areas = new Float64Array(nk + 1); for (l = 1; l <= nk; l++) areas[l] = S.a[l];
+  // 9. grande zone compacte (pièces rangées serrées) : pas de comptage au hasard, on propose le comptage sur une ligne
+  var zones = [], zl = new Uint8Array(nk + 1), cfz = compFeat(Lf, nk, L0, null, w, h), zt = [];
+  for (l = 1; l <= nk; l++) zt.push([cfz.tex[l], S.a[l]]);
+  var zTex = zt.length ? wq(zt, 0.75) : 0;
+  for (l = 1; l <= nk; l++) if (S.a[l] >= 12 * Aref && S.a[l] >= 0.03 * N && sol[l] >= 0.7 && cfz.tex[l] >= 0.7 * zTex) { zl[l] = 1; zones.push(S.x0[l], S.y0[l], S.x1[l] + 1, S.y1[l] + 1, cnt[l]); }
+  if (zones.length) {
+    // autour d'une zone serrée : éclats de reflets et objets coupés par le bord de la photo, pas des pièces
+    for (l = 1; l <= nk; l++) {
+      if (zl[l]) continue;
+      if (S.border[l]) { zl[l] = 1; continue; }
+      var cx0 = (S.x0[l] + S.x1[l]) / 2, cy0 = (S.y0[l] + S.y1[l]) / 2;
+      for (var zz = 0; zz < zones.length; zz += 5) {
+        var mx0 = 0.08 * (zones[zz + 2] - zones[zz]), my0 = 0.08 * (zones[zz + 3] - zones[zz + 1]);
+        if (cx0 > zones[zz] - mx0 && cx0 < zones[zz + 2] + mx0 && cy0 > zones[zz + 1] - my0 && cy0 < zones[zz + 3] + my0) { zl[l] = 1; break; }
+      }
+    }
+    var mk2 = []; for (i = 0; i < mk.length; i += 3) if (!zl[mk[i + 2]]) mk2.push(mk[i], mk[i + 1], mk[i + 2]); mk = mk2;
+  }
+  var cfo = compFeat(Lf, nk, L0, P.chroma, w, h);
+  var out = new Float32Array(mk);
+  tm.total = Date.now() - t0;
+  return { markers: out, labels: Lf, edge: edge, areas: areas, nComp: nk, zones: zones, ctex: cfo.tex, cchr: cfo.chr,
+    pol: pol, autoPol: autoPol, Aref: Aref, autoRef: autoRef, rref: rref, thr: thr, sigma: sigma, tm: tm };
+}
+/* ===== Mode « Pièces rangées » : comptage le long d'un trait ===== */
+function bil(a, W, H, x, y) { // lecture bilinéaire
+  if (x < 0) x = 0; if (y < 0) y = 0; if (x > W - 1.001) x = W - 1.001; if (y > H - 1.001) y = H - 1.001;
+  var x0 = x | 0, y0 = y | 0, tx = x - x0, ty = y - y0, i = y0 * W + x0;
+  return (a[i] * (1 - tx) + a[i + 1] * tx) * (1 - ty) + (a[i + W] * (1 - tx) + a[i + W + 1] * tx) * ty;
+}
+function boxS(a, r) { // moyenne glissante de rayon r
+  var n = a.length, c = new Float64Array(n + 1), o = new Float32Array(n), i;
+  for (i = 0; i < n; i++) c[i + 1] = c[i] + a[i];
+  for (i = 0; i < n; i++) { var lo = Math.max(0, i - r), hi = Math.min(n, i + r + 1); o[i] = (c[hi] - c[lo]) / (hi - lo); }
+  return o;
+}
+function medOf(arr, a, b) { var t = Array.prototype.slice.call(arr, a, b).sort(function (u, v) { return u - v; }); return t.length ? t[t.length >> 1] : 0; }
+function acPeak(y, a, b, lmin, lmax) { // autocorrélation normalisée de y[a..b) ; plus haut pic dans [lmin,lmax]
+  var n = b - a, m = 0, i, L; if (n < 8) return { p: 0, v: -1, ac: null };
+  for (i = a; i < b; i++) m += y[i]; m /= n;
+  var v0 = 0; for (i = a; i < b; i++) v0 += (y[i] - m) * (y[i] - m);
+  if (v0 <= 0) return { p: 0, v: -1, ac: null };
+  lmax = Math.min(lmax, n - 4); var ac = new Float32Array(Math.max(lmax + 2, 3));
+  for (L = 1; L <= lmax + 1 && L < n; L++) { var s = 0; for (i = a; i + L < b; i++) s += (y[i] - m) * (y[i + L] - m); ac[L] = s / v0 * n / (n - L); }
+  var best = -1e9, bp = 0;
+  for (L = Math.max(2, lmin); L <= lmax; L++) if (ac[L] >= ac[L - 1] && ac[L] >= ac[L + 1] && ac[L] > best) { best = ac[L]; bp = L; }
+  // signal très régulier : tous les multiples du pas corrèlent autant ; on garde le plus petit
+  for (L = Math.max(2, lmin); L < bp; L++) if (ac[L] >= ac[L - 1] && ac[L] >= ac[L + 1] && ac[L] >= 0.85 * best) { best = ac[L]; bp = L; break; }
+  var pr = bp;
+  if (bp > 1) { var y1 = ac[bp - 1], y2 = ac[bp], y3 = ac[bp + 1], dn = y1 - 2 * y2 + y3; if (dn < 0) pr = bp + 0.5 * (y1 - y3) / dn; }
+  return { p: pr, v: best, ac: ac };
+}
+/* Pas des pièces le long d'un profil : autocorrélation, puis demi-pas si les pièces alternent tête-bêche */
+function pitchOf(Y, a0, b0, half) {
+  var n = Y.length, Yd = new Float32Array(n), Yb = boxS(Y, Math.max(4, Math.round(n / 12))), i;
+  for (i = 0; i < n; i++) Yd[i] = Y[i] - Yb[i];
+  var pk = acPeak(Yd, a0, b0, 4, Math.round((b0 - a0) / 2)), p = pk.p, ac = pk.ac;
+  for (var it = 0; it < 4 && ac && p > 0; it++) {
+    var vf = ac[Math.round(p)] || pk.v, np = 0;
+    for (var dv = 3; dv >= 2 && !np; dv--) { // tiers puis moitié du pas trouvé
+      var hlo = Math.floor(0.8 * p / dv), hhi = Math.ceil(1.2 * p / dv), hv = -1, hp = 0;
+      if (hlo < 4) continue;
+      for (var L = hlo; L <= hhi && L + 1 < ac.length; L++) if (ac[L] >= ac[L - 1] && ac[L] >= ac[L + 1] && ac[L] > hv) { hv = ac[L]; hp = L; }
+      if (hp && hv > 0.2 && hv >= half * vf) np = hp;
+    }
+    if (np) p = np; else break;
+  }
+  return p;
+}
+/* g : gris (avec g.sat) ; A,B : extrémités du trait (px image de travail) */
+function countLine(g, W, H, A, B, opt) {
+  opt = opt || {};
+  var dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy), n = Math.floor(len) + 1, i, j;
+  var none = { n: 0, marks: [], cuts: [], len: len, p: 0 };
+  if (len < 10) return none;
+  var ux = dx / len, uy = dy / len, nx = -uy, ny = ux, sat = g.sat;
+  function prof(hw) { // profil moyenné en travers du trait (bande de ±hw px)
+    var Y = new Float32Array(n), S = new Float32Array(n), st = Math.max(1, hw / 12);
+    for (var q = 0; q < n; q++) {
+      var cx = A.x + ux * q, cy = A.y + uy * q, sy = 0, ss = 0, k = 0;
+      for (var t = -hw; t <= hw + 1e-6; t += st) { var x = cx + nx * t, y = cy + ny * t; sy += bil(g, W, H, x, y); if (sat) ss += bil(sat, W, H, x, y); k++; }
+      Y[q] = sy / k; S[q] = ss / k;
+    }
+    return { Y: Y, S: S };
+  }
+  var half = opt.half == null ? 0.5 : opt.half;
+  var a0 = Math.round(n * 0.1), b0 = Math.round(n * 0.9);
+  // 1. profil étroit : premier pas et étendue couverte de pièces
+  var hwn = Math.max(3, Math.round(Math.max(W, H) * 0.006)), pn = prof(hwn), Yn = pn.Y, Sn = pn.S;
+  var p1 = pitchOf(Yn, a0, b0, half);
+  if (!(p1 > 0)) return none;
+  // texture : les pièces usinées sont striées (reflets, gorges), le fond est plus uni
+  var Gd = new Float32Array(n); for (i = 1; i < n; i++) Gd[i] = Math.abs(Yn[i] - Yn[i - 1]); Gd[0] = Gd[1] || 0;
+  var Tn = boxS(Gd, Math.max(2, Math.round(p1 / 3)));
+  var F = [Yn, Sn, Tn], q = [], m = [], f, k;
+  for (f = 0; f < 3; f++) { q.push(medOf(F[f], a0, b0)); var dv = []; for (i = a0; i < b0; i++) dv.push(Math.abs(F[f][i] - q[f])); m.push(Math.max(f === 2 ? 1.5 : 6, 1.48 * medOf(dv, 0, dv.length))); }
+  function dist(i, c) { var s2 = 0; for (var f = 0; f < 3; f++) { var z = (F[f][i] - c[f]) / m[f]; s2 += z * z; } return Math.sqrt(s2); }
+  var e = Math.max(2, Math.round(n * 0.03));
+  function edge(fromStart) {
+    var a = fromStart ? 0 : n - e, b = fromStart ? e : n, c = [], k;
+    for (var f = 0; f < 3; f++) c.push(medOf(F[f], a, b));
+    // bout du trait semblable aux pièces : pas de fond, le trait commence sur une pièce
+    var d0 = 0; for (f = 0; f < 3; f++) d0 += ((c[f] - q[f]) / m[f]) * ((c[f] - q[f]) / m[f]);
+    if (Math.sqrt(d0) < 1.2) return fromStart ? 0 : n - 1;
+    var run = Math.max(2, Math.round(0.2 * p1)), isP = new Uint8Array(n);
+    for (k = 0; k < n; k++) isP[k] = dist(k, q) < dist(k, c) ? 1 : 0;
+    for (k = 0; k < n; k++) {
+      var q0 = fromStart ? k : n - 1 - k, cnt = 0;
+      if (!isP[q0]) continue;
+      for (var t = 0; t < run; t++) { var qq = fromStart ? q0 + t : q0 - t; if (qq >= 0 && qq < n && isP[qq]) cnt++; }
+      if (cnt >= 0.7 * run) return q0;
+    }
+    return fromStart ? 0 : n - 1;
+  }
+  var lo = edge(true), hi = edge(false);
+  if (hi - lo < 8) return none;
+  // 2. profil large (≈ longueur d'une pièce) : efface les gorges, les reflets et l'alternance tête-bêche
+  var hw = opt.hw || Math.max(hwn, Math.min(Math.round(1.3 * p1), Math.round(0.12 * Math.max(W, H))));
+  var pw = prof(hw), Y = pw.Y;
+  var aa = Math.max(lo, Math.round(lo + 0.05 * (hi - lo))), bb = Math.min(hi, Math.round(hi - 0.05 * (hi - lo)));
+  var p = pitchOf(Y, aa, bb, half);
+  if (!(p > 0)) p = p1;
+  if (!opt.hw && p < 0.75 * p1 && Math.round(1.3 * p) < hw) { // premier pas doublé : bande trop large, on refait
+    hw = Math.max(hwn, Math.round(1.3 * p)); pw = prof(hw); Y = pw.Y;
+    var p2 = pitchOf(Y, aa, bb, half); if (p2 > 0) p = p2;
+  }
+  // 3. creux (joints entre pièces) : écart sous la moyenne locale
+  var Yl = boxS(Y, 1), Yh = boxS(Y, Math.max(2, Math.round(p * 0.6))), V = new Float32Array(n), vm = 0;
+  for (i = 0; i < n; i++) { V[i] = Math.max(0, Yh[i] - Yl[i]); if (i >= lo && i <= hi && V[i] > vm) vm = V[i]; }
+  if (vm > 0) for (i = 0; i < n; i++) V[i] /= vm;
+  // 4. coupures : programmation dynamique sur (coupure, longueur du dernier intervalle) ; le pas peut dériver (perspective)
+  var alpha = opt.alpha == null ? 10 : opt.alpha, beta = opt.beta == null ? 2 : opt.beta, NEG = -1e18;
+  function dp(P) {
+    var pmn = Math.min(P(lo), P(hi)), pmx = Math.max(P(lo), P(hi));
+    var dmin = Math.max(2, Math.floor(0.5 * pmn)), dmax = Math.ceil(1.6 * pmx), D = dmax - dmin + 1, d, i, j;
+    if (hi - lo < dmin) return [lo, hi];
+    var sc = new Float64Array((hi + 1) * D).fill(NEG), bk = new Int32Array((hi + 1) * D).fill(-1);
+    function pri(s, d) { var l = Math.log(d / P(s)); return beta * l * l; }
+    for (d = dmin; d <= dmax && lo + d <= hi; d++) { i = lo + d; sc[i * D + d - dmin] = (i === hi ? 0 : V[i]) - pri(i - d / 2, d); }
+    for (i = lo + dmin; i <= hi; i++) {
+      var vi = i === hi ? 0 : V[i];
+      for (d = dmin; d <= dmax; d++) {
+        j = i - d; if (j - dmin < lo) break;
+        var bsv = NEG, bd = -1, base = j * D;
+        for (var d2 = dmin; d2 <= dmax; d2++) { var s0 = sc[base + d2 - dmin]; if (s0 <= NEG) continue; var lr = Math.log(d / d2), s1 = s0 - alpha * lr * lr; if (s1 > bsv) { bsv = s1; bd = d2; } }
+        if (bd < 0) continue;
+        var tot = bsv + vi - pri(i - d / 2, d), k2 = i * D + d - dmin;
+        if (tot > sc[k2]) { sc[k2] = tot; bk[k2] = bd; }
+      }
+    }
+    var cuts = [], bestE = NEG, bdE = -1;
+    for (d = dmin; d <= dmax; d++) { var sE = sc[hi * D + d - dmin]; if (sE > bestE) { bestE = sE; bdE = d; } }
+    if (bdE < 0) return [lo, hi];
+    var ci = hi, cd = bdE; cuts.push(ci);
+    while (ci > lo) { var nd = bk[ci * D + cd - dmin]; ci -= cd; cuts.push(ci); if (nd < 0) break; cd = nd; }
+    return cuts.reverse();
+  }
+  function fitP(cuts) { // pas local = droite ajustée sur les intervalles trouvés
+    var mid = (lo + hi) / 2, sw = 0, sx = 0, sy = 0, sxx = 0, sxy = 0, k;
+    for (k = 0; k + 1 < cuts.length; k++) { var X = (cuts[k] + cuts[k + 1]) / 2 - mid, Yv = cuts[k + 1] - cuts[k]; sw++; sx += X; sy += Yv; sxx += X * X; sxy += X * Yv; }
+    var pa = p, pb = 0, den = sw * sxx - sx * sx;
+    if (sw >= 4 && den > 0) { pb = (sw * sxy - sx * sy) / den; pa = (sy - pb * sx) / sw; }
+    else if (sw >= 2) pa = sy / sw;
+    var pl = pa + pb * (lo - mid), ph = pa + pb * (hi - mid);
+    if (!(pl > 0.6 * p && ph > 0.6 * p && pl < 1.6 * p && ph < 1.6 * p)) { pa = p; pb = 0; }
+    return function (s) { return pa + pb * (s - mid); };
+  }
+  var cuts = dp(function () { return p; });
+  cuts = dp(fitP(cuts)); cuts = dp(fitP(cuts));
+  // un bout plus court qu'une demi-pièce n'est pas une pièce (trait arrêté au milieu d'un joint)
+  var marks = [], ls = [];
+  for (i = 0; i + 1 < cuts.length; i++) ls.push(cuts[i + 1] - cuts[i]);
+  var lmed = medOf(ls, 0, ls.length) || p;
+  for (i = 0; i + 1 < cuts.length; i++) {
+    if ((i === 0 || i === cuts.length - 2) && cuts.length > 2 && ls[i] < 0.45 * lmed) continue;
+    var m = (cuts[i] + cuts[i + 1]) / 2; marks.push([A.x + ux * m, A.y + uy * m]);
+  }
+  return { n: marks.length, marks: marks, cuts: cuts.map(function (s) { return [A.x + ux * s, A.y + uy * s]; }), p: p, p0: p1, hw: hw, lo: lo, hi: hi, len: len, prof: opt.debug ? { Y: Y, S: pw.S } : null };
+}
+</script>
+
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+var ALGO = $('algo').textContent;
+var LS = 'mcs-compteur';
+var DEF = { mode: 'round', sens: 50, pol: 'auto', minPct: 30 };
+var set = Object.assign({}, DEF);
+try { var sv = JSON.parse(localStorage.getItem(LS) || 'null'); if (sv && typeof sv === 'object') { ['mode', 'sens', 'pol', 'minPct'].forEach(function (k) { if (sv[k] != null) set[k] = sv[k]; }); } } catch (e) {}
+function saveSet() { try { localStorage.setItem(LS, JSON.stringify(set)); } catch (e) {} }
+
+/* ---------- état ---------- */
+var st = {
+  W: 0, H: 0,            // image de travail
+  disp: null,            // canvas d'affichage (meilleure définition)
+  res: null,             // dernier résultat du calcul
+  roi: null, refArea: 0,
+  removed: [],           // points retirés à la main (coordonnées image de travail)
+  added: [],             // points ajoutés à la main
+  undo: [],
+  view: { s: 1, tx: 0, ty: 0 }, fitS: 1,
+  zoneMode: false, refMode: false,
+  edgeCv: null, items: [], busy: false, reqId: 0, lastMs: 0,
+  lines: [], lineDraw: null, lineId: 0, refTex: 0, refChr: -1   // mode « Pièces rangées » : traits tracés au doigt
+};
+function rowsMode() { return set.mode === 'rows'; }
+
+/* ---------- calcul : Worker depuis un Blob, repli dans la page ---------- */
+var worker = null, local = null, pend = {};
+function makeLocal() {
+  if (!local) { local = {}; (new Function('S', ALGO + '\nS.countParts=countParts;S.grayOf=grayOf;S.countLine=countLine;'))(local); }
+  return local;
+}
+var WSRC = ALGO + '\nvar G=null,GW=0,GH=0;self.onmessage=function(e){var d=e.data;try{if(d.cmd==="load"){G=grayOf(new Uint8ClampedArray(d.buf),d.w,d.h);GW=d.w;GH=d.h;self.postMessage({id:d.id,ok:1});}else if(d.cmd==="count"){var r=countParts(G,GW,GH,d.P);self.postMessage({id:d.id,res:r},[r.markers.buffer,r.labels.buffer,r.edge.buffer]);}else if(d.cmd==="line"){self.postMessage({id:d.id,res:countLine(G,GW,GH,d.A,d.B)});}}catch(err){self.postMessage({id:d.id,err:String(err&&err.message||err)});}};';
+try {
+  worker = new Worker(URL.createObjectURL(new Blob([WSRC], { type: 'text/javascript' })));
+  worker.onmessage = function (e) { var p = pend[e.data.id]; if (!p) return; delete pend[e.data.id]; if (e.data.err) p.rej(new Error(e.data.err)); else p.res(e.data); };
+  worker.onerror = function (e) { e.preventDefault && e.preventDefault(); killWorker(); };
+} catch (e) { worker = null; }
+function killWorker() {
+  if (worker) { try { worker.terminate(); } catch (e) {} }
+  worker = null;
+  var ps = pend; pend = {};
+  Object.keys(ps).forEach(function (k) { ps[k].rej(new Error('worker')); });
+}
+var gLocal = null, msgId = 0;
+function call(msg, transfer) {
+  if (worker) {
+    return new Promise(function (res, rej) {
+      var id = ++msgId; msg.id = id; pend[id] = { res: res, rej: rej };
+      try { worker.postMessage(msg, transfer || []); } catch (e) { delete pend[id]; rej(e); }
+    }).catch(function (e) { killWorker(); return callLocal(msg); });
+  }
+  return new Promise(function (res) { setTimeout(function () { res(callLocal(msg)); }, 30); });
+}
+function callLocal(msg) {
+  var L = makeLocal();
+  if (msg.cmd === 'load') { gLocal = L.grayOf(new Uint8ClampedArray(msg.keep || msg.buf), msg.w, msg.h); return { ok: 1 }; }
+  if (msg.cmd === 'line') return { res: L.countLine(gLocal, st.W, st.H, msg.A, msg.B) };
+  return { res: L.countParts(gLocal, st.W, st.H, msg.P) };
+}
+
+/* ---------- chargement de la photo ---------- */
+var WORK_MAX = 1400, DISP_MAX = 2400;
+function decode(file) {
+  if (window.createImageBitmap) {
+    return createImageBitmap(file, { imageOrientation: 'from-image' }).catch(function () { return createImageBitmap(file); }).catch(imgDecode.bind(null, file));
+  }
+  return imgDecode(file);
+}
+function imgDecode(file) {
+  return new Promise(function (res, rej) {
+    var u = URL.createObjectURL(file), im = new Image();
+    im.onload = function () { res(im); setTimeout(function () { URL.revokeObjectURL(u); }, 2000); };
+    im.onerror = function () { URL.revokeObjectURL(u); rej(new Error('image')); };
+    im.src = u;
+  });
+}
+function loadFile(file) {
+  if (!file) return;
+  var t0 = performance.now();
+  showRes(true); setBusy(true);
+  decode(file).then(function (bmp) {
+    var iw = bmp.width || bmp.naturalWidth, ih = bmp.height || bmp.naturalHeight;
+    if (!iw || !ih) throw new Error('vide');
+    var sw = Math.min(1, WORK_MAX / Math.max(iw, ih)), sd = Math.min(1, DISP_MAX / Math.max(iw, ih));
+    var W = Math.max(1, Math.round(iw * sw)), H = Math.max(1, Math.round(ih * sw));
+    var dc = document.createElement('canvas'); dc.width = Math.round(iw * sd); dc.height = Math.round(ih * sd);
+    var dx = dc.getContext('2d'); dx.imageSmoothingQuality = 'high'; dx.drawImage(bmp, 0, 0, dc.width, dc.height);
+    var wc = document.createElement('canvas'); wc.width = W; wc.height = H;
+    var wx = wc.getContext('2d', { willReadFrequently: true }); wx.imageSmoothingQuality = 'high'; wx.drawImage(dc, 0, 0, W, H);
+    if (bmp.close) bmp.close();
+    var data = wx.getImageData(0, 0, W, H).data;
+    st.W = W; st.H = H; st.disp = dc; st.res = null; st.roi = null; st.refArea = 0; st.refTex = 0; st.refChr = -1; st.lines = []; st.lineDraw = null;
+    st.removed = []; st.added = []; st.undo = []; st.edgeCv = null; st.items = [];
+    setZone(false); setRefMode(false);
+    st.tDecode = performance.now() - t0;
+    var buf = data.buffer, msg = { cmd: 'load', w: W, h: H, buf: buf };
+    if (!worker) msg.keep = buf;
+    return call(msg, worker ? [buf] : []);
+  }).then(function () {
+    sizeCanvas(); fit(); draw();
+    return recount(true);
+  }).then(function () {
+    st.tLoad = performance.now() - t0; if (window.__cpt) window.__cpt.tLoad = st.tLoad;
+    try { $('cRes').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
+  }).catch(function (e) {
+    setBusy(false);
+    warn('Photo illisible. Réessayez avec une autre image.');
+  });
+}
+$('fCam').addEventListener('change', function () { loadFile(this.files && this.files[0]); this.value = ''; });
+$('fFile').addEventListener('change', function () { loadFile(this.files && this.files[0]); this.value = ''; });
+$('bNew').addEventListener('click', function () { $('fCam').click(); });
+
+/* ---------- comptage ---------- */
+function params() { var sh = set.mode === 'shapes'; return { mode: set.mode, sens: +set.sens, pol: set.pol, minPct: +set.minPct, roi: st.roi, refArea: sh ? st.refArea : 0, refTex: sh ? st.refTex : 0, refChr: sh ? st.refChr : -1 }; }
+function recount() {
+  if (!st.W) return Promise.resolve();
+  if (rowsMode()) { ++st.reqId; setBusy(false); rebuild(); draw(); return Promise.resolve(); }
+  var id = ++st.reqId, t0 = performance.now();
+  setBusy(true);
+  return call({ cmd: 'count', P: params() }).then(function (d) {
+    if (id !== st.reqId) return;
+    st.res = d.res; st.lastMs = performance.now() - t0;
+    buildEdges(); rebuild(); setBusy(false); draw();
+  }).catch(function () { if (id === st.reqId) { setBusy(false); warn('Le comptage a échoué sur cette photo.'); } });
+}
+var deb = 0;
+function recountSoon() { clearTimeout(deb); deb = setTimeout(recount, 120); }
+
+function buildEdges() {
+  var r = st.res, c = document.createElement('canvas'); c.width = r.roi.lw; c.height = r.roi.lh;
+  var x = c.getContext('2d'), im = x.createImageData(r.roi.lw, r.roi.lh), d = im.data, e = r.edge;
+  for (var i = 0, p = 0; i < e.length; i++, p += 4) if (e[i]) { d[p] = 255; d[p + 1] = 150; d[p + 2] = 30; d[p + 3] = 235; }
+  x.putImageData(im, 0, 0); st.edgeCv = c;
+}
+/* Liste des repères = automatiques (moins les retirés) + ajoutés, numérotés dans l'ordre de lecture */
+function rebuild() {
+  if (rowsMode()) { rebuildRows(); return; }
+  $('lineList').hidden = true;
+  var r = st.res; if (!r) return;
+  var M = r.markers, n = M.length / 3, used = new Uint8Array(n), items = [], i, j;
+  var rad = Math.max(4, 0.6 * r.rref);
+  var sc = r.sc || 1;
+  function labelAt(x, y) {
+    var lx = Math.floor((x - r.roi.x) / sc), ly = Math.floor((y - r.roi.y) / sc);
+    return lx >= 0 && ly >= 0 && lx < r.roi.lw && ly < r.roi.lh ? r.labels[ly * r.roi.lw + lx] : 0;
+  }
+  st.removed.forEach(function (p) {
+    // repère retiré : on retire, après recomptage, le repère le plus proche dans la même pièce détectée
+    var lab = labelAt(p[0], p[1]), lim = lab ? 4 * rad : 1.6 * rad, bi = -1, bd = lim * lim;
+    for (i = 0; i < n; i++) { if (used[i] || (lab && M[3 * i + 2] !== lab)) continue; var dx = M[3 * i] - p[0], dy = M[3 * i + 1] - p[1], d = dx * dx + dy * dy; if (d < bd) { bd = d; bi = i; } }
+    if (bi >= 0) { used[bi] = 1; items.push({ x: M[3 * bi], y: M[3 * bi + 1], k: 'rm', p: p }); }
+  });
+  var nRmHit = items.length;
+  for (i = 0; i < n; i++) if (!used[i]) items.push({ x: M[3 * i], y: M[3 * i + 1], k: 'auto' });
+  st.added.forEach(function (p) { items.push({ x: p[0], y: p[1], k: 'add', p: p }); });
+  var live = items.filter(function (t) { return t.k !== 'rm'; });
+  var band = Math.max(8, 1.6 * r.rref);
+  live.sort(function (a, b) { var ra = Math.floor(a.y / band), rb = Math.floor(b.y / band); return ra - rb || a.x - b.x; });
+  live.forEach(function (t, k) { t.no = k + 1; });
+  st.items = items;
+  var nAdd = st.added.length, nRm = nRmHit;
+  $('nTot').textContent = live.length;
+  $('nTotU').textContent = live.length > 1 ? 'pièces' : 'pièce';
+  var det = [];
+  if (nAdd) det.push(nAdd + (nAdd > 1 ? ' ajoutées' : ' ajoutée'));
+  if (nRm) det.push(nRm + (nRm > 1 ? ' retirées' : ' retirée'));
+  $('nDet').textContent = det.length ? 'dont ' + det.join(' / ') + ' à la main' : 'Aucune correction à la main';
+  $('bUndo').disabled = !st.undo.length;
+  var w = [];
+  if (!r.nComp) w.push('Aucune pièce trouvée. Essayez « Réglages fins » : couleur des pièces ou sensibilité.');
+  else if (r.nComp > 1500) w.push('Beaucoup de petites taches : fond pas assez uni ? Montez la taille mini ou baissez la sensibilité.');
+  warn(w.join(' '));
+  var nz = r.zones ? r.zones.length / 5 : 0;
+  $('rowsTip').hidden = !nz;
+  if (nz) $('rowsTip').firstChild.textContent = nz > 1 ? 'Pièces serrées en rangées : les zones encadrées ne sont pas comptées.' : 'Pièces serrées en rangées : la zone encadrée n\'est pas comptée.';
+  ecart();
+  window.__cpt = { zones: r.zones ? r.zones.length / 5 : 0, sc: r.sc, total: live.length, auto: n, added: nAdd, removed: nRm, comps: r.nComp, pol: r.pol, ms: st.lastMs, tm: r.tm, Aref: r.Aref, rref: r.rref, W: st.W, H: st.H, tLoad: st.tLoad };
+  document.body.setAttribute('data-count', live.length);
+}
+/* ---------- mode « Pièces rangées » : un trait par rangée ---------- */
+function lineVal(L) { return L.n == null ? 0 : Math.max(0, L.n + L.adj); }
+function rebuildRows() {
+  $('rowsTip').hidden = true;
+  var items = [];
+  st.added.forEach(function (p) { items.push({ x: p[0], y: p[1], k: 'add', p: p }); });
+  items.forEach(function (t) { t.no = '+'; });
+  st.items = items;
+  var tot = 0, parts = [];
+  st.lines.forEach(function (L) { var v = lineVal(L); tot += v; parts.push(L.n == null ? '…' : String(v)); });
+  var nAdd = st.added.length; tot += nAdd;
+  $('nTot').textContent = tot;
+  $('nTotU').textContent = tot > 1 ? 'pièces' : 'pièce';
+  var det = [];
+  if (st.lines.length) det.push(st.lines.length + (st.lines.length > 1 ? ' traits : ' : ' trait : ') + parts.join(' + '));
+  else det.push('Aucun trait tracé');
+  var nAdj = 0; st.lines.forEach(function (L) { nAdj += Math.abs(L.adj); });
+  if (nAdd) det.push(nAdd + (nAdd > 1 ? ' ajoutées' : ' ajoutée') + ' à la main');
+  if (nAdj) det.push(nAdj + ' corrigée' + (nAdj > 1 ? 's' : '') + ' au ±');
+  $('nDet').textContent = det.join(' · ');
+  $('bUndo').disabled = !st.undo.length;
+  renderLines();
+  warn('');
+  ecart();
+  modeMsg();
+  window.__cpt = { mode: 'rows', total: tot, lines: st.lines.map(function (L) { return { n: L.n, adj: L.adj }; }), added: nAdd, W: st.W, H: st.H, tLoad: st.tLoad };
+  document.body.setAttribute('data-count', tot);
+}
+function renderLines() {
+  var ul = $('lineList');
+  ul.hidden = !st.lines.length;
+  var h = '';
+  st.lines.forEach(function (L, i) {
+    var v = L.n == null ? '…' : lineVal(L), ad = L.adj ? ' <small>(' + (L.adj > 0 ? '+' : '−') + Math.abs(L.adj) + ')</small>' : '';
+    h += '<li><span class="ln">Trait ' + (i + 1) + '</span><span class="lc">' + v + ad + '</span>' +
+      '<button type="button" data-a="m" data-i="' + L.id + '" aria-label="Une pièce de moins sur le trait ' + (i + 1) + '">−</button>' +
+      '<button type="button" data-a="p" data-i="' + L.id + '" aria-label="Une pièce de plus sur le trait ' + (i + 1) + '">+</button>' +
+      '<button type="button" class="del" data-a="x" data-i="' + L.id + '" aria-label="Supprimer le trait ' + (i + 1) + '">✕</button></li>';
+  });
+  ul.innerHTML = h;
+}
+function lineById(id) { for (var i = 0; i < st.lines.length; i++) if (st.lines[i].id === id) return i; return -1; }
+$('lineList').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  var i = lineById(+b.getAttribute('data-i')); if (i < 0) return;
+  var L = st.lines[i], a = b.getAttribute('data-a');
+  if (a === 'x') { delLine(i); return; }
+  var d = a === 'p' ? 1 : -1;
+  if (d < 0 && lineVal(L) <= 0) return;
+  L.adj += d; st.undo.push({ t: 'ladj', L: L, d: d }); rebuild(); draw();
+});
+function delLine(i) { var L = st.lines.splice(i, 1)[0]; st.undo.push({ t: 'ldel', L: L, i: i }); rebuild(); draw(); }
+function addLine(A, B) {
+  var L = { id: ++st.lineId, A: A, B: B, n: null, adj: 0, marks: [] };
+  st.lines.push(L); st.undo.push({ t: 'ladd', L: L }); rebuild(); draw();
+  call({ cmd: 'line', A: A, B: B }).then(function (d) {
+    var r = d.res; L.n = r.n; L.marks = r.marks || []; L.p = r.p;
+    rebuild(); draw();
+  }).catch(function () { L.n = 0; warn('Le comptage sur ce trait a échoué.'); rebuild(); draw(); });
+}
+function segDist(p, A, B) { var dx = B.x - A.x, dy = B.y - A.y, l2 = dx * dx + dy * dy, t = l2 ? Math.max(0, Math.min(1, ((p.x - A.x) * dx + (p.y - A.y) * dy) / l2)) : 0; return Math.hypot(p.x - A.x - t * dx, p.y - A.y - t * dy); }
+function warn(t) { $('warn').hidden = !t; $('warn').textContent = t || ''; }
+function ecart() {
+  var v = $('iExp').value.trim(), e = $('ecart');
+  if (v === '' || !st.res) { e.hidden = true; return; }
+  var exp = Math.round(+v), got = +$('nTot').textContent, d = got - exp;
+  e.hidden = false;
+  e.className = 'ecart ' + (d === 0 ? 'ok' : 'ko');
+  e.textContent = d === 0 ? 'Conforme' : d < 0 ? 'Manque ' + (-d) : d + ' en trop';
+}
+$('iExp').addEventListener('input', ecart);
+
+function setBusy(b) { st.busy = b; $('busy').hidden = !b; document.body.setAttribute('data-busy', b ? '1' : '0'); }
+function showRes(b) { $('cRes').hidden = !b; }
+
+/* ---------- affichage ---------- */
+var cv = $('cv'), ctx = cv.getContext('2d'), CW = 0, CH = 0, DPR = 1;
+function sizeCanvas() {
+  var wv = $('viewer').clientWidth || 360;
+  var ar = st.W ? st.H / st.W : 0.75;
+  var maxH = Math.max(260, Math.min(window.innerHeight * 0.66, 760));
+  CW = wv; CH = Math.round(Math.max(240, Math.min(maxH, wv * ar)));
+  DPR = Math.min(3, window.devicePixelRatio || 1);
+  cv.width = Math.round(CW * DPR); cv.height = Math.round(CH * DPR); cv.style.height = CH + 'px';
+}
+function fit() {
+  if (!st.W) return;
+  var s = Math.min(CW / st.W, CH / st.H);
+  st.fitS = s; st.view = { s: s, tx: (CW - st.W * s) / 2, ty: (CH - st.H * s) / 2 };
+}
+function clampView() {
+  var v = st.view, maxS = Math.max(st.fitS * 14, 4);
+  if (v.s < st.fitS) v.s = st.fitS; if (v.s > maxS) v.s = maxS;
+  var iw = st.W * v.s, ih = st.H * v.s;
+  v.tx = iw <= CW ? (CW - iw) / 2 : Math.min(0, Math.max(CW - iw, v.tx));
+  v.ty = ih <= CH ? (CH - ih) / 2 : Math.min(0, Math.max(CH - ih, v.ty));
+}
+function zoomAt(f, sx, sy) {
+  var v = st.view, ix = (sx - v.tx) / v.s, iy = (sy - v.ty) / v.s;
+  v.s *= f; clampView(); v.tx = sx - ix * v.s; v.ty = sy - iy * v.s; clampView(); draw();
+}
+function mR() { // rayon d'un repère à l'écran (px CSS)
+  var r = st.res ? st.res.rref : 10;
+  return Math.max(7, Math.min(16, r * st.view.s * 0.6));
+}
+var raf = 0;
+function draw() { if (!raf) raf = requestAnimationFrame(function () { raf = 0; paint(); }); }
+function paint() {
+  var v = st.view;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = getComputedStyle($('viewer')).backgroundColor || '#111';
+  ctx.fillRect(0, 0, CW, CH);
+  if (!st.disp) return;
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(st.disp, v.tx, v.ty, st.W * v.s, st.H * v.s);
+  if (rowsMode()) { paintRows(); return; }
+  var r = st.res;
+  if (r && st.edgeCv) {
+    ctx.globalAlpha = 0.75;
+    ctx.imageSmoothingEnabled = v.s < 1.5;
+    ctx.drawImage(st.edgeCv, v.tx + r.roi.x * v.s, v.ty + r.roi.y * v.s, r.roi.w * v.s, r.roi.h * v.s);
+    ctx.globalAlpha = 1; ctx.imageSmoothingEnabled = true;
+  }
+  var roi = st.roi;
+  if (roi) shade(roi, 'rgba(0,0,0,.55)');
+  if (st.drag) { ctx.save(); ctx.setLineDash([8, 6]); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd23f'; var d = st.drag; ctx.strokeRect(v.tx + d.x * v.s, v.ty + d.y * v.s, d.w * v.s, d.h * v.s); ctx.restore(); }
+  else if (roi) { ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffd23f'; ctx.strokeRect(v.tx + roi.x * v.s, v.ty + roi.y * v.s, roi.w * v.s, roi.h * v.s); }
+  if (!r) return;
+  if (r.zones) for (var z = 0; z < r.zones.length; z += 5) { // zone de pièces serrées non comptée
+    var zx = v.tx + r.zones[z] * v.s, zy = v.ty + r.zones[z + 1] * v.s, zw = (r.zones[z + 2] - r.zones[z]) * v.s, zh = (r.zones[z + 3] - r.zones[z + 1]) * v.s;
+    ctx.save(); ctx.setLineDash([10, 6]); ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.strokeRect(zx, zy, zw, zh);
+    ctx.lineWidth = 3; ctx.strokeStyle = '#ffd23f'; ctx.strokeRect(zx, zy, zw, zh); ctx.restore();
+    tag('non comptée', zx + 6, zy + 6, '#ffd23f', '#111', 'left');
+  }
+  var R = mR(), showNo = R >= 8.5;
+  setHint('Touchez un repère pour le retirer. Touchez ailleurs pour ajouter une pièce. Deux doigts pour zoomer.' + (showNo ? '' : ' Zoomez pour lire les numéros.'));
+  drawItems(R, showNo);
+}
+function setHint(t) { if (st.hintTxt !== t) { st.hintTxt = t; $('hint').textContent = t; } }
+function tag(txt, x, y, bg, fg, al) { // étiquette lisible sur la photo
+  ctx.font = '600 15px "Barlow Condensed","Arial Narrow",Arial,sans-serif';
+  var w = ctx.measureText(txt).width + 12, h = 22, x0 = al === 'left' ? x : x - w / 2, y0 = al === 'left' ? y : y - h / 2;
+  x0 = Math.max(2, Math.min(CW - w - 2, x0)); y0 = Math.max(2, Math.min(CH - h - 2, y0));
+  ctx.fillStyle = 'rgba(0,0,0,.75)'; ctx.fillRect(x0 - 1.5, y0 - 1.5, w + 3, h + 3);
+  ctx.fillStyle = bg; ctx.fillRect(x0, y0, w, h);
+  ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, x0 + w / 2, y0 + h / 2 + 1);
+}
+function paintRows() {
+  var v = st.view, i, k;
+  function seg(A, B, pend) {
+    var ax = v.tx + A.x * v.s, ay = v.ty + A.y * v.s, bx = v.tx + B.x * v.s, by = v.ty + B.y * v.s;
+    ctx.save(); ctx.lineCap = 'round'; if (pend) ctx.setLineDash([10, 7]);
+    ctx.lineWidth = 7; ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+    ctx.lineWidth = 3.5; ctx.strokeStyle = '#ffd23f'; ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.restore();
+    return { ax: ax, ay: ay, bx: bx, by: by };
+  }
+  for (i = 0; i < st.lines.length; i++) {
+    var L = st.lines[i], e = seg(L.A, L.B, L.n == null);
+    var rr = Math.max(4, Math.min(9, (L.p || 20) * v.s * 0.22));
+    for (k = 0; k < L.marks.length; k++) {
+      var mx = v.tx + L.marks[k][0] * v.s, my = v.ty + L.marks[k][1] * v.s;
+      if (mx < -rr || my < -rr || mx > CW + rr || my > CH + rr) continue;
+      ctx.beginPath(); ctx.arc(mx, my, rr, 0, 2 * Math.PI); ctx.fillStyle = '#2156d9'; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+    }
+    // nombre du trait, posé au-delà de son extrémité de fin
+    var dx = e.bx - e.ax, dy = e.by - e.ay, dl = Math.hypot(dx, dy) || 1;
+    var txt = (i + 1) + ' : ' + (L.n == null ? '…' : lineVal(L));
+    tag(txt, e.bx + dx / dl * 22, e.by + dy / dl * 22, '#ffd23f', '#111', 'center');
+  }
+  if (st.lineDraw) seg(st.lineDraw.A, st.lineDraw.B, false);
+  setHint('Glissez un doigt le long d\'une rangée, de la première à la dernière pièce. Touchez un trait pour le supprimer. Touchez ailleurs pour ajouter une pièce. Deux doigts pour zoomer.');
+  var R = Math.max(7, Math.min(14, 12));
+  drawItems(R, true);
+}
+function drawItems(R, showNo) {
+  var v = st.view;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (var i = 0; i < st.items.length; i++) {
+    var t = st.items[i], x = v.tx + t.x * v.s, y = v.ty + t.y * v.s;
+    if (x < -R || y < -R || x > CW + R || y > CH + R) continue;
+    if (t.k === 'rm') {
+      ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(0,0,0,.7)'; cross(x, y, R * 0.7);
+      ctx.lineWidth = 2.5; ctx.strokeStyle = '#ff4d3d'; cross(x, y, R * 0.7);
+      continue;
+    }
+    var digits = String(t.no).length, rw = showNo && digits > 2 ? R * (0.32 * digits) : 0;
+    ctx.beginPath();
+    if (rw) { ctx.moveTo(x - rw, y - R); ctx.arc(x + rw, y, R, -Math.PI / 2, Math.PI / 2); ctx.arc(x - rw, y, R, Math.PI / 2, 3 * Math.PI / 2); ctx.closePath(); }
+    else ctx.arc(x, y, showNo ? R : Math.max(4, R * 0.6), 0, 2 * Math.PI);
+    ctx.fillStyle = t.k === 'add' ? '#13804a' : '#2156d9';
+    ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(0,0,0,.65)';
+    ctx.beginPath();
+    if (rw) { ctx.moveTo(x - rw, y - R - 1.5); ctx.arc(x + rw, y, R + 1.5, -Math.PI / 2, Math.PI / 2); ctx.arc(x - rw, y, R + 1.5, Math.PI / 2, 3 * Math.PI / 2); ctx.closePath(); }
+    else ctx.arc(x, y, (showNo ? R : Math.max(4, R * 0.6)) + 1.5, 0, 2 * Math.PI);
+    ctx.stroke();
+    if (showNo) {
+      ctx.fillStyle = '#fff';
+      ctx.font = '600 ' + Math.round(R * (digits > 1 ? 1.0 : 1.15)) + 'px "DM Mono",Consolas,"Roboto Mono",monospace';
+      ctx.fillText(t.no, x, y + 0.5);
+    }
+  }
+}
+function cross(x, y, s) { ctx.beginPath(); ctx.moveTo(x - s, y - s); ctx.lineTo(x + s, y + s); ctx.moveTo(x + s, y - s); ctx.lineTo(x - s, y + s); ctx.stroke(); }
+function shade(roi, col) {
+  var v = st.view, x0 = v.tx + roi.x * v.s, y0 = v.ty + roi.y * v.s, x1 = x0 + roi.w * v.s, y1 = y0 + roi.h * v.s;
+  var ix0 = v.tx, iy0 = v.ty, ix1 = v.tx + st.W * v.s, iy1 = v.ty + st.H * v.s;
+  ctx.fillStyle = col;
+  ctx.fillRect(ix0, iy0, ix1 - ix0, y0 - iy0);
+  ctx.fillRect(ix0, y1, ix1 - ix0, iy1 - y1);
+  ctx.fillRect(ix0, y0, x0 - ix0, y1 - y0);
+  ctx.fillRect(x1, y0, ix1 - x1, y1 - y0);
+}
+
+/* ---------- gestes : tap, zoom deux doigts, déplacement, zone ---------- */
+var ptr = new Map(), g = null;
+function pos(e) { var b = cv.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; }
+function toImg(p) { var v = st.view; return { x: (p.x - v.tx) / v.s, y: (p.y - v.ty) / v.s }; }
+cv.addEventListener('pointerdown', function (e) {
+  if (!st.W) return;
+  try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+  var p = pos(e); ptr.set(e.pointerId, p);
+  if (ptr.size === 1) {
+    g = { t0: performance.now(), x0: p.x, y0: p.y, multi: false, moved: false, v0: Object.assign({}, st.view), zone: st.zoneMode, line: rowsMode() && !st.zoneMode && !st.refMode };
+  } else if (ptr.size === 2 && g) {
+    g.multi = true; st.drag = null; if (st.lineDraw) { st.lineDraw = null; draw(); }
+    var a = Array.from(ptr.values());
+    g.d0 = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) || 1;
+    g.m0 = { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2 };
+    g.v0 = Object.assign({}, st.view);
+  }
+  e.preventDefault();
+});
+cv.addEventListener('pointermove', function (e) {
+  if (!ptr.has(e.pointerId) || !g) return;
+  var p = pos(e); ptr.set(e.pointerId, p);
+  if (ptr.size >= 2) {
+    var a = Array.from(ptr.values()), d = Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) || 1, m = { x: (a[0].x + a[1].x) / 2, y: (a[0].y + a[1].y) / 2 };
+    var v0 = g.v0, ix = (g.m0.x - v0.tx) / v0.s, iy = (g.m0.y - v0.ty) / v0.s;
+    st.view.s = v0.s * d / g.d0; clampView();
+    st.view.tx = m.x - ix * st.view.s; st.view.ty = m.y - iy * st.view.s; clampView(); draw();
+    return;
+  }
+  var dx = p.x - g.x0, dy = p.y - g.y0;
+  if (!g.moved && Math.hypot(dx, dy) > 10) g.moved = true;
+  if (!g.moved) return;
+  if (g.line && !g.multi) { // mode rangées : un doigt trace le trait
+    st.lineDraw = { A: toImg({ x: g.x0, y: g.y0 }), B: toImg(p) }; draw();
+  } else if (g.zone && !g.multi) {
+    var a0 = toImg({ x: g.x0, y: g.y0 }), a1 = toImg(p);
+    var x0 = Math.max(0, Math.min(a0.x, a1.x)), y0 = Math.max(0, Math.min(a0.y, a1.y));
+    var x1 = Math.min(st.W, Math.max(a0.x, a1.x)), y1 = Math.min(st.H, Math.max(a0.y, a1.y));
+    st.drag = { x: x0, y: y0, w: Math.max(0, x1 - x0), h: Math.max(0, y1 - y0) }; draw();
+  } else {
+    st.view.tx = g.v0.tx + dx; st.view.ty = g.v0.ty + dy; clampView(); draw();
+  }
+});
+function endPtr(e, cancel) {
+  if (!ptr.has(e.pointerId)) return;
+  ptr.delete(e.pointerId);
+  if (!g) return;
+  if (ptr.size === 1) { // il reste un doigt après le zoom : on continue en déplacement, sans tap
+    var p = Array.from(ptr.values())[0]; g.x0 = p.x; g.y0 = p.y; g.v0 = Object.assign({}, st.view); g.moved = true; g.zone = false; g.line = false; st.lineDraw = null; return;
+  }
+  if (ptr.size > 0) return;
+  var gg = g; g = null;
+  if (cancel) { st.drag = null; st.lineDraw = null; draw(); return; }
+  if (gg.line && gg.moved && !gg.multi && st.lineDraw) {
+    var ld = st.lineDraw; st.lineDraw = null;
+    var sl = Math.hypot(ld.B.x - ld.A.x, ld.B.y - ld.A.y) * st.view.s;
+    if (sl >= 30) addLine(clampPt(ld.A), clampPt(ld.B));
+    draw(); return;
+  }
+  if (gg.zone && gg.moved && !gg.multi && st.drag) {
+    var d = st.drag; st.drag = null;
+    if (d.w >= 20 && d.h >= 20) { st.roi = { x: Math.round(d.x), y: Math.round(d.y), w: Math.round(d.w), h: Math.round(d.h) }; setZone(false); recount(); }
+    draw(); return;
+  }
+  if (!gg.multi && !gg.moved && performance.now() - gg.t0 < 800) tap(pos(e));
+}
+cv.addEventListener('pointerup', function (e) { endPtr(e, false); });
+cv.addEventListener('pointercancel', function (e) { endPtr(e, true); });
+cv.addEventListener('wheel', function (e) { if (!st.W) return; e.preventDefault(); var p = pos(e); zoomAt(Math.exp(-e.deltaY * 0.0015), p.x, p.y); }, { passive: false });
+cv.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+$('zIn').addEventListener('click', function () { zoomAt(1.6, CW / 2, CH / 2); });
+$('zOut').addEventListener('click', function () { zoomAt(1 / 1.6, CW / 2, CH / 2); });
+$('zFit').addEventListener('click', function () { fit(); draw(); });
+
+function clampPt(q) { return { x: Math.max(0, Math.min(st.W - 1, q.x)), y: Math.max(0, Math.min(st.H - 1, q.y)) }; }
+function tap(p) {
+  if (!st.W || (!st.res && !rowsMode()) || st.busy) return;
+  var ip = toImg(p);
+  if (ip.x < 0 || ip.y < 0 || ip.x >= st.W || ip.y >= st.H) return;
+  if (st.refMode) { pickRef(ip); return; }
+  if (st.zoneMode) return;
+  var v = st.view;
+  if (rowsMode()) { // touche sur un trait : on le supprime
+    var bi = -1, bdl = 18 / v.s;
+    st.lines.forEach(function (L, i) { var d = segDist(ip, L.A, L.B); if (d < bdl) { bdl = d; bi = i; } });
+    if (bi >= 0) { delLine(bi); return; }
+  }
+  var hit = Math.max((rowsMode() ? 12 : mR()) + 6, 16) / v.s, best = null, bd = hit * hit;
+  st.items.forEach(function (t) { var dx = t.x - ip.x, dy = t.y - ip.y, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = t; } });
+  if (best && best.k === 'auto') { var pt = [best.x, best.y]; st.removed.push(pt); st.undo.push({ t: 'rm', p: pt }); }
+  else if (best && best.k === 'rm') { st.removed.splice(st.removed.indexOf(best.p), 1); st.undo.push({ t: 'unrm', p: best.p }); }
+  else if (best && best.k === 'add') { var ia = st.added.indexOf(best.p); st.added.splice(ia, 1); st.undo.push({ t: 'unadd', p: best.p }); }
+  else { var np = [ip.x, ip.y]; st.added.push(np); st.undo.push({ t: 'add', p: np }); }
+  rebuild(); draw();
+}
+$('bUndo').addEventListener('click', function () {
+  var a = st.undo.pop(); if (!a) return;
+  if (a.t === 'rm') st.removed.splice(st.removed.indexOf(a.p), 1);
+  else if (a.t === 'unrm') st.removed.push(a.p);
+  else if (a.t === 'add') st.added.splice(st.added.indexOf(a.p), 1);
+  else if (a.t === 'unadd') st.added.push(a.p);
+  else if (a.t === 'roi') { st.roi = a.p; setZone(false); rebuild(); draw(); recount(); return; }
+  else if (a.t === 'ref') { st.refArea = a.p; st.refTex = a.tx || 0; st.refChr = a.cr == null ? -1 : a.cr; refUi(); rebuild(); draw(); recount(); return; }
+  else if (a.t === 'ladd') { var il = st.lines.indexOf(a.L); if (il >= 0) st.lines.splice(il, 1); }
+  else if (a.t === 'ldel') st.lines.splice(Math.min(a.i, st.lines.length), 0, a.L);
+  else if (a.t === 'ladj') a.L.adj -= a.d;
+  rebuild(); draw();
+});
+
+/* ---------- zone à compter ---------- */
+function setZone(on) {
+  st.zoneMode = on; $('bZone').setAttribute('aria-pressed', on ? 'true' : 'false');
+  if (on) setRefMode(false);
+  $('bAll').hidden = !st.roi || rowsMode();
+  modeMsg();
+}
+$('bZone').addEventListener('click', function () { setZone(!st.zoneMode); });
+$('bAll').addEventListener('click', function () { st.undo.push({ t: 'roi', p: st.roi }); st.roi = null; setZone(false); draw(); recount(); });
+var _rs = recount;
+recount = function () { $('bAll').hidden = !st.roi || rowsMode(); return _rs.apply(null, arguments); };
+
+/* ---------- pièce de référence ---------- */
+function setRefMode(on) { st.refMode = on; $('bRef').setAttribute('aria-pressed', on ? 'true' : 'false'); if (on && st.zoneMode) { st.zoneMode = false; $('bZone').setAttribute('aria-pressed', 'false'); } modeMsg(); }
+function refUi() {
+  var sh = set.mode === 'shapes', rw = rowsMode();
+  $('bZone').hidden = rw; if (rw) { $('bAll').hidden = true; }
+  else $('bAll').hidden = !st.roi;
+  $('bRef').hidden = !sh; $('bRefX').hidden = !(sh && st.refArea > 0);
+  $('bRef').textContent = st.refArea > 0 ? 'Changer la référence' : 'Pièce de référence';
+}
+function modeMsg() {
+  var m = $('modeMsg');
+  if (st.zoneMode) { m.hidden = false; m.textContent = 'Tracez au doigt le rectangle à compter.'; }
+  else if (st.refMode) { m.hidden = false; m.textContent = 'Touchez une pièce seule, bien détourée.'; }
+  else if (rowsMode() && st.W && !st.lines.length) { m.hidden = false; m.textContent = 'Tracez au doigt un trait sur une rangée, de la première à la dernière pièce.'; }
+  else m.hidden = true;
+}
+$('bRef').addEventListener('click', function () { setRefMode(!st.refMode); });
+$('bRefX').addEventListener('click', function () { st.undo.push({ t: 'ref', p: st.refArea, tx: st.refTex, cr: st.refChr }); st.refArea = 0; st.refTex = 0; st.refChr = -1; refUi(); recount(); });
+function pickRef(ip) {
+  var r = st.res, sc = r.sc || 1, lx = Math.floor((ip.x - r.roi.x) / sc), ly = Math.floor((ip.y - r.roi.y) / sc), best = 0, bd = 1e9;
+  var rad = Math.max(2, Math.round(12 / (st.view.s * sc)));
+  for (var dy = -rad; dy <= rad; dy++) for (var dx = -rad; dx <= rad; dx++) {
+    var x = lx + dx, y = ly + dy; if (x < 0 || y < 0 || x >= r.roi.lw || y >= r.roi.lh) continue;
+    var l = r.labels[y * r.roi.lw + x]; if (l && dx * dx + dy * dy < bd) { bd = dx * dx + dy * dy; best = l; }
+  }
+  setRefMode(false);
+  if (!best) { warn('Pas de pièce à cet endroit. Touchez une pièce détourée en orange.'); return; }
+  st.undo.push({ t: 'ref', p: st.refArea, tx: st.refTex, cr: st.refChr });
+  st.refArea = r.areas[best]; st.refTex = r.ctex ? r.ctex[best] : 0; st.refChr = r.cchr ? r.cchr[best] : -1; refUi(); recount();
+}
+
+/* ---------- réglages ---------- */
+function segUi(id, val) { Array.prototype.forEach.call($(id).querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-v') === val ? 'true' : 'false'); }); }
+function setUi() { segUi('segMode', set.mode); segUi('segPol', set.pol); $('rSens').value = set.sens; $('rMin').value = set.minPct; $('vMin').textContent = set.minPct + ' %'; refUi(); }
+function setMode(m) { set.mode = m; if (set.mode !== 'shapes') setRefMode(false); if (rowsMode()) setZone(false); saveSet(); setUi(); modeMsg(); draw(); recount(); }
+$('segMode').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; setMode(b.getAttribute('data-v')); });
+$('bRows').addEventListener('click', function () { setMode('rows'); try { $('viewer').scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (er) {} });
+$('segPol').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; set.pol = b.getAttribute('data-v'); saveSet(); setUi(); recount(); });
+$('rSens').addEventListener('input', function () { set.sens = +this.value; saveSet(); recountSoon(); });
+$('rMin').addEventListener('input', function () { set.minPct = +this.value; $('vMin').textContent = set.minPct + ' %'; saveSet(); recountSoon(); });
+$('bDef').addEventListener('click', function () { var md = set.mode; set = Object.assign({}, DEF, { mode: md }); saveSet(); setUi(); recount(); });
+setUi();
+
+var lastVW = 0;
+window.addEventListener('resize', function () {
+  if (!st.W) return;
+  var wv = $('viewer').clientWidth;
+  if (wv === lastVW) return; // la barre d'adresse du téléphone qui bouge ne doit pas défaire le zoom
+  lastVW = wv; sizeCanvas(); fit(); draw();
+});
+// accès de contrôle (tests automatiques) : lecture seule de l'état
+window.__compteur = {
+  load: loadFile,
+  state: function () {
+    var v = st.view;
+    return { W: st.W, H: st.H, view: { s: v.s, tx: v.tx, ty: v.ty }, fitS: st.fitS, roi: st.roi, refArea: st.refArea, zone: st.zoneMode, ref: st.refMode,
+      items: st.items.map(function (t) { return { x: t.x, y: t.y, k: t.k, no: t.no, sx: v.tx + t.x * v.s, sy: v.ty + t.y * v.s }; }),
+      lines: st.lines.map(function (L) { return { A: L.A, B: L.B, n: L.n, adj: L.adj, marks: L.marks }; }), mode: set.mode,
+      cpt: window.__cpt, worker: !!worker, ptrs: ptr.size };
+  }
+};
+})();
+</script>
+</body>
+</html>

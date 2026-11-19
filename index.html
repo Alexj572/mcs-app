@@ -465,6 +465,7 @@ document.dispatchEvent(new Event('firebaseReady'));
     <button onclick="goTo('stats')" id="nav-stats">📊 Stats</button>
     <button onclick="goTo('devis')" id="nav-devis" class="hidden">💰 Devis Pièce</button>
     <button onclick="goTo('usinage')" id="nav-usinage" class="hidden">🔧 Aide à l'usinage</button>
+    <button onclick="goTo('compteur')" id="nav-compteur">📷 Compteur de pièces</button>
     <div class="nav-spacer"></div>
     <button onclick="goTo('settings')" id="nav-settings" class="nav-settings hidden">⚙️ Paramètres</button>
   </nav>
@@ -1036,7 +1037,7 @@ function doLogout(){
 document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 
 // ── NAV ───────────────────────────────────────────────
-const PAGE_TITLES={'home':'Accueil','fiche-new':'Nouvelle Fiche','fiche-edit':'Modifier','fiche-view':'Fiche','fiches':'Fiches','devis':'Devis','usinage':"Aide à l'usinage",'stats':'Statistiques','settings':'Paramètres','machines':'Machines'};
+const PAGE_TITLES={'home':'Accueil','fiche-new':'Nouvelle Fiche','fiche-edit':'Modifier','fiche-view':'Fiche','fiches':'Fiches','devis':'Devis','usinage':"Aide à l'usinage",'compteur':'Compteur de pièces','stats':'Statistiques','settings':'Paramètres','machines':'Machines'};
 function updateBottomNav(page){
   // Boutons header nav
   const btnBack=document.getElementById('btn-back');
@@ -1078,7 +1079,7 @@ function goTo(page,data){
 }
 
 function _navigateTo(page,data){
-  ['home','fiche','fiches','stats','settings','devis','usinage'].forEach(p=>{
+  ['home','fiche','fiches','stats','settings','devis','usinage','compteur'].forEach(p=>{
     const btn=document.getElementById('nav-'+p);
     if(btn)btn.classList.remove('active');
   });
@@ -1088,6 +1089,7 @@ function _navigateTo(page,data){
   else if(page==='stats'){if(!canTab('accessStats')){toast('Accès non autorisé','error');return;}const b=document.getElementById('nav-stats');if(b)b.classList.add('active')}
   else if(page==='devis'){if(!canDo('accessDevis')){toast('Accès non autorisé','error');return;}const b=document.getElementById('nav-devis');if(b)b.classList.add('active')}
   else if(page==='usinage'){if(!canTab('accessUsinage')){toast('Accès non autorisé','error');return;}const b=document.getElementById('nav-usinage');if(b)b.classList.add('active')}
+  else if(page==='compteur'){const b=document.getElementById('nav-compteur');if(b)b.classList.add('active')}
   else if(page==='settings'){
     if(!currentUser||currentUser.role!=='admin'){toast("Accès réservé à l'administrateur",'error');return;}
     const b=document.getElementById('nav-settings');if(b)b.classList.add('active');
@@ -1104,6 +1106,7 @@ function _navigateTo(page,data){
   else if(page==='fiche-view')main.innerHTML=renderFicheView(data);
   else if(page==='devis')main.innerHTML=renderDevis();
   else if(page==='usinage')main.innerHTML=renderUsinage();
+  else if(page==='compteur')main.innerHTML=renderCompteur();
   else if(page==='stats')main.innerHTML=renderStats();
   else if(page==='settings')main.innerHTML=renderSettings();
 }
@@ -1152,6 +1155,10 @@ function renderHome(){
         <div class="home-btn-icon">🔧</div>
         <div class="home-btn-text"><strong>Aide à l'usinage</strong><span>Filetages, circlips, tolérances, clavettes, dégagements, coupe</span></div>
       </button>`:''}
+      <button class="home-btn green" onclick="goTo('compteur')">
+        <div class="home-btn-icon">📷</div>
+        <div class="home-btn-text"><strong>Compteur de pièces</strong><span>Prendre en photo et compter les pièces</span></div>
+      </button>
       ${canDo('accessDevis')?`<button class="home-btn orange" onclick="goTo('devis')">
         <div class="home-btn-icon">💰</div>
         <div class="home-btn-text"><strong>Devis Pièce</strong><span>Calculer un devis</span></div>
@@ -1170,7 +1177,7 @@ function renderHome(){
         ${localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair'}
       </button>
     </div>
-    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 17</div>
+    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 18</div>
   </div>`;
 }
 
@@ -1184,6 +1191,12 @@ function renderDevis(){
 function renderUsinage(){
   return`<div style="width:100%;height:calc(100vh - 100px);display:flex;flex-direction:column;overflow:hidden">
     <iframe id="usinage-frame" name="usinage-frame" src="MCS_Usinage.html?v=24" style="flex:1;border:none;width:100%;min-height:600px" title="Aide à l'usinage" allow="same-origin"></iframe>
+  </div>`;
+}
+// ── COMPTEUR DE PIECES ────────────────────────────────
+function renderCompteur(){
+  return`<div style="width:100%;height:calc(100vh - 100px);display:flex;flex-direction:column;overflow:hidden">
+    <iframe id="compteur-frame" name="compteur-frame" src="MCS_Compteur.html?v=1" style="flex:1;border:none;width:100%;min-height:600px" title="Compteur de pièces" allow="same-origin"></iframe>
   </div>`;
 }
 function printDevis(){
