@@ -125,6 +125,26 @@ label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.05em;tex
 .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
 .close-btn{background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1}.close-btn:hover{color:var(--text)}
 /* LIGHTBOX */
+/* VIGNETTES LISTE + CAMERA */
+.fl-thumb{position:relative;flex:none;width:56px;height:56px;padding:0;border-radius:8px;border:1px solid var(--border);overflow:hidden;background:var(--bg3);cursor:zoom-in;display:block;font-family:inherit}
+.fl-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.fl-thumb:hover{border-color:var(--accent)}
+.fl-thumb-more{position:absolute;right:2px;bottom:2px;background:rgba(0,0,0,.72);color:#fff;font-size:10px;font-weight:700;line-height:1;padding:2px 5px;border-radius:8px}
+.fl-thumb-pdf{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.04em}
+.fl-thumb-empty{flex:none;width:56px;height:56px;border-radius:8px;border:1px dashed var(--border);opacity:.45;box-sizing:border-box}
+.fl-desig{display:flex;align-items:center;gap:12px}
+.fl-desig-txt{min-width:0}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:48px;height:72px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:38px;line-height:1;border-radius:10px;cursor:pointer;z-index:2001;padding:0 0 4px}
+#lb-prev{left:12px}#lb-next{right:12px}
+#cam-modal{position:fixed;inset:0;z-index:2100;background:#000;display:flex;flex-direction:column;color:#fff}
+#cam-stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;background:#000}
+#cam-video,#cam-still{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;background:#000}
+#cam-count{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:6px 14px;border-radius:16px;font-size:14px;font-weight:600;white-space:nowrap}
+#cam-bar{flex:none;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;padding:14px 16px max(14px,env(safe-area-inset-bottom));background:rgba(0,0,0,.85)}
+#cam-bar button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:15px;font-weight:600;padding:12px 18px;border-radius:10px;cursor:pointer;white-space:nowrap;font-family:inherit}
+#cam-bar button#cam-shut{width:76px;height:76px;padding:0;border-radius:50%;background:#fff;border:6px solid rgba(255,255,255,.45);background-clip:padding-box}
+#cam-bar button#cam-keep{background:var(--green2,#1f8a44);border-color:transparent}
+@media(max-width:768px){.fl-thumb,.fl-thumb-empty{width:48px;height:48px}.fl-thumb-mob{margin-right:0}}
 #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
 #lightbox img{max-width:92vw;max-height:88vh;border-radius:8px;box-shadow:0 0 60px rgba(0,0,0,.8);cursor:default}
 #lb-bar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:8px;z-index:2001}
@@ -417,11 +437,30 @@ document.dispatchEvent(new Event('firebaseReady'));
 <!-- LIGHTBOX -->
 <div id="lightbox" class="hidden" onclick="closeLightbox()">
   <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button type="button" id="lb-prev" class="lb-nav hidden" onclick="event.stopPropagation();lbNav(-1)" aria-label="Image précédente">‹</button>
   <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
+  <button type="button" id="lb-next" class="lb-nav hidden" onclick="event.stopPropagation();lbNav(1)" aria-label="Image suivante">›</button>
   <div id="lb-bar" onclick="event.stopPropagation()">
     <button type="button" onclick="rotatePhoto(-90)" title="Tourner à gauche">⟲ Gauche</button>
     <button type="button" onclick="rotatePhoto(90)" title="Tourner à droite">⟳ Droite</button>
     <button type="button" onclick="printCurrentPhoto()">🖨️ Imprimer</button>
+  </div>
+</div>
+
+<!-- CAMERA -->
+<div id="cam-modal" class="hidden" role="dialog" aria-label="Prendre une photo">
+  <div id="cam-stage">
+    <video id="cam-video" autoplay playsinline muted></video>
+    <img id="cam-still" class="hidden" alt="">
+    <div id="cam-count" class="hidden"></div>
+  </div>
+  <div id="cam-bar">
+    <button type="button" id="cam-switch" class="hidden" onclick="camSwitch()">🔄 Changer de caméra</button>
+    <button type="button" id="cam-shut" onclick="camShoot()" aria-label="Prendre la photo"></button>
+    <button type="button" id="cam-retake" class="hidden" onclick="camRetake()">↩ Reprendre</button>
+    <button type="button" id="cam-keep" class="hidden" onclick="camKeep()">✓ Garder</button>
+    <button type="button" id="cam-cancel" onclick="camClose()">Annuler</button>
+    <button type="button" id="cam-done" class="hidden" onclick="camClose()">Terminé</button>
   </div>
 </div>
 
@@ -883,16 +922,44 @@ function openLightbox(src,rot){
   _lb={src,rot:rot||0,ficheId:null,idx:-1,name:''};
   document.getElementById('lightbox-img').src=src;applyLbRot();
   document.getElementById('lightbox').classList.remove('hidden');
+  updateLbNav();
+}
+function ficheImgIdx(f){const r=[];((f&&f.files)||[]).forEach((fl,i)=>{if(fl&&fl.type&&fl.type.startsWith('image/')&&(fl.url||fl.data))r.push(i)});return r}
+function updateLbNav(){
+  const f=_lb&&_lb.ficheId?getFiche(_lb.ficheId):null,n=f?ficheImgIdx(f).length:0;
+  ['lb-prev','lb-next'].forEach(id=>document.getElementById(id).classList.toggle('hidden',n<2));
+}
+function lbNav(d){
+  if(!_lb||!_lb.ficheId)return;
+  const f=getFiche(_lb.ficheId),l=ficheImgIdx(f),p=l.indexOf(_lb.idx);if(l.length<2||p<0)return;
+  openPhoto(_lb.ficheId,l[(p+d+l.length)%l.length]);
 }
 function openPhoto(ficheId,i){
   const f=getFiche(ficheId),fl=f&&f.files&&f.files[i];if(!fl)return;
-  openLightbox(fl.url||fl.data,fl.rot);_lb.ficheId=ficheId;_lb.idx=i;_lb.name=fl.name||'';
+  openLightbox(fl.url||fl.data,fl.rot);_lb.ficheId=ficheId;_lb.idx=i;_lb.name=fl.name||'';updateLbNav();
+}
+// Vignette de la liste : ouvre la visionneuse (image) ou le fichier (PDF) sans ouvrir la fiche
+function thumbClick(ev,ficheId,i){
+  if(ev)ev.stopPropagation();
+  const f=getFiche(ficheId),fl=f&&f.files&&f.files[i];if(!fl)return;
+  if(fl.type&&fl.type.startsWith('image/'))openPhoto(ficheId,i);else openFile(fl.url||fl.data,fl.type);
+}
+function ficheThumb(f){
+  const files=(f.files||[]).filter(Boolean),imgs=ficheImgIdx(f);
+  if(imgs.length){
+    const i=imgs[0],fl=f.files[i],src=fl.url||fl.data;
+    return`<button type="button" class="fl-thumb" onclick="thumbClick(event,'${f.id}',${i})" title="Voir le plan" aria-label="Voir le plan"><img src="${escH(src)}" alt="" loading="lazy" decoding="async" style="${rotCss(fl.rot)}">${imgs.length>1?`<span class="fl-thumb-more">+${imgs.length-1}</span>`:''}</button>`;
+  }
+  const pi=(f.files||[]).findIndex(fl=>fl&&(fl.url||fl.data)&&(((fl.type||'').indexOf('pdf')>=0)||/\.pdf$/i.test(fl.name||'')));
+  if(pi>=0)return`<button type="button" class="fl-thumb fl-thumb-pdf" onclick="thumbClick(event,'${f.id}',${pi})" title="Ouvrir le PDF" aria-label="Ouvrir le PDF">PDF</button>`;
+  return`<span class="fl-thumb-empty"></span>`;
 }
 function closeLightbox(){
   const wasOpen=!document.getElementById('lightbox').classList.contains('hidden');
   document.getElementById('lightbox').classList.add('hidden');
   document.getElementById('lightbox-img').src='';
   if(wasOpen&&_lb&&_lb.ficheId&&currentPage==='fiche-view'){const y=window.scrollY;document.getElementById('main').innerHTML=renderFicheView(currentFicheId);window.scrollTo(0,y);}
+  else if(wasOpen&&_lb&&_lb.ficheId&&currentPage==='fiches'){const y=window.scrollY;applyAndRender();window.scrollTo(0,y);}
   _lb=null;
 }
 let _rotT=null;
@@ -990,7 +1057,10 @@ async function doDupFiche(id){
     if(made.length===1)goTo('fiche-view',made[0].id);else goTo('fiches');
   }catch(e){console.error(e);ok.disabled=false;ok.textContent='📄 Dupliquer';toast((made.length?made.length+' copie(s) créée(s), puis ':'')+'échec : vérifiez la connexion','error');}
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(_cam)camClose();else closeLightbox();}
+  else if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&_lb&&_lb.ficheId&&!document.getElementById('lightbox').classList.contains('hidden'))lbNav(e.key==='ArrowLeft'?-1:1);
+});
 
 // ── AUTH ──────────────────────────────────────────────
 async function doLogin(){
@@ -1177,7 +1247,7 @@ function renderHome(){
         ${localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair'}
       </button>
     </div>
-    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 18</div>
+    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 19</div>
   </div>`;
 }
 
@@ -1420,7 +1490,7 @@ function renderTablePaged(list){
   const tableHtml=`<table class="fiches-table"><thead><tr><th></th><th style="cursor:pointer;user-select:none" onclick="toggleSort('designation')">Désignation${sortIcon('designation')}</th><th style="cursor:pointer;user-select:none" onclick="toggleSort('machine')">Machine${sortIcon('machine')}</th><th style="cursor:pointer;user-select:none" onclick="toggleSort('client')">Client${sortIcon('client')}</th><th style="cursor:pointer;user-select:none" onclick="toggleSort('matiere')">Matière${sortIcon('matiere')}</th><th style="cursor:pointer;user-select:none" onclick="toggleSort('date')">Date${sortIcon('date')}</th><th style="width:80px">Actions</th></tr></thead><tbody>
   ${paged.map(f=>{const m=getMachine(f.machineId)||{color:'#888',nom:'?'};return`<tr onclick="goTo('fiche-view','${f.id}')">
     <td style="padding:0;width:4px"><div style="width:4px;height:100%;min-height:48px;background:${m.color};border-radius:4px 0 0 4px"></div></td>
-    <td><strong>${f.designation||'—'}</strong><br><span style="color:var(--text2);font-size:12px">${f.planRef||'—'}</span></td>
+    <td><div class="fl-desig">${ficheThumb(f)}<div class="fl-desig-txt"><strong>${f.designation||'—'}</strong><br><span style="color:var(--text2);font-size:12px">${f.planRef||'—'}</span></div></div></td>
     <td><span class="machine-badge" style="background:${m.color}30;color:${txtC(m.color)};border:1px solid ${m.color}50">${m.nom}</span></td>
     <td>${f.client||'—'}</td><td>${f.matiere||'—'}</td><td style="white-space:nowrap">${fmt(f.date)}</td>
     <td onclick="event.stopPropagation()" style="white-space:nowrap">
@@ -1433,6 +1503,7 @@ function renderTablePaged(list){
     const m=getMachine(f.machineId)||{color:'#888',nom:'?'};
     return`<div class="mobile-fiche-card" onclick="goTo('fiche-view','${f.id}')">
       <div class="mobile-fiche-left" style="background:${m.color}"></div>
+      ${ficheThumb(f)}
       <div class="mobile-fiche-body">
         <div class="mobile-fiche-name">${f.designation||f.planRef||'Sans titre'}</div>
         ${f.designation&&f.planRef?`<div class="mobile-fiche-ref" style="font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">N° ${f.planRef}</div>`:''}
@@ -1638,6 +1709,7 @@ function renderFicheForm(ficheId,initData){
       <div style="font-weight:600">Cliquer pour ajouter des fichiers</div>
       <div style="font-size:12px;color:var(--text2);margin-top:4px">Images JPG/PNG · PDF</div>
     </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="btn btn-primary" style="flex:1 1 220px;justify-content:center" onclick="camOpen()">📷 Prendre une photo</button></div>
     <div id="file-preview" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start">
       ${existingFiles.map((fl,i)=>{const src=fl.url||fl.data||'';return fl.type&&fl.type.startsWith('image/')&&src
         ?`<div class="img-thumb-wrap" id="exist-file-${i}"><img src="${src}" alt="${fl.name}" style="${rotCss(fl.rot)}" onclick="openLightbox('${src}',${fl.rot||0})"><div class="img-zoom-badge">🔍</div><button class="del-thumb" onclick="removeExistingFile(${i})" title="Supprimer">✕</button></div>`
@@ -1826,6 +1898,120 @@ async function deleteStorageFile(url){
     await window.fbDeleteObject(fileRef);
   }catch(e){console.warn('deleteStorageFile',e);}
 }
+
+// ── PRISE DE PHOTO (caméra intégrée) ───────────────────
+let _cam=null;
+function camFallback(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('capture','environment');
+  inp.onchange=()=>{if(inp.files&&inp.files.length)handleFiles(inp.files)};
+  try{inp.click()}catch(e){}
+}
+function camStop(){
+  if(_cam&&_cam.stream)_cam.stream.getTracks().forEach(t=>{try{t.stop()}catch(e){}});
+  const v=document.getElementById('cam-video');if(v)v.srcObject=null;
+}
+function camUi(mode){ // 'live' | 'review'
+  const live=mode==='live',n=_cam?_cam.count:0,$=id=>document.getElementById(id);
+  $('cam-video').classList.toggle('hidden',!live);$('cam-still').classList.toggle('hidden',live);
+  $('cam-shut').classList.toggle('hidden',!live);
+  $('cam-switch').classList.toggle('hidden',!live||!_cam||_cam.devs.length<2);
+  $('cam-retake').classList.toggle('hidden',live);$('cam-keep').classList.toggle('hidden',live);
+  $('cam-cancel').classList.toggle('hidden',!live||n>0);$('cam-done').classList.toggle('hidden',!live||n===0);
+  $('cam-count').classList.toggle('hidden',n===0);
+  $('cam-count').textContent=n+(n>1?' photos ajoutées':' photo ajoutée');
+}
+async function camGet(deviceId){
+  const base={width:{ideal:2560},height:{ideal:1920}};
+  const vid=deviceId?Object.assign({deviceId:{exact:deviceId}},base):Object.assign({facingMode:{ideal:'environment'}},base);
+  try{return await navigator.mediaDevices.getUserMedia({video:vid});}
+  catch(e){
+    if(e&&e.name==='OverconstrainedError')return await navigator.mediaDevices.getUserMedia({video:true});
+    throw e;
+  }
+}
+async function camStart(deviceId,tok){
+  camStop();
+  const stream=await camGet(deviceId);
+  if(!_cam||_cam.tok!==tok){stream.getTracks().forEach(t=>t.stop());return false;}
+  _cam.stream=stream;
+  const v=document.getElementById('cam-video');v.srcObject=stream;
+  try{await v.play()}catch(e){}
+  return true;
+}
+async function camOpen(){
+  if(_cam)return;
+  if(!window.isSecureContext||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){camFallback();return;}
+  const tok={};_cam={tok,stream:null,devs:[],cur:null,count:0,shot:null,url:null,hist:false};
+  document.getElementById('cam-modal').classList.remove('hidden');
+  try{history.pushState({mcsCam:1},'');_cam.hist=true}catch(e){}
+  camUi('live');
+  try{
+    await camStart(null,tok);if(!_cam||_cam.tok!==tok)return;
+    let cur=(_cam.stream.getVideoTracks()[0].getSettings()||{});
+    try{
+      const all=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='videoinput');
+      _cam.devs=all;
+      if(all.length>1){
+        // l'arrière par défaut : libellé, sinon (si facingMode ignoré) la dernière de la liste
+        let want=all.find(d=>/back|rear|arri[eè]re|environment/i.test(d.label));
+        if(!want&&cur.facingMode!=='environment')want=all[all.length-1];
+        if(want&&want.deviceId&&want.deviceId!==cur.deviceId){
+          try{await camStart(want.deviceId,tok);if(!_cam||_cam.tok!==tok)return;}
+          catch(e){await camStart(null,tok);if(!_cam||_cam.tok!==tok)return;}
+        }
+      }
+    }catch(e){}
+    _cam.cur=(_cam.stream.getVideoTracks()[0].getSettings()||{}).deviceId||null;
+    camUi('live');
+  }catch(e){
+    if(!_cam||_cam.tok!==tok)return;
+    const n=e&&e.name;
+    camClose();
+    if(n==='NotAllowedError'||n==='SecurityError'||n==='PermissionDeniedError')toast('Accès à la caméra refusé : autorisez-le dans les réglages du navigateur','error');
+    else if(n==='NotFoundError'||n==='DevicesNotFoundError')toast('Aucune caméra détectée sur cet appareil','error');
+    else toast('Caméra indisponible : choisissez la photo dans les fichiers','error');
+    camFallback();
+  }
+}
+async function camSwitch(){
+  if(!_cam||_cam.devs.length<2)return;
+  const i=_cam.devs.findIndex(d=>d.deviceId===_cam.cur),nx=_cam.devs[(i+1)%_cam.devs.length],tok=_cam.tok;
+  try{await camStart(nx.deviceId,tok);if(_cam&&_cam.tok===tok)_cam.cur=nx.deviceId;}
+  catch(e){if(_cam&&_cam.tok===tok){toast('Cette caméra ne s\'ouvre pas','error');try{await camStart(_cam.cur,tok)}catch(e2){}}}
+}
+function camShoot(){
+  const v=document.getElementById('cam-video');
+  if(!_cam||!v.videoWidth)return;
+  const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+  c.toBlob(b=>{
+    if(!b||!_cam){return;}
+    if(_cam.url)URL.revokeObjectURL(_cam.url);
+    _cam.shot=b;_cam.url=URL.createObjectURL(b);
+    document.getElementById('cam-still').src=_cam.url;camUi('review');
+  },'image/jpeg',0.92);
+}
+function camRetake(){
+  if(!_cam)return;
+  if(_cam.url){URL.revokeObjectURL(_cam.url);_cam.url=null}
+  _cam.shot=null;document.getElementById('cam-still').removeAttribute('src');camUi('live');
+}
+function camKeep(){
+  if(!_cam||!_cam.shot)return;
+  const d=new Date(),p=n=>String(n).padStart(2,'0');
+  const name='photo-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+'.jpg';
+  const file=new File([_cam.shot],name,{type:'image/jpeg'});
+  _cam.count++;handleFiles([file]);camRetake();
+}
+function camClose(fromPop){
+  if(!_cam)return;
+  const c=_cam;camStop();_cam=null;
+  if(c.url)URL.revokeObjectURL(c.url);
+  document.getElementById('cam-modal').classList.add('hidden');
+  document.getElementById('cam-still').removeAttribute('src');
+  if(!fromPop&&c.hist&&history.state&&history.state.mcsCam){try{history.back()}catch(e){}}
+}
+window.addEventListener('popstate',()=>{if(_cam)camClose(true)});
 
 function handleFiles(files){
   for(const file of files){
