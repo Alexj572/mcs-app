@@ -168,12 +168,40 @@ main{max-width:1240px;margin:0 auto;padding:10px 12px 20px}
 .mrow{display:flex;align-items:center;gap:8px;padding:6px 0}
 .mlbl{font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;min-width:48px}
 input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
-.mpct{font-family:'Arial Narrow','Roboto Condensed','Liberation Sans Narrow',Arial,sans-serif;font-size:17px;font-weight:800;color:var(--blue2);min-width:38px;text-align:right}
+.mbox{display:flex;align-items:center;gap:3px;flex-shrink:0}
+.mbox input{width:60px;text-align:right;padding:3px 6px;font-family:'Arial Narrow','Roboto Condensed','Liberation Sans Narrow',Arial,sans-serif;font-size:16px;font-weight:800;color:var(--blue2)}
+.mbox span{font-size:13px;font-weight:800;color:var(--blue2)}
+.mhint{font-size:10px;color:var(--t2);line-height:1.4;margin:-2px 0 4px}
+label.mp-sw{display:inline-flex;align-items:center;gap:5px;text-transform:none;letter-spacing:0;font-size:10px;font-weight:600;color:var(--t2);cursor:pointer;margin:0 0 4px}
+label.mp-sw input{width:auto;margin:0;accent-color:var(--blue2);cursor:pointer}
+.mp-box{display:none;border:1px solid var(--rowbrd);border-radius:6px;padding:5px 8px;margin:0 0 6px;background:var(--mbg)}
+.mp-box.on{display:block}
+.mp-row{display:flex;align-items:center;gap:5px;padding:2px 0}
+.mp-row span{flex:1;min-width:0;font-size:11px;color:var(--t2)}
+.mp-row input{width:58px;flex-shrink:0;text-align:right;padding:3px 6px}
+.mp-row i{font-style:normal;font-size:10px;color:var(--t2)}
+.mp-row.chg span{color:var(--orange2);font-weight:700}
+.mp-row.chg span::after{content:' · modifié';font-weight:400;font-size:9px}
+.mp-row.chg input{border-color:var(--orange2)}
+.mp-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;padding-top:4px;border-top:1px solid var(--rowbrd);font-size:10px;color:var(--t2)}
+.mp-foot .btn{padding:4px 9px;font-size:10px}
+/* sous-traitance */
+.st-row{display:grid;grid-template-columns:1fr 72px 112px 26px;gap:4px;align-items:center;padding:3px 0}
+.st-row input,.st-row select{font-size:11px;padding:4px 6px}
+.st-row .st-mt{text-align:right}
+.st-x{width:26px;height:26px;border:1px solid var(--brd);border-radius:5px;background:transparent;color:var(--t2);cursor:pointer;font-size:12px;line-height:1}
+.st-x:hover{border-color:var(--red2);color:var(--red2)}
+.st-add{padding:4px 10px;font-size:10px;margin-top:3px}
+.st-none{font-size:10px;color:var(--t2);padding:2px 0}
 
 /* DECOMPO */
 .deco{display:grid;grid-template-columns:1fr auto;gap:0 8px;font-size:10px;line-height:1.9;color:var(--t2)}
 .dv{font-family:'Arial Narrow','Roboto Condensed','Liberation Sans Narrow',Arial,sans-serif;font-size:12px;color:var(--tx)}
 .dbar{grid-column:1/-1;height:1px;background:var(--rowbrd);margin:2px 0}
+.deco.d3{grid-template-columns:1fr auto auto;gap:0 10px}
+.deco .dh{font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:right;line-height:1.6}
+.deco small,.ps-deco small{font-size:9px;font-weight:700;color:var(--orange2);white-space:nowrap}
+.deco .dr{font-style:italic}
 
 /* SIDE COL */
 .side{display:flex;flex-direction:column;gap:8px}
@@ -189,6 +217,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 
 @media(max-width:860px){.g2,.mat-bloc{grid-template-columns:1fr}}
 @media(max-width:600px){.g3{grid-template-columns:1fr 1fr}.mat-bloc{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.st-row{grid-template-columns:1fr 64px 26px}.st-row select{grid-column:1/3;grid-row:2}}
 
 /* ════════════════════════════
    RÉSUMÉ PDF/IMPRESSION
@@ -233,6 +262,10 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 .ps-deco{display:grid;grid-template-columns:1fr auto;font-size:10px;line-height:1.8;color:#333}
 .ps-deco .dv{font-weight:700;color:#111;font-family:'Arial Narrow',Arial,sans-serif;font-size:11px;text-align:right}
 .ps-deco .dbar{grid-column:1/-1;height:1px;background:#bbc;margin:2px 0}
+.ps-deco.d3{grid-template-columns:1fr auto auto;column-gap:10px}
+.ps-deco .dh{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:right;color:#333}
+.ps-deco small{color:#8a4200}
+.ps-deco .dr{font-style:italic}
 .ps-marge{display:flex;justify-content:space-between;align-items:center;padding:4px 0;margin-bottom:3px;border-bottom:1px solid #dde}
 .ps-marge span:first-child{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#333}
 .ps-marge span:last-child{font-family:'Arial Narrow',Arial,sans-serif;font-size:18px;font-weight:800;color:#234a9e}
@@ -406,6 +439,11 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
         <div class="ps-row"><span class="pl">Investissement prod.</span><span class="pr" id="ps-invest">—</span></div>
         <div class="ps-row"><span class="pl">Mise en place cmd.</span><span class="pr" id="ps-mep">—</span></div>
       </div>
+
+      <div class="ps-sec s-purple" id="ps-stsec" style="display:none">
+        <div class="ps-stitle" style="color:#5b2ca6">🏭 Sous-traitance</div>
+        <div id="ps-stl"></div>
+      </div>
     </div>
 
     <!-- col droite : résultats + décompo + temps -->
@@ -413,22 +451,24 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 
       <div class="ps-sec s-green">
         <div class="ps-stitle" style="color:#17663a">📊 Résultats</div>
-        <div class="ps-marge"><span>Marge appliquée</span><span id="ps-marge">0%</span></div>
+        <div class="ps-marge"><span>Marge sur le coût</span><span id="ps-marge">0 %</span></div>
+        <div class="ps-row" id="ps-mprow" style="display:none"><span class="pl">Marge par poste</span><span class="pr" id="ps-mp" style="text-align:right">—</span></div>
         <div class="ps-row"><span class="pl">Matière / pièce</span><span class="pr" id="ps-rmp">—</span></div>
         <div class="ps-row"><span class="pl">Matière / commande</span><span class="pr" id="ps-rmc">—</span></div>
         <div class="ps-row"><span class="pl">Usinage Tour / pièce</span><span class="pr" id="ps-rtp">—</span></div>
         <div class="ps-row"><span class="pl">Usinage Fraisage / pièce</span><span class="pr" id="ps-rfp">—</span></div>
         <div class="ps-row"><span class="pl">Coûts annexes / pièce</span><span class="pr" id="ps-rann">—</span></div>
+        <div class="ps-row"><span class="pl">Sous-traitance / pièce</span><span class="pr" id="ps-rst">—</span></div>
         <div class="ps-row"><span class="pl" style="font-weight:600">Coût brut / pièce</span><span class="pr" id="ps-rbrut">—</span></div>
         <div style="height:1px;background:#999;margin:4px 0"></div>
-        <div class="ps-row hi"><span class="pl">TARIF PIÈCE</span><span class="pr" id="ps-rtp2">—</span></div>
-        <div class="ps-row hii"><span class="pl">TARIF COMMANDE</span><span class="pr" id="ps-rtc">—</span></div>
-        <div class="ps-row hgain"><span class="pl">📈 Gains sur commande</span><span class="pr" id="ps-rgain">—</span></div>
+        <div class="ps-row hi"><span class="pl">TARIF PIÈCE HT</span><span class="pr" id="ps-rtp2">—</span></div>
+        <div class="ps-row hii"><span class="pl">TARIF COMMANDE HT</span><span class="pr" id="ps-rtc">—</span></div>
+        <div class="ps-row hgain"><span class="pl">📈 Gain sur commande HT</span><span class="pr" id="ps-rgain">—</span></div>
       </div>
 
       <div class="ps-sec s-red">
-        <div class="ps-stitle" style="color:#a3261c">🔍 Décomposition / Pièce</div>
-        <div class="ps-deco" id="ps-deco">—</div>
+        <div class="ps-stitle" style="color:#a3261c">🔍 Décomposition / Pièce (HT)</div>
+        <div class="ps-deco d3" id="ps-deco">—</div>
       </div>
 
       <div class="ps-sec s-purple">
@@ -438,7 +478,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 
     </div>
   </div>
-  <div class="ps-footer">Devis généré par MCS — Mécanique Concept Saar · <span id="ps-footer-date"></span></div>
+  <div class="ps-footer">Prix hors taxes (HT) · Devis généré par MCS — Mécanique Concept Saar · <span id="ps-footer-date"></span></div>
 </div>
 <!-- FIN BLOC IMPRESSION -->
 
@@ -695,6 +735,15 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
           <td class="tl">Mise en place cmd. <span class="cbadge">€ commande</span></td>
           <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="mep" placeholder="0" step="1" oninput="cx()"></td>
         </tr>
+
+        <tr class="sep"><td colspan="2">🏭 Sous-traitance</td></tr>
+        <tr>
+          <td colspan="2" style="padding:3px 0 2px">
+            <div id="stList"></div>
+            <div class="st-none" id="stNone">Traitement thermique, traitement de surface, rectification…</div>
+            <button class="btn bg st-add" onclick="stAdd()">＋ Ajouter une sous-traitance</button>
+          </td>
+        </tr>
       </table>
     </div>
 
@@ -708,21 +757,36 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
         <div class="trow"><span class="tlbl">Usinage Tour / pièce</span><span class="tval" id="r-tp">—</span></div>
         <div class="trow"><span class="tlbl">Usinage Fraisage / pièce</span><span class="tval" id="r-fp">—</span></div>
         <div class="trow"><span class="tlbl">Coûts annexes / pièce</span><span class="tval" id="r-ann">—</span></div>
+        <div class="trow"><span class="tlbl">Sous-traitance / pièce</span><span class="tval" id="r-st">—</span></div>
         <div class="trow"><span class="tlbl" style="font-weight:600;color:var(--tx)">Coût brut / pièce</span><span class="tval" id="r-brut">—</span></div>
         <div class="dv2"></div>
         <div class="mrow">
           <span class="mlbl">Marge</span>
-          <input type="range" id="mSlider" min="0" max="60" value="0" oninput="um()">
-          <span class="mpct" id="mPct">0%</span>
+          <input type="range" id="mSlider" min="0" max="100" step="1" value="0" oninput="um()" aria-label="Marge">
+          <span class="mbox"><input type="text" inputmode="decimal" autocomplete="off" id="mIn" value="0" oninput="umT()" onchange="mgShow()" aria-label="Marge en %"><span>%</span></span>
         </div>
-        <div class="trow big"><span class="tlbl">TARIF PIÈCE</span><span class="tval" id="r-tp2">—</span></div>
-        <div class="trow cmd2"><span class="tlbl">TARIF COMMANDE</span><span class="tval" id="r-tc">—</span></div>
-        <div class="trow gain"><span class="tlbl">📈 Gains commande</span><span class="tval" id="r-gain">—</span></div>
+        <div class="mhint" id="mHint">Sans marge : prix = coût</div>
+        <label class="mp-sw"><input type="checkbox" id="mpOn" onchange="mpTg()"> Marge par poste</label>
+        <div class="mp-box" id="mpBox">
+          <div class="mp-row" data-k="usi"><span>Usinage (tour + fraisage)</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="mat"><span>Matière</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="ctrl"><span>Contrôle</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="transp"><span>Transport</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="embal"><span>Emballage</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="outils"><span>Outillage</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="divers"><span>Divers</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="inv"><span>Invest. + mise en place</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-row" data-k="st"><span>Sous-traitance</span><input type="text" inputmode="decimal" autocomplete="off" oninput="mpIn(this)" onblur="mpRef()"><i>%</i></div>
+          <div class="mp-foot"><span id="mpN">Tous au taux général</span><button class="btn bg" id="mpRaz" onclick="mpRaz()">↺ Tout au taux général</button></div>
+        </div>
+        <div class="trow big"><span class="tlbl">TARIF PIÈCE HT</span><span class="tval" id="r-tp2">—</span></div>
+        <div class="trow cmd2"><span class="tlbl">TARIF COMMANDE HT</span><span class="tval" id="r-tc">—</span></div>
+        <div class="trow gain"><span class="tlbl">📈 Gain sur commande HT</span><span class="tval" id="r-gain">—</span></div>
       </div>
 
       <div class="card c-red">
-        <div class="st">Décomposition / Pièce</div>
-        <div class="deco" id="deco">—</div>
+        <div class="st">Décomposition / Pièce (HT)</div>
+        <div class="deco d3" id="deco">—</div>
       </div>
 
       <div class="card c-purple">
@@ -744,7 +808,11 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 </main>
 
 <script>
-let shape='rond', density=null, matNom=null, marge=0;
+let shape='rond', density=null, matNom=null;
+/* Marge = coefficient sur le coût : 20 % -> prix = coût × 1,20.
+   margeG : taux général (%) ; mp : taux modifiés par poste (%) ; mpOn : réglage par poste actif */
+let margeG=0, mpOn=false, mp={};
+const POSTES=[['usi','Usinage'],['mat','Matière'],['ctrl','Contrôle'],['transp','Transport'],['embal','Emballage'],['outils','Outillage'],['divers','Divers'],['inv','Invest. + MEP'],['st','Sous-traitance']];
 let poidsP=null, R=null; // poids exact d'une pièce (kg), derniers résultats
 const PRINT_COPY=document.documentElement.hasAttribute('data-print-copy');
 function pad2(n){return String(n).padStart(2,'0');}
@@ -753,6 +821,10 @@ function num(v){if(v===''||v===null||v===undefined)return null;const x=parseFloa
 function r2(v){const x=Number(Math.round(v+'e2')+'e-2');return isFinite(x)?x:Math.round(v*100)/100;}
 function hm(v){const t=Math.round(v*60),h=Math.floor(t/60),m=t-h*60;return h+'h '+pad2(m)+'min';}
 function nf(v){return String(v).replace('.',',');}
+function pct(x){return nf(String(Math.round(x*100)/100));}
+function coefT(x){return nf((Math.round((100+x)*100)/10000).toFixed(4).replace(/0{1,2}$/,''));}
+function clampM(x){return Math.max(0,Math.min(1000,x));}
+function mRate(k){return mpOn&&(k in mp)?mp[k]:margeG;}
 
 document.addEventListener('DOMContentLoaded',()=>{
   const d=new Date();
@@ -867,26 +939,31 @@ function calc(){
   const divers=gv('divers')/qte;
   const inv=(gv('invest')+gv('mep'))/qte;
   const ann=ctrl+transp+embal+outils+divers+inv;
-  const brut=matP+tourP+fraiseP+ann;
-  const tP=r2(marge<1?brut/(1-marge):brut), tC=tP*qte, gain=tC-brut*qte;
-  return {pKg,pPiece,qte,tauxT,regT,tpT,hCycleT,hTotT,tourP,tauxF,regF,tpF,hCycleF,hTotF,fraiseP,matP,matCmd,ctrl,transp,embal,outils,divers,inv,ann,brut,tP,tC,gain};
+  // sous-traitance : montant par pièce, ou forfait commande réparti sur la quantité
+  const stL=stGet().map(x=>{const a=num(x.mt);if(!a)return null;const cmd=x.mode==='cmd';return {lib:x.lib.trim(),cmd,mt:a,c:cmd?a/qte:a};}).filter(Boolean);
+  const stP=stL.reduce((a,x)=>a+x.c,0);
+  const brut=matP+tourP+fraiseP+ann+stP;
+  // postes : coût / pièce × (1 + marge du poste)
+  const L=[['usi','Tour',tourP],['usi','Fraisage',fraiseP],['mat','Matière',matP],['ctrl','Contrôle',ctrl],['transp','Transport',transp],
+    ['embal','Emballage',embal],['outils','Outillage',outils],['divers','Divers',divers],['inv','Invest.+MEP',inv]].map(([k,l,c])=>({k,l,c}));
+  stL.forEach(x=>L.push({k:'st',l:'S-T'+(x.lib?' : '+x.lib:''),c:x.c}));
+  L.forEach(x=>{x.m=mRate(x.k);x.p=x.c*(1+x.m/100);});
+  const mpAct=mpOn&&Object.keys(mp).some(k=>mp[k]!==margeG);
+  const tP=r2(L.reduce((a,x)=>a+x.p,0)), tC=tP*qte, gain=tC-brut*qte;
+  return {pKg,pPiece,qte,tauxT,regT,tpT,hCycleT,hTotT,tourP,tauxF,regF,tpF,hCycleF,hTotF,fraiseP,matP,matCmd,ctrl,transp,embal,outils,divers,inv,ann,stL,stP,brut,L,mpAct,tP,tC,gain};
 }
 function cx(){
   R=calc();
-  const {pPiece,qte,regT,hCycleT,hTotT,tourP,regF,hCycleF,hTotF,fraiseP,matP,matCmd,ctrl,transp,embal,outils,divers,inv,ann,brut,tP,tC,gain}=R;
+  const {pPiece,qte,regT,hCycleT,hTotT,tourP,regF,hCycleF,hTotF,fraiseP,matP,matCmd,ann,stP,brut,tP,tC,gain}=R;
   document.getElementById('pCmd').value=pPiece>0?(pPiece*qte).toFixed(3):'';
 
   s('r-mp',f(matP)); s('r-mc',f(matCmd));
   s('r-tp',f(tourP)); s('r-fp',f(fraiseP));
-  s('r-ann',f(ann)); s('r-brut',f(brut));
+  s('r-ann',f(ann)); s('r-st',f(stP)); s('r-brut',f(brut));
   s('r-tp2',f(tP)); s('r-tc',f(tC)); s('r-gain',f(gain));
 
-  document.getElementById('deco').innerHTML=[
-    ['Matière',matP],['Tour',tourP],['Fraisage',fraiseP],
-    ['Contrôle',ctrl],['Transport',transp],['Emballage',embal],
-    ['Outillage',outils],['Divers',divers],['Invest.+MEP',inv]
-  ].map(([l,v2])=>`<span>${l}</span><span class="dv">${f(v2)}</span>`).join('')+
-  `<span class="dbar"></span><span class="dbar"></span><span style="font-weight:700;color:var(--tx)">Total brut</span><span class="dv" style="color:var(--blue2)">${f(brut)}</span>`;
+  document.getElementById('deco').innerHTML=decoH(R,'color:var(--tx)','color:var(--blue2)');
+  mgHint();
 
   document.getElementById('decoT').innerHTML=[
     ['Réglage tournage', hm(regT)],
@@ -905,16 +982,63 @@ function cx(){
   updSt();
 }
 
-function um(){
-  marge=document.getElementById('mSlider').value/100;
-  document.getElementById('mPct').textContent=(marge*100).toFixed(0)+'%';
-  cx();
+/* Décomposition : coût et prix HT par poste ; les colonnes tombent juste sur les totaux
+   (l'écart d'arrondi éventuel est affiché sur sa propre ligne). */
+function decoH(R,tx,acc){
+  const {L,brut,tP,mpAct}=R;let sc=0,sp=0;
+  let h='<span class="dh"></span><span class="dh">Coût</span><span class="dh">Prix HT</span>';
+  L.forEach(x=>{const c=r2(x.c),p=r2(x.p);sc+=c;sp+=p;
+    const tg=mpAct&&x.m!==margeG?` <small>+${pct(x.m)}&nbsp;%</small>`:'';
+    h+=`<span>${esc(x.l)}${tg}</span><span class="dv">${f(c)}</span><span class="dv">${f(p)}</span>`;});
+  const dc=r2(r2(brut)-sc),dp=r2(tP-sp);
+  if(Math.abs(dc)>=0.005||Math.abs(dp)>=0.005)h+=`<span class="dr">Écart d'arrondi</span><span class="dv">${f(dc)}</span><span class="dv">${f(dp)}</span>`;
+  return h+`<span class="dbar"></span><span style="font-weight:700;${tx}">Total / pièce</span><span class="dv" style="font-weight:700;${tx}">${f(brut)}</span><span class="dv" style="font-weight:700;${acc}">${f(tP)}</span>`;
 }
+function mgHint(){
+  const h=el('mHint');if(!h)return;
+  h.textContent=margeG>0?'Marge '+pct(margeG)+' % → +'+pct(margeG)+' % sur le coût (prix = coût × '+coefT(margeG)+')'+(R&&R.mpAct?' · réglée par poste':''):'Sans marge : prix = coût'+(R&&R.mpAct?' · marge réglée par poste':'');
+}
+function um(){ // curseur
+  margeG=+el('mSlider').value;el('mIn').value=pct(margeG);mpRef();cx();
+}
+function umT(){ // saisie libre (au-delà de 100 % possible)
+  const x=num(el('mIn').value);margeG=x===null?0:clampM(x);
+  el('mSlider').value=Math.min(100,margeG);mpRef();cx();
+}
+function mgShow(){el('mIn').value=pct(margeG);el('mSlider').value=Math.min(100,margeG);}
+function mpRef(){
+  document.querySelectorAll('.mp-row').forEach(r=>{const k=r.dataset.k,i=r.querySelector('input'),o=k in mp;
+    r.classList.toggle('chg',o);if(document.activeElement!==i)i.value=pct(o?mp[k]:margeG);});
+  const n=Object.keys(mp).length;
+  el('mpN').textContent=n?(n+' poste'+(n>1?'s':'')+' modifié'+(n>1?'s':'')):'Tous au taux général';
+  el('mpRaz').style.display=n?'':'none';
+  el('mpOn').checked=mpOn;el('mpBox').classList.toggle('on',mpOn);
+}
+function mpIn(i){
+  const k=i.closest('.mp-row').dataset.k,t=i.value.trim(),x=num(t);
+  if(t===''||x===null||clampM(x)===margeG)delete mp[k];else mp[k]=clampM(x);
+  mpRef();cx();
+}
+function mpTg(){mpOn=el('mpOn').checked;mpRef();cx();}
+function mpRaz(){mp={};mpRef();cx();}
+/* lignes de sous-traitance */
+function stRowH(x){
+  x=x||{};const cmd=x.mode==='cmd';
+  return '<div class="st-row"><input type="text" class="st-lib" placeholder="Ex : trempe, zingage" autocomplete="off" value="'+esc(x.lib||'')+'" oninput="cx()" aria-label="Sous-traitance">'+
+    '<input type="text" inputmode="decimal" class="st-mt" placeholder="0,00 €" autocomplete="off" value="'+esc(x.mt==null?'':x.mt)+'" oninput="cx()" aria-label="Montant">'+
+    '<select class="st-md" onchange="cx()" aria-label="Montant par pièce ou forfait"><option value="piece"'+(cmd?'':' selected')+'>€ / pièce</option><option value="cmd"'+(cmd?' selected':'')+'>€ forfait cmd</option></select>'+
+    '<button class="st-x" title="Retirer cette ligne" onclick="stDel(this)">✕</button></div>';
+}
+function stGet(){return [...document.querySelectorAll('#stList .st-row')].map(r=>({lib:r.querySelector('.st-lib').value,mt:r.querySelector('.st-mt').value,mode:r.querySelector('.st-md').value==='cmd'?'cmd':'piece'}));}
+function stNone(){const n=el('stNone');if(n)n.style.display=document.querySelector('#stList .st-row')?'none':'';}
+function stDraw(a){el('stList').innerHTML=(a||[]).map(stRowH).join('');stNone();}
+function stAdd(){el('stList').insertAdjacentHTML('beforeend',stRowH());stNone();const l=el('stList').lastElementChild;try{l.querySelector('.st-lib').focus();}catch(e){}cx();}
+function stDel(b){b.closest('.st-row').remove();stNone();cx();}
 
 function syncPrint(){
   if(PRINT_COPY)return;
   if(!R)R=calc();
-  const {pPiece,qte,pKg,matP,matCmd,tauxT,regT,tpT,tauxF,regF,tpF,hCycleT,hTotT,hCycleF,hTotF,tourP,fraiseP,ctrl,transp,embal,outils,divers,inv,ann,brut,tP,tC,gain}=R;
+  const {pPiece,qte,pKg,matP,matCmd,tauxT,regT,tpT,tauxF,regF,tpF,hCycleT,hTotT,hCycleF,hTotF,tourP,fraiseP,ann,stL,stP,brut,mpAct,tP,tC,gain}=R;
 
   ps('ps-num', document.getElementById('devisNum').value.trim()||'—');
   ps('ps-client', document.getElementById('clientName').value||'—');
@@ -943,18 +1067,18 @@ function syncPrint(){
   ps('ps-transp', fv(gv('transp'))); ps('ps-embal', fv(gv('embal')));
   ps('ps-outils', fv(gv('outils'))); ps('ps-divers', fv(gv('divers')));
   ps('ps-invest', fv(gv('invest'))); ps('ps-mep', fv(gv('mep')));
-  ps('ps-marge',(marge*100).toFixed(0)+'%');
+  ps('ps-marge',margeG>0?'+'+pct(margeG)+' % (× '+coefT(margeG)+')':'0 %');
+  const mpl=POSTES.filter(([k])=>mRate(k)!==margeG).map(([k,l])=>l+' +'+pct(mRate(k))+' %');
+  el('ps-mprow').style.display=mpAct&&mpl.length?'':'none';ps('ps-mp',mpl.join(' · '));
+  el('ps-stsec').style.display=stL.length?'':'none';
+  el('ps-stl').innerHTML=stL.map(x=>'<div class="ps-row"><span class="pl">'+esc(x.lib||'Sous-traitance')+'</span><span class="pr">'+
+    (x.cmd?f(x.mt)+' forfait cmd':f(x.mt)+' / pièce')+'</span></div>').join('');
   ps('ps-rmp',f(matP)); ps('ps-rmc',f(matCmd));
   ps('ps-rtp',f(tourP)); ps('ps-rfp',f(fraiseP));
-  ps('ps-rann',f(ann)); ps('ps-rbrut',f(brut));
+  ps('ps-rann',f(ann)); ps('ps-rst',f(stP)); ps('ps-rbrut',f(brut));
   ps('ps-rtp2',f(tP)); ps('ps-rtc',f(tC)); ps('ps-rgain',f(gain));
 
-  document.getElementById('ps-deco').innerHTML=[
-    ['Matière',matP],['Tour',tourP],['Fraisage',fraiseP],
-    ['Contrôle',ctrl],['Transport',transp],['Emballage',embal],
-    ['Outillage',outils],['Divers',divers],['Invest.+MEP',inv]
-  ].map(([l,v2])=>`<span>${l}</span><span class="dv">${f(v2)}</span>`).join('')+
-  `<span class="dbar"></span><span class="dbar"></span><span style="font-weight:700">Total brut</span><span class="dv" style="color:#2952b3">${f(brut)}</span>`;
+  document.getElementById('ps-deco').innerHTML=decoH(R,'','color:#234a9e');
 
   document.getElementById('ps-temps').innerHTML=[
     ['Réglage tournage', hm(regT)],['Cycle tournage', hm(hCycleT)],['Total tour', hm(hTotT)],
@@ -1031,8 +1155,7 @@ function razNow(){
   document.getElementById('pPiece').value=''; document.getElementById('pCmd').value='';
   ['r-l','r-de','r-di','d-de','d-di','d-e','c-l','c-c','p-l','p-w','p-h','h-l','h-s'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['pKg','qte','rTh','rTm','tpT','rFh','rFm','tpF','ctrl','transp','embal','outils','divers','invest','mep'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('mSlider').value=0; marge=0;
-  document.getElementById('mPct').textContent='0%';
+  margeG=0;mpOn=false;mp={};mgShow();stDraw([]);mpRef();
   poidsP=null;cx();
   savedSnap=snap();updSt();
 }
@@ -1049,7 +1172,8 @@ function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;',
 function getState(){
   const v={};FIELDS.forEach(id=>{v[id]=el(id).value;});
   const c=document.querySelector('.chip.on');
-  return {v,shape,density,matNom,chip:c?c.dataset.n:null,marge:+el('mSlider').value};
+  const m={};POSTES.forEach(([k])=>{if(k in mp)m[k]=mp[k];});
+  return {v,shape,density,matNom,chip:c?c.dataset.n:null,marge:margeG,mpOn,mp:m,stl:stGet()};
 }
 function snap(){return JSON.stringify([getState(),el('devisNum').value.trim()]);}
 function setState(st){
@@ -1059,7 +1183,12 @@ function setState(st){
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tb.classList.add('active');}
   document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',!!st.chip&&c.dataset.n===st.chip));
   density=(typeof st.density==='number')?st.density:null;matNom=st.matNom||null;ud();
-  el('mSlider').value=st.marge||0;marge=(+el('mSlider').value)/100;el('mPct').textContent=(marge*100).toFixed(0)+'%';
+  // marge : taux général, puis taux par poste et sous-traitance (absents des devis de l'ancien format -> valeurs par défaut)
+  const g=typeof st.marge==='number'?st.marge:num(st.marge);margeG=g===null||!isFinite(g)?0:clampM(g);mgShow();
+  mpOn=st.mpOn===true;mp={};
+  if(st.mp&&typeof st.mp==='object')POSTES.forEach(([k])=>{const x=typeof st.mp[k]==='number'?st.mp[k]:num(st.mp[k]);if(x!==null&&isFinite(x))mp[k]=clampM(x);});
+  stDraw(Array.isArray(st.stl)?st.stl.filter(x=>x&&typeof x==='object').map(x=>({lib:String(x.lib==null?'':x.lib),mt:String(x.mt==null?'':x.mt),mode:x.mode==='cmd'?'cmd':'piece'})):[]);
+  mpRef();
   cp();
 }
 function fb(){try{const P=window.parent;if(P&&P!==window&&P.db&&P.fbCollection&&P.fbGetDocs&&P.fbSetDoc&&P.fbDoc&&P.fbDeleteDoc)return P;}catch(e){}return null;}
@@ -1116,7 +1245,7 @@ async function saveDevis(){
     const st=getState(),Rr=R;
     const rec={id,numero,numAuto:auto,
       client:st.v.clientName.trim(),designation:st.v.prodName.trim(),date:st.v.devisDate||'',
-      quantite:Rr.qte,prixPiece:Rr.tP,total:Math.round(Rr.tC*100)/100,coutBrut:Math.round(Rr.brut*10000)/10000,marge:st.marge,matiere:matNom||'',
+      quantite:Rr.qte,prixPiece:Rr.tP,total:Math.round(Rr.tC*100)/100,coutBrut:Math.round(Rr.brut*10000)/10000,marge:st.marge,margeParPoste:Rr.mpAct,sousTraitance:Math.round(Rr.stP*10000)/10000,ht:true,matiere:matNom||'',
       etat:st,
       createdAt:(curMeta&&curMeta.createdAt)||now,createdBy:(curMeta&&curMeta.createdBy)||u.name,createdById:(curMeta&&curMeta.createdById)||u.id||'',
       updatedAt:now,updatedBy:u.name,updatedById:u.id||''};
@@ -1169,7 +1298,7 @@ function drawList(){
       ?'<span class="dv-q">Supprimer '+esc(d.numero)+' ?</span><button class="btn bg dv-del" onclick="delDevis(\''+d.id+'\')">Oui, supprimer</button><button class="btn bg" onclick="delAsk=null;drawList()">Non</button>'
       :'<button class="btn bb" onclick="openDevis(\''+d.id+'\')">Ouvrir</button><button class="btn bg" onclick="dupDevis(\''+d.id+'\')">Dupliquer</button><button class="btn bg dv-del" title="Supprimer" onclick="delAsk=\''+d.id+'\';drawList()">🗑</button>';
     return '<div class="dv-row'+(cur?' cur':'')+'"><div class="dv-i"><b>'+esc(d.numero||'—')+'</b> · '+esc(d.client||'Sans client')+(d.designation?' · '+esc(d.designation):'')+tags+
-      '<div class="dv-m">'+fdd(d.date)+' · '+esc(d.quantite==null?'—':nf(d.quantite))+' pce'+(d.quantite>1?'s':'')+' · '+f(d.prixPiece)+' / pce · total '+f(d.total)+' · '+esc(d.updatedBy||d.createdBy||'—')+'</div></div><div class="dv-b">'+btns+'</div></div>';
+      '<div class="dv-m">'+fdd(d.date)+' · '+esc(d.quantite==null?'—':nf(d.quantite))+' pce'+(d.quantite>1?'s':'')+' · '+f(d.prixPiece)+' / pce · total '+f(d.total)+' HT · '+esc(d.updatedBy||d.createdBy||'—')+'</div></div><div class="dv-b">'+btns+'</div></div>';
   }).join('');
 }
 function findRec(id){return LIST.find(d=>d.id===id);}
@@ -1206,12 +1335,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   el('cfOv').addEventListener('click',function(e){if(e.target===this)cfClose();});
   el('listOv').addEventListener('click',function(e){if(e.target===this)closeList();});
   document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(el('cfOv').classList.contains('show'))cfClose();else if(el('listOv').classList.contains('show'))closeList();});
-  cx();savedSnap=snap();updSt();
+  mgShow();stNone();mpRef();cx();savedSnap=snap();updSt();
 });
 
 function s(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
 function ps(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
-function f(n){if(typeof n!=='number'||isNaN(n)||!isFinite(n))return '—';if(Math.abs(n)<0.005)n=0;return n.toFixed(2).replace('.',',')+' €';}
+function f(n){if(typeof n!=='number'||isNaN(n)||!isFinite(n))return '—';n=r2(n);if(Math.abs(n)<0.005)n=0;return n.toFixed(2).replace('.',',')+' €';}
 </script>
 
 </body>
