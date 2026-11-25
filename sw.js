@@ -1,5 +1,5 @@
 // MCS App — Service Worker v1.5
-const CACHE_NAME = 'mcs-app-v24';
+const CACHE_NAME = 'mcs-app-v25';
 const FIREBASE_HOSTS = ['firestore.googleapis.com','firebasestorage.googleapis.com','identitytoolkit.googleapis.com'];
 
 // Ressources à mettre en cache immédiatement
@@ -7,6 +7,7 @@ const STATIC_ASSETS = [
   './',
   './index.html',
   './MCS_Usinage.html',
+  './MCS_Devis.html',
   './MCS_Compteur.html',
   'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap',
   'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',

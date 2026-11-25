@@ -57,6 +57,8 @@ th();window.addEventListener('storage',function(e){if(!e.key||e.key==='mcs-theme
 [data-theme="light"] .bg:hover{border-color:var(--acc);color:var(--acc)}
 [data-theme="light"] .bb{background:linear-gradient(135deg,#2952b3,#3561c4);box-shadow:0 3px 10px rgba(41,82,179,.25)}
 [data-theme="light"] .pdf-modal{backdrop-filter:none;box-shadow:0 8px 40px rgba(20,35,70,.35)}
+/* Dans l'appli (iframe) : l'appli a déjà sa barre et règle le thème elle-même */
+.emb header{display:none}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--bg);background-attachment:fixed;color:var(--tx);min-height:100vh;font-size:12px}
 input,select{background:var(--ibg);border:1px solid var(--ibrd);border-radius:6px;color:var(--tx);padding:5px 8px;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;width:100%;transition:border .15s}
@@ -177,7 +179,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 .side{display:flex;flex-direction:column;gap:8px}
 
 /* BTNS */
-.acts{display:flex;gap:7px;justify-content:flex-end;margin-top:10px}
+.acts{display:flex;gap:7px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border:none;border-radius:var(--r);font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .18s}
 .bg{background:transparent;color:var(--t2);border:1px solid var(--brd)}.bg:hover{border-color:var(--acc);color:var(--acc)}
 .bb{background:linear-gradient(135deg,var(--mcs-blue),var(--blue2));color:#fff;box-shadow:0 3px 10px rgba(41,82,179,.3)}.bb:hover{opacity:.9;transform:translateY(-1px)}
@@ -205,39 +207,39 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 .ps-header{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2952b3;padding-bottom:6px;margin-bottom:10px}
 .ps-logo{height:36px}
 .ps-title{font-family:'Arial Narrow',Arial,sans-serif;font-size:20px;font-weight:800;color:#2952b3;letter-spacing:.04em}
-.ps-sub{font-size:9px;color:#666}
-.ps-date{font-size:10px;color:#555;text-align:right}
-.ps-client{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;background:#f0f4ff;border-radius:4px;padding:7px 10px;margin-bottom:8px;border:1px solid #c0ccee}
-.ps-fi label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#556;display:block;margin-bottom:1px}
-.ps-fi span{font-size:12px;font-weight:600;color:#1a2a4e}
+.ps-sub{font-size:9px;color:#444}
+.ps-date{font-size:10px;color:#333;text-align:right}
+.ps-client{display:grid;grid-template-columns:.8fr 1.3fr 1.3fr .8fr;gap:6px;background:#f0f4ff;border-radius:4px;padding:7px 10px;margin-bottom:8px;border:1px solid #c0ccee}
+.ps-fi label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#333;display:block;margin-bottom:1px}
+.ps-fi span{font-size:12px;font-weight:600;color:#111}
 .ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .ps-sec{border:1px solid #ccd;border-radius:4px;padding:7px 9px;position:relative;background:#fff}
 .ps-sec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:4px 4px 0 0}
-.ps-sec.s-blue::before{background:linear-gradient(90deg,#2952b3,#4a78e8)}
-.ps-sec.s-green::before{background:linear-gradient(90deg,#1e7e3a,#28a04a)}
-.ps-sec.s-orange::before{background:linear-gradient(90deg,#e8852a,#f0a050)}
-.ps-sec.s-purple::before{background:linear-gradient(90deg,#6c3db0,#8a55e0)}
-.ps-sec.s-red::before{background:linear-gradient(90deg,#c0281e,#e03020)}
-.ps-stitle{font-family:'Arial Narrow',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#2952b3;margin-bottom:5px}
+.ps-sec.s-blue::before{background:#234a9e}
+.ps-sec.s-green::before{background:#17663a}
+.ps-sec.s-orange::before{background:#8a4200}
+.ps-sec.s-purple::before{background:#5b2ca6}
+.ps-sec.s-red::before{background:#a3261c}
+.ps-stitle{font-family:'Arial Narrow',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#234a9e;margin-bottom:5px}
 .ps-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #eaecf4;font-size:10px}
 .ps-row:last-child{border-bottom:none}
-.ps-row .pl{color:#556}
-.ps-row .pr{font-weight:700;color:#1a2a4e;font-family:'Arial Narrow',Arial,sans-serif;font-size:12px}
-.ps-row.hi .pl{font-weight:700;color:#1a2a4e;font-size:11px}
-.ps-row.hi .pr{font-size:16px;color:#2952b3}
-.ps-row.hii .pl{font-weight:700;color:#1a2a4e;font-size:11px}
-.ps-row.hii .pr{font-size:18px;color:#e8852a}
-.ps-row.hgain .pr{color:#1e7e3a;font-size:14px}
-.ps-deco{display:grid;grid-template-columns:1fr auto;font-size:10px;line-height:1.8;color:#556}
-.ps-deco .dv{font-weight:700;color:#1a2a4e;font-family:'Arial Narrow',Arial,sans-serif;font-size:11px;text-align:right}
-.ps-deco .dbar{grid-column:1/-1;height:1px;background:#dde;margin:2px 0}
+.ps-row .pl{color:#333}
+.ps-row .pr{font-weight:700;color:#111;font-family:'Arial Narrow',Arial,sans-serif;font-size:12px}
+.ps-row.hi .pl{font-weight:700;color:#111;font-size:11px}
+.ps-row.hi .pr{font-size:16px;color:#234a9e}
+.ps-row.hii .pl{font-weight:700;color:#111;font-size:11px}
+.ps-row.hii .pr{font-size:18px;color:#111}
+.ps-row.hgain .pr{color:#17663a;font-size:14px}
+.ps-deco{display:grid;grid-template-columns:1fr auto;font-size:10px;line-height:1.8;color:#333}
+.ps-deco .dv{font-weight:700;color:#111;font-family:'Arial Narrow',Arial,sans-serif;font-size:11px;text-align:right}
+.ps-deco .dbar{grid-column:1/-1;height:1px;background:#bbc;margin:2px 0}
 .ps-marge{display:flex;justify-content:space-between;align-items:center;padding:4px 0;margin-bottom:3px;border-bottom:1px solid #dde}
-.ps-marge span:first-child{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#556}
-.ps-marge span:last-child{font-family:'Arial Narrow',Arial,sans-serif;font-size:18px;font-weight:800;color:#2952b3}
+.ps-marge span:first-child{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#333}
+.ps-marge span:last-child{font-family:'Arial Narrow',Arial,sans-serif;font-size:18px;font-weight:800;color:#234a9e}
 .ps-temps{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:10px}
-.ps-temps .tli{color:#556}
-.ps-temps .tva{font-weight:700;color:#1a2a4e;text-align:right;font-family:'Arial Narrow',Arial,sans-serif}
-.ps-footer{text-align:center;font-size:8px;color:#999;margin-top:6px;border-top:1px solid #dde;padding-top:4px}
+.ps-temps .tli{color:#333}
+.ps-temps .tva{font-weight:700;color:#111;text-align:right;font-family:'Arial Narrow',Arial,sans-serif}
+.ps-footer{text-align:center;font-size:8px;color:#555;margin-top:6px;border-top:1px solid #dde;padding-top:4px}
 
 /* Print browser */
 @media print{
@@ -245,7 +247,8 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
   header,main,body::after{display:none!important}
   body{min-height:0!important;background:none!important;padding:0!important;margin:0!important}
   html{min-height:0!important}
-  .print-summary{display:block!important;width:100%}
+  .print-summary{display:block!important;width:100%;color:#111}
+  .pdf-overlay,.dv-note{display:none!important}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
@@ -263,6 +266,37 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
 .pdf-progress.show{display:flex}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--pbrd);border-top-color:var(--blue2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ENREGISTREMENT DES DEVIS */
+.dv-bar{display:flex;gap:8px;align-items:flex-end;margin-top:8px}
+.dv-bar .f{width:130px;flex-shrink:0}
+.dv-st{flex:1;min-width:0;font-size:10px;color:var(--t2);padding-bottom:6px;line-height:1.35}
+.dv-st.mod{color:var(--orange2);font-weight:700}
+.dv-modal{width:min(720px,94vw);max-height:88vh;display:flex;flex-direction:column;padding:16px 16px 14px}
+.dv-modal h3{margin-bottom:10px}
+.dv-tools{display:flex;gap:6px}
+.dv-tools input{flex:1;min-width:0;font-size:12px;padding:7px 10px}
+.dv-tools select{width:auto;flex-shrink:0;font-size:11px}
+.dv-src{font-size:10px;color:var(--t2);margin-top:6px}
+.dv-src.warn{color:var(--orange2);font-weight:700}
+.dv-list{overflow:auto;flex:1;min-height:90px;margin-top:6px;border-top:1px solid var(--rowbrd)}
+.dv-row{display:flex;gap:8px;align-items:center;padding:7px 2px;border-bottom:1px solid var(--rowbrd);flex-wrap:wrap}
+.dv-row.cur{background:var(--pbg)}
+.dv-i{flex:1;min-width:190px;font-size:12px;color:var(--tx);line-height:1.4;overflow-wrap:anywhere}
+.dv-i b{color:var(--acc)}
+.dv-m{font-size:10px;color:var(--t2)}
+.dv-tag{display:inline-block;font-size:9px;font-weight:700;padding:0 5px;border-radius:3px;border:1px solid var(--orange2);color:var(--orange2);margin-left:4px}
+.dv-b{display:flex;gap:5px;flex-wrap:wrap}
+.dv-b .btn{padding:5px 10px;font-size:11px}
+.dv-del{border-color:var(--red2)!important;color:var(--red2)!important}
+.dv-q{font-size:11px;font-weight:700;color:var(--red2)}
+.dv-empty{padding:18px 4px;font-size:12px;color:var(--t2);text-align:center}
+#cfOv{z-index:9999}
+#cfMsg{font-size:12px;color:var(--tx);line-height:1.5}
+.dv-note{display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:10000;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#fff;background:#17663a;box-shadow:0 4px 18px rgba(0,0,0,.35);max-width:92vw;text-align:center}
+.dv-note.show{display:block}
+.dv-note.warn{background:#8a4200}
+.dv-note.err{background:#b42318}
 </style>
 </head>
 <body>
@@ -290,6 +324,32 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
   </div>
 </div>
 
+<!-- DEVIS ENREGISTRÉS -->
+<div class="pdf-overlay" id="listOv">
+  <div class="pdf-modal dv-modal">
+    <h3>📂 Devis enregistrés</h3>
+    <div class="dv-tools">
+      <input type="search" id="dvQ" placeholder="Rechercher : client, désignation, n°" autocomplete="off" oninput="drawList()">
+      <select id="dvSort" onchange="drawList()"><option value="desc">Récents d'abord</option><option value="asc">Anciens d'abord</option></select>
+    </div>
+    <div class="dv-src" id="dvSrc"></div>
+    <div class="dv-list" id="dvList"></div>
+    <div class="pdf-btns" style="margin-top:10px"><button class="btn bg" onclick="closeList()">Fermer</button></div>
+  </div>
+</div>
+<!-- CONFIRMATION -->
+<div class="pdf-overlay" id="cfOv">
+  <div class="pdf-modal">
+    <h3 id="cfT">Confirmer</h3>
+    <div id="cfMsg"></div>
+    <div class="pdf-btns">
+      <button class="btn bg" onclick="cfClose()">Annuler</button>
+      <button class="btn bb" id="cfOk">OK</button>
+    </div>
+  </div>
+</div>
+<div class="dv-note" id="dvNote"></div>
+
 <div class="print-summary" id="printSummary">
   <div class="ps-header">
     <div style="display:flex;align-items:center;gap:10px">
@@ -303,6 +363,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
   </div>
 
   <div class="ps-client">
+    <div class="ps-fi"><label>N° devis</label><span id="ps-num">—</span></div>
     <div class="ps-fi"><label>Client</label><span id="ps-client">—</span></div>
     <div class="ps-fi"><label>Produit / Référence</label><span id="ps-ref">—</span></div>
     <div class="ps-fi"><label>Date</label><span id="ps-ddate">—</span></div>
@@ -314,7 +375,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
     <div style="display:flex;flex-direction:column;gap:7px">
 
       <div class="ps-sec s-orange">
-        <div class="ps-stitle" style="color:#e8852a">📦 Matière</div>
+        <div class="ps-stitle" style="color:#8a4200">📦 Matière</div>
         <div class="ps-row"><span class="pl">Matériau</span><span class="pr" id="ps-mat">—</span></div>
         <div class="ps-row"><span class="pl">Poids brut / pièce</span><span class="pr" id="ps-pp">—</span></div>
         <div class="ps-row"><span class="pl">Poids commandé total</span><span class="pr" id="ps-pc">—</span></div>
@@ -336,7 +397,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
       </div>
 
       <div class="ps-sec s-red">
-        <div class="ps-stitle" style="color:#c0281e">💰 Coûts annexes (commande)</div>
+        <div class="ps-stitle" style="color:#a3261c">💰 Coûts annexes (commande)</div>
         <div class="ps-row"><span class="pl">Contrôle (× pièce)</span><span class="pr" id="ps-ctrl">—</span></div>
         <div class="ps-row"><span class="pl">Transport</span><span class="pr" id="ps-transp">—</span></div>
         <div class="ps-row"><span class="pl">Emballage</span><span class="pr" id="ps-embal">—</span></div>
@@ -351,7 +412,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
     <div style="display:flex;flex-direction:column;gap:7px">
 
       <div class="ps-sec s-green">
-        <div class="ps-stitle" style="color:#1e7e3a">📊 Résultats</div>
+        <div class="ps-stitle" style="color:#17663a">📊 Résultats</div>
         <div class="ps-marge"><span>Marge appliquée</span><span id="ps-marge">0%</span></div>
         <div class="ps-row"><span class="pl">Matière / pièce</span><span class="pr" id="ps-rmp">—</span></div>
         <div class="ps-row"><span class="pl">Matière / commande</span><span class="pr" id="ps-rmc">—</span></div>
@@ -359,19 +420,19 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
         <div class="ps-row"><span class="pl">Usinage Fraisage / pièce</span><span class="pr" id="ps-rfp">—</span></div>
         <div class="ps-row"><span class="pl">Coûts annexes / pièce</span><span class="pr" id="ps-rann">—</span></div>
         <div class="ps-row"><span class="pl" style="font-weight:600">Coût brut / pièce</span><span class="pr" id="ps-rbrut">—</span></div>
-        <div class="dv2" style="margin:4px 0"></div>
+        <div style="height:1px;background:#999;margin:4px 0"></div>
         <div class="ps-row hi"><span class="pl">TARIF PIÈCE</span><span class="pr" id="ps-rtp2">—</span></div>
         <div class="ps-row hii"><span class="pl">TARIF COMMANDE</span><span class="pr" id="ps-rtc">—</span></div>
         <div class="ps-row hgain"><span class="pl">📈 Gains sur commande</span><span class="pr" id="ps-rgain">—</span></div>
       </div>
 
       <div class="ps-sec s-red">
-        <div class="ps-stitle" style="color:#c0281e">🔍 Décomposition / Pièce</div>
+        <div class="ps-stitle" style="color:#a3261c">🔍 Décomposition / Pièce</div>
         <div class="ps-deco" id="ps-deco">—</div>
       </div>
 
       <div class="ps-sec s-purple">
-        <div class="ps-stitle" style="color:#6c3db0">⏱ Temps Machine</div>
+        <div class="ps-stitle" style="color:#5b2ca6">⏱ Temps Machine</div>
         <div class="ps-temps" id="ps-temps">—</div>
       </div>
 
@@ -407,6 +468,10 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
         <div><label>Produit / Référence</label><input type="text" id="prodName" placeholder="Ex : Axe Ø40 Inox 304" oninput="syncPrint()"></div>
         <div><label>Date</label><input type="date" id="devisDate" oninput="syncPrint()"></div>
       </div>
+      <div class="dv-bar">
+        <div class="f"><label>N° devis</label><input type="text" id="devisNum" placeholder="auto" autocomplete="off" oninput="syncPrint()"></div>
+        <div class="dv-st" id="dvSt">Nouveau devis</div>
+      </div>
     </div>
 
     <div class="card c-orange">
@@ -419,27 +484,27 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
         <button class="tab" onclick="sw('hex',this)">⬡ 6 Pans</button>
       </div>
       <div class="sf active" id="f-rond"><div class="si">
-        <div class="f"><label>Longueur (mm)</label><input type="number" id="r-l" placeholder="ex: 140" oninput="cp()"></div>
-        <div class="f"><label>Ø Ext. (mm)</label><input type="number" id="r-de" placeholder="ex: 40" oninput="cp()"></div>
-        <div class="f"><label>Ø Int. (mm)</label><input type="number" id="r-di" placeholder="0 si plein" min="0" oninput="cp()"></div>
+        <div class="f"><label>Longueur (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="r-l" placeholder="ex: 140" oninput="cp()"></div>
+        <div class="f"><label>Ø Ext. (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="r-de" placeholder="ex: 40" oninput="cp()"></div>
+        <div class="f"><label>Ø Int. (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="r-di" placeholder="0 si plein" min="0" oninput="cp()"></div>
       </div></div>
       <div class="sf" id="f-disque"><div class="si">
-        <div class="f"><label>Ø Ext. (mm)</label><input type="number" id="d-de" placeholder="ex: 400" oninput="cp()"></div>
-        <div class="f"><label>Ø Int. (mm)</label><input type="number" id="d-di" placeholder="ex: 150" min="0" oninput="cp()"></div>
-        <div class="f"><label>Épaisseur (mm)</label><input type="number" id="d-e" placeholder="ex: 15" oninput="cp()"></div>
+        <div class="f"><label>Ø Ext. (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="d-de" placeholder="ex: 400" oninput="cp()"></div>
+        <div class="f"><label>Ø Int. (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="d-di" placeholder="ex: 150" min="0" oninput="cp()"></div>
+        <div class="f"><label>Épaisseur (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="d-e" placeholder="ex: 15" oninput="cp()"></div>
       </div></div>
       <div class="sf" id="f-carre"><div class="si">
-        <div class="f"><label>Longueur (mm)</label><input type="number" id="c-l" placeholder="ex: 40" oninput="cp()"></div>
-        <div class="f"><label>Côté (mm)</label><input type="number" id="c-c" placeholder="ex: 30" oninput="cp()"></div>
+        <div class="f"><label>Longueur (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="c-l" placeholder="ex: 40" oninput="cp()"></div>
+        <div class="f"><label>Côté (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="c-c" placeholder="ex: 30" oninput="cp()"></div>
       </div></div>
       <div class="sf" id="f-plat"><div class="si">
-        <div class="f"><label>Longueur (mm)</label><input type="number" id="p-l" placeholder="ex: 200" oninput="cp()"></div>
-        <div class="f"><label>Largeur (mm)</label><input type="number" id="p-w" placeholder="ex: 80" oninput="cp()"></div>
-        <div class="f"><label>Hauteur (mm)</label><input type="number" id="p-h" placeholder="ex: 8" oninput="cp()"></div>
+        <div class="f"><label>Longueur (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="p-l" placeholder="ex: 200" oninput="cp()"></div>
+        <div class="f"><label>Largeur (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="p-w" placeholder="ex: 80" oninput="cp()"></div>
+        <div class="f"><label>Hauteur (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="p-h" placeholder="ex: 8" oninput="cp()"></div>
       </div></div>
       <div class="sf" id="f-hex"><div class="si">
-        <div class="f"><label>Longueur (mm)</label><input type="number" id="h-l" placeholder="ex: 100" oninput="cp()"></div>
-        <div class="f"><label>Clé SW (mm)</label><input type="number" id="h-s" placeholder="ex: 25" oninput="cp()"></div>
+        <div class="f"><label>Longueur (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="h-l" placeholder="ex: 100" oninput="cp()"></div>
+        <div class="f"><label>Clé SW (mm)</label><input type="text" inputmode="decimal" autocomplete="off" id="h-s" placeholder="ex: 25" oninput="cp()"></div>
       </div></div>
       <div class="pbar">
         <div>
@@ -525,7 +590,7 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
           <span class="chip pl" data-d="1.40" data-n="PVC rigide" onclick="sm(this)">PVC</span>
           <div class="custom-row">
             <div class="f"><label>Nom personnalisé</label><input type="text" id="cName" placeholder="Matériau…"></div>
-            <div class="f"><label>Densité (g/cm³)</label><input type="number" id="cDens" placeholder="ex: 8.64" step="0.01" min="0.1"></div>
+            <div class="f"><label>Densité (g/cm³)</label><input type="text" inputmode="decimal" autocomplete="off" id="cDens" placeholder="ex: 8.64" step="0.01" min="0.1"></div>
             <button class="btn bg" style="padding:4px 9px;font-size:10px;white-space:nowrap" onclick="ac()">✓ Appliquer</button>
           </div>
         </div>
@@ -544,91 +609,91 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
         <tr class="sep"><td colspan="2">📦 Matière</td></tr>
         <tr>
           <td class="tl">Prix matière / kg (€)</td>
-          <td class="tr2"><input type="number" id="pKg" placeholder="ex: 1.15" step="0.01" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="pKg" placeholder="ex: 1.15" step="0.01" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Poids brut / pièce (kg) <span class="abadge">AUTO</span></td>
-          <td class="tr2"><input type="number" id="pPiece" readonly tabindex="-1" placeholder="—"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="pPiece" readonly tabindex="-1" placeholder="—"></td>
         </tr>
         <tr>
           <td class="tl">Poids commandé total (kg) <span class="abadge">AUTO</span></td>
-          <td class="tr2"><input type="number" id="pCmd" readonly tabindex="-1" placeholder="—"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="pCmd" readonly tabindex="-1" placeholder="—"></td>
         </tr>
         <tr>
           <td class="tl">Quantité (pièces)</td>
-          <td class="tr2"><input type="number" id="qte" placeholder="ex: 8" step="1" min="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="qte" placeholder="ex: 8" step="1" min="1" oninput="cx()"></td>
         </tr>
 
         <tr class="sep"><td colspan="2">🔩 Tour</td></tr>
         <tr>
           <td class="tl">Taux horaire tournage (€/h)</td>
-          <td class="tr2"><input type="number" id="tauxT" value="60" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="tauxT" value="60" step="1" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Réglage tournage</td>
           <td class="tr2">
             <div class="hm" style="justify-content:flex-end">
-              <input type="number" id="rTh" placeholder="0" min="0" step="1" oninput="cx()" style="width:44px;text-align:center">
+              <input type="text" inputmode="decimal" autocomplete="off" id="rTh" placeholder="0" min="0" step="1" oninput="cx()" style="width:44px;text-align:center">
               <span>h</span>
-              <input type="number" id="rTm" placeholder="0" min="0" max="59" step="1" oninput="cx()" style="width:44px;text-align:center">
+              <input type="text" inputmode="decimal" autocomplete="off" id="rTm" placeholder="0" min="0" max="59" step="1" oninput="cx()" style="width:44px;text-align:center">
               <span>min</span>
             </div>
           </td>
         </tr>
         <tr>
           <td class="tl">Temps pièce tournage (min)</td>
-          <td class="tr2"><input type="number" id="tpT" placeholder="ex: 12" step="1" min="0" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="tpT" placeholder="ex: 12" step="1" min="0" oninput="cx()"></td>
         </tr>
 
         <tr class="sep"><td colspan="2">⚙️ Fraiseuse</td></tr>
         <tr>
           <td class="tl">Taux horaire fraisage (€/h)</td>
-          <td class="tr2"><input type="number" id="tauxF" value="60" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="tauxF" value="60" step="1" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Réglage fraisage</td>
           <td class="tr2">
             <div class="hm" style="justify-content:flex-end">
-              <input type="number" id="rFh" placeholder="0" min="0" step="1" oninput="cx()" style="width:44px;text-align:center">
+              <input type="text" inputmode="decimal" autocomplete="off" id="rFh" placeholder="0" min="0" step="1" oninput="cx()" style="width:44px;text-align:center">
               <span>h</span>
-              <input type="number" id="rFm" placeholder="0" min="0" max="59" step="1" oninput="cx()" style="width:44px;text-align:center">
+              <input type="text" inputmode="decimal" autocomplete="off" id="rFm" placeholder="0" min="0" max="59" step="1" oninput="cx()" style="width:44px;text-align:center">
               <span>min</span>
             </div>
           </td>
         </tr>
         <tr>
           <td class="tl">Temps pièce fraisage (min)</td>
-          <td class="tr2"><input type="number" id="tpF" placeholder="ex: 15" step="1" min="0" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="tpF" placeholder="ex: 15" step="1" min="0" oninput="cx()"></td>
         </tr>
 
         <tr class="sep"><td colspan="2">💰 Coûts annexes</td></tr>
         <tr>
           <td class="tl">Contrôle (€/pièce)</td>
-          <td class="tr2"><input type="number" id="ctrl" placeholder="0" step="0.01" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="ctrl" placeholder="0" step="0.01" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Transport <span class="cbadge">€ commande</span></td>
-          <td class="tr2"><input type="number" id="transp" placeholder="0" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="transp" placeholder="0" step="1" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Emballage <span class="cbadge">€ commande</span></td>
-          <td class="tr2"><input type="number" id="embal" placeholder="0" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="embal" placeholder="0" step="1" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Outillage <span class="cbadge">€ commande</span></td>
-          <td class="tr2"><input type="number" id="outils" placeholder="0" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="outils" placeholder="0" step="1" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Divers <span class="cbadge">€ commande</span></td>
-          <td class="tr2"><input type="number" id="divers" placeholder="0" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="divers" placeholder="0" step="1" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Investissement prod. <span class="cbadge">€ commande</span></td>
-          <td class="tr2"><input type="number" id="invest" placeholder="0" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="invest" placeholder="0" step="1" oninput="cx()"></td>
         </tr>
         <tr>
           <td class="tl">Mise en place cmd. <span class="cbadge">€ commande</span></td>
-          <td class="tr2"><input type="number" id="mep" placeholder="0" step="1" oninput="cx()"></td>
+          <td class="tr2"><input type="text" inputmode="decimal" autocomplete="off" id="mep" placeholder="0" step="1" oninput="cx()"></td>
         </tr>
       </table>
     </div>
@@ -669,19 +734,30 @@ input[type=range]{flex:1;accent-color:var(--blue2);cursor:pointer;height:3px}
   </div>
 
   <div class="acts">
+    <button class="btn bg" onclick="openList()">📂 Devis enregistrés</button>
     <button class="btn bg" onclick="raz()">↺ Réinitialiser</button>
     <button class="btn bg" onclick="doPrint()" style="border-color:var(--red2);color:var(--red2)">⎙ Imprimer</button>
     <button class="btn bb" onclick="savePDF()">⬇ Enregistrer PDF</button>
+    <button class="btn bb" id="dvSaveBtn" onclick="saveDevis()">💾 Enregistrer le devis</button>
   </div>
 
 </main>
 
 <script>
 let shape='rond', density=null, matNom=null, marge=0;
+let poidsP=null, R=null; // poids exact d'une pièce (kg), derniers résultats
+const PRINT_COPY=document.documentElement.hasAttribute('data-print-copy');
+function pad2(n){return String(n).padStart(2,'0');}
+function todayISO(){const d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function num(v){if(v===''||v===null||v===undefined)return null;const x=parseFloat(String(v).replace(/[\s\u00a0\u202f]/g,'').replace(',','.'));return isFinite(x)?x:null;}
+function r2(v){const x=Number(Math.round(v+'e2')+'e-2');return isFinite(x)?x:Math.round(v*100)/100;}
+function hm(v){const t=Math.round(v*60),h=Math.floor(t/60),m=t-h*60;return h+'h '+pad2(m)+'min';}
+function nf(v){return String(v).replace('.',',');}
 
 document.addEventListener('DOMContentLoaded',()=>{
   const d=new Date();
-  document.getElementById('devisDate').value=d.toISOString().split('T')[0];
+  if(PRINT_COPY)return;
+  document.getElementById('devisDate').value=todayISO();
   document.getElementById('hDate').textContent=d.toLocaleDateString('fr-FR',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
   try{const t=localStorage.getItem('mcs-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.getElementById('tBtn').textContent='☀️ Clair';}}catch(e){}
   document.getElementById('pdfOverlay').addEventListener('click',function(e){if(e.target===this)closePdfModal();});
@@ -701,9 +777,9 @@ function sm(el){
   ud(); cp();
 }
 function ac(){
-  const d=parseFloat(document.getElementById('cDens').value);
+  const d=gn('cDens');
   const n=document.getElementById('cName').value.trim()||'Personnalisé';
-  if(!d||d<=0){alert('Densité invalide');return;}
+  if(!d||d<=0){note('Densité invalide','err');return;}
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   density=d; matNom=n; ud(); cp();
 }
@@ -720,11 +796,12 @@ function sw(s,btn){
   btn.classList.add('active'); cp();
 }
 
-function gn(id){const v=document.getElementById(id)?.value;if(v===''||v===null||v===undefined)return null;return parseFloat(v);}
-function gv(id){return parseFloat(document.getElementById(id)?.value)||0;}
+function gn(id){return num(document.getElementById(id)?.value);}
+function gv(id){return gn(id)||0;}
 function getReg(idH,idM){return gv(idH)+gv(idM)/60;}
 
 function cp(){
+  poidsP=null;
   if(density===null){
     document.getElementById('poidsVal').textContent='—';
     document.getElementById('pPiece').value='';
@@ -734,11 +811,11 @@ function cp(){
   const π=Math.PI;let v=0,valid=true;
   if(shape==='rond'){
     const L=gn('r-l'),De=gn('r-de'),Di=gn('r-di')??0;
-    if(L===null||De===null)valid=false;
+    if(L===null||De===null||Di>=De)valid=false;
     else{const Lcm=L/10,Dcm=De/10,Dicm=Di/10;v=(π/4)*(Dcm*Dcm-Dicm*Dicm)*Lcm;}
   }else if(shape==='disque'){
     const De=gn('d-de'),Di=gn('d-di')??0,e=gn('d-e');
-    if(De===null||e===null)valid=false;
+    if(De===null||e===null||Di>=De)valid=false;
     else{const Dcm=De/10,Dicm=Di/10,ecm=e/10;v=(π/4)*(Dcm*Dcm-Dicm*Dicm)*ecm;}
   }else if(shape==='carre'){
     const L=gn('c-l'),C=gn('c-c');
@@ -753,25 +830,23 @@ function cp(){
     if(L===null||sw2===null)valid=false;
     else{const Lcm=L/10,scm=sw2/10;v=(Math.sqrt(3)/2)*scm*scm*Lcm;}
   }
+  if(!(v>0))valid=false;
   if(!valid){
     document.getElementById('poidsVal').textContent='—';
     document.getElementById('pPiece').value='';document.getElementById('pCmd').value='';
     cx();return;
   }
   const poids=(v*density)/1000;
+  poidsP=poids;
   document.getElementById('poidsVal').textContent=poids.toFixed(3);
   document.getElementById('pPiece').value=poids.toFixed(4);
-  const qte=gv('qte');
-  document.getElementById('pCmd').value=qte>0?(poids*qte).toFixed(3):'';
   cx();
 }
 
-function cx(){
+function calc(){
   const pKg=gv('pKg');
-  const pPiece=parseFloat(document.getElementById('pPiece').value)||0;
-  const qte=gv('qte')||1;
-  if(pPiece>0&&qte>0) document.getElementById('pCmd').value=(pPiece*qte).toFixed(3);
-  const pCmd=parseFloat(document.getElementById('pCmd').value)||0;
+  const pPiece=poidsP||0;
+  let qte=gv('qte'); if(!(qte>0))qte=1;
   const tauxT=gv('tauxT');
   const regT=getReg('rTh','rTm');
   const tpT=gv('tpT');
@@ -784,7 +859,7 @@ function cx(){
   const hCycleF=tpF*qte/60;
   const hTotF=regF+hCycleF;
   const fraiseP=tauxF*(regF/qte+tpF/60);
-  const matCmd=pCmd*pKg, matP=pPiece*pKg;
+  const matP=pPiece*pKg, matCmd=matP*qte;
   const ctrl=gv('ctrl');
   const transp=gv('transp')/qte;
   const embal=gv('embal')/qte;
@@ -793,7 +868,13 @@ function cx(){
   const inv=(gv('invest')+gv('mep'))/qte;
   const ann=ctrl+transp+embal+outils+divers+inv;
   const brut=matP+tourP+fraiseP+ann;
-  const tP=marge<1?brut/(1-marge):brut, tC=tP*qte, gain=tC-brut*qte;
+  const tP=r2(marge<1?brut/(1-marge):brut), tC=tP*qte, gain=tC-brut*qte;
+  return {pKg,pPiece,qte,tauxT,regT,tpT,hCycleT,hTotT,tourP,tauxF,regF,tpF,hCycleF,hTotF,fraiseP,matP,matCmd,ctrl,transp,embal,outils,divers,inv,ann,brut,tP,tC,gain};
+}
+function cx(){
+  R=calc();
+  const {pPiece,qte,regT,hCycleT,hTotT,tourP,regF,hCycleF,hTotF,fraiseP,matP,matCmd,ctrl,transp,embal,outils,divers,inv,ann,brut,tP,tC,gain}=R;
+  document.getElementById('pCmd').value=pPiece>0?(pPiece*qte).toFixed(3):'';
 
   s('r-mp',f(matP)); s('r-mc',f(matCmd));
   s('r-tp',f(tourP)); s('r-fp',f(fraiseP));
@@ -807,7 +888,6 @@ function cx(){
   ].map(([l,v2])=>`<span>${l}</span><span class="dv">${f(v2)}</span>`).join('')+
   `<span class="dbar"></span><span class="dbar"></span><span style="font-weight:700;color:var(--tx)">Total brut</span><span class="dv" style="color:var(--blue2)">${f(brut)}</span>`;
 
-  const hm=v=>{const h=Math.floor(v),m=Math.round((v-h)*60);return h+'h '+String(m).padStart(2,'0')+'min';};
   document.getElementById('decoT').innerHTML=[
     ['Réglage tournage', hm(regT)],
     ['Cycle tournage (×'+qte+' pcs)', hm(hCycleT)],
@@ -822,6 +902,7 @@ function cx(){
   }).join('');
 
   syncPrint();
+  updSt();
 }
 
 function um(){
@@ -831,49 +912,34 @@ function um(){
 }
 
 function syncPrint(){
-  const pPiece=parseFloat(document.getElementById('pPiece').value)||0;
-  const qte=gv('qte')||1;
-  const pKg=gv('pKg');
-  const matP=pPiece*pKg;
-  const matCmd=(parseFloat(document.getElementById('pCmd').value)||0)*pKg;
-  const tauxT=gv('tauxT'), regT=getReg('rTh','rTm'), tpT=gv('tpT');
-  const tauxF=gv('tauxF'), regF=getReg('rFh','rFm'), tpF=gv('tpF');
-  const hCycleT=tpT*qte/60, hTotT=regT+hCycleT;
-  const hCycleF=tpF*qte/60, hTotF=regF+hCycleF;
-  const tourP=tauxT*(regT/qte+tpT/60);
-  const fraiseP=tauxF*(regF/qte+tpF/60);
-  const ctrl=gv('ctrl'), transp=gv('transp')/qte, embal=gv('embal')/qte;
-  const outils=gv('outils')/qte, divers=gv('divers')/qte;
-  const inv=(gv('invest')+gv('mep'))/qte;
-  const ann=ctrl+transp+embal+outils+divers+inv;
-  const brut=matP+tourP+fraiseP+ann;
-  const tP=marge<1?brut/(1-marge):brut, tC=tP*qte, gain=tC-brut*qte;
-  const hm=v=>{const h=Math.floor(v),m=Math.round((v-h)*60);return h+'h '+String(m).padStart(2,'0')+'min';};
-  const fmtHm=(h,m)=>{const hh=parseInt(h)||0,mm=parseInt(m)||0;return hh+'h '+String(mm).padStart(2,'0')+'min';};
+  if(PRINT_COPY)return;
+  if(!R)R=calc();
+  const {pPiece,qte,pKg,matP,matCmd,tauxT,regT,tpT,tauxF,regF,tpF,hCycleT,hTotT,hCycleF,hTotF,tourP,fraiseP,ctrl,transp,embal,outils,divers,inv,ann,brut,tP,tC,gain}=R;
 
+  ps('ps-num', document.getElementById('devisNum').value.trim()||'—');
   ps('ps-client', document.getElementById('clientName').value||'—');
   ps('ps-ref', document.getElementById('prodName').value||'—');
   const dd=document.getElementById('devisDate').value;
-  ps('ps-ddate', dd?new Date(dd).toLocaleDateString('fr-FR'):'—');
+  ps('ps-ddate', /^\d{4}-\d\d-\d\d$/.test(dd)?dd.split('-').reverse().join('/'):'—');
   const now=new Date();
   ps('ps-date','Édité le '+now.toLocaleDateString('fr-FR')+' à '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}));
   ps('ps-footer-date',now.toLocaleDateString('fr-FR'));
   ps('ps-mat', matNom||(density?density.toFixed(2)+' g/cm³':'—'));
-  ps('ps-pp', pPiece>0?pPiece.toFixed(3)+' kg':'—');
-  ps('ps-pc', (pPiece*qte)>0?(pPiece*qte).toFixed(3)+' kg':'—');
-  ps('ps-pkg', pKg>0?pKg.toFixed(2)+' €/kg':'—');
-  ps('ps-qte', qte+' pièce'+(qte>1?'s':''));
+  ps('ps-pp', pPiece>0?nf(pPiece.toFixed(3))+' kg':'—');
+  ps('ps-pc', (pPiece*qte)>0?nf((pPiece*qte).toFixed(3))+' kg':'—');
+  ps('ps-pkg', pKg>0?nf(pKg.toFixed(2))+' €/kg':'—');
+  ps('ps-qte', nf(qte)+' pièce'+(qte>1?'s':''));
   ps('ps-cmat', f(matP));
-  ps('ps-tT', tauxT+' €/h');
-  ps('ps-rT', fmtHm(document.getElementById('rTh').value,document.getElementById('rTm').value));
-  ps('ps-tpT', tpT>0?tpT+' min/pièce':'—');
+  ps('ps-tT', nf(tauxT)+' €/h');
+  ps('ps-rT', hm(regT));
+  ps('ps-tpT', tpT>0?nf(tpT)+' min/pièce':'—');
   ps('ps-ttT', hm(hTotT)+' (régl. '+hm(regT)+' + prod. '+hm(hCycleT)+')');
-  ps('ps-tF', tauxF+' €/h');
-  ps('ps-rF', fmtHm(document.getElementById('rFh').value,document.getElementById('rFm').value));
-  ps('ps-tpF', tpF>0?tpF+' min/pièce':'—');
+  ps('ps-tF', nf(tauxF)+' €/h');
+  ps('ps-rF', hm(regF));
+  ps('ps-tpF', tpF>0?nf(tpF)+' min/pièce':'—');
   ps('ps-ttF', hm(hTotF)+' (régl. '+hm(regF)+' + prod. '+hm(hCycleF)+')');
-  const fv=v=>v>0?v.toFixed(2)+' €':'—';
-  ps('ps-ctrl', gv('ctrl')>0?gv('ctrl').toFixed(2)+' €/pièce':'—');
+  const fv=v=>v>0?nf(v.toFixed(2))+' €':'—';
+  ps('ps-ctrl', gv('ctrl')>0?nf(gv('ctrl').toFixed(2))+' €/pièce':'—');
   ps('ps-transp', fv(gv('transp'))); ps('ps-embal', fv(gv('embal')));
   ps('ps-outils', fv(gv('outils'))); ps('ps-divers', fv(gv('divers')));
   ps('ps-invest', fv(gv('invest'))); ps('ps-mep', fv(gv('mep')));
@@ -900,13 +966,17 @@ function syncPrint(){
   }).join('');
 }
 
+function printHTML(){
+  const de=document.documentElement;de.setAttribute('data-print-copy','');
+  const h='<!DOCTYPE html>\n'+de.outerHTML;de.removeAttribute('data-print-copy');return h;
+}
 function doPrint(){
   syncPrint();
   // Si dans une iframe, ouvrir dans un nouvel onglet pour imprimer
   try{
     if(window.self!==window.top){
       const w=window.open('','_blank');
-      w.document.write(document.documentElement.outerHTML);
+      w.document.write(printHTML());
       w.document.close();
       w.focus();
       setTimeout(()=>{w.print();},400);
@@ -935,7 +1005,7 @@ function doSavePDF(){
     try{
       if(window.self!==window.top){
         const w=window.open('','_blank');
-        w.document.write(document.documentElement.outerHTML);
+        w.document.write(printHTML());
         w.document.close();
         w.document.title=filename;
         w.focus();
@@ -949,7 +1019,12 @@ function doSavePDF(){
 }
 
 function raz(){
-  if(!confirm('Réinitialiser tous les champs ?'))return;
+  askC('Repartir d\'un devis vierge ? Tous les champs sont vidés (les taux horaires sont gardés).','↺ Réinitialiser',()=>razNow());
+}
+function razNow(){
+  ['clientName','prodName','devisNum','cName','cDens'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('devisDate').value=todayISO();
+  curId=null;curMeta=null;curNote='';
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   density=null; matNom=null; ud();
   document.getElementById('poidsVal').textContent='—';
@@ -958,12 +1033,185 @@ function raz(){
   ['pKg','qte','rTh','rTm','tpT','rFh','rFm','tpF','ctrl','transp','embal','outils','divers','invest','mep'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('mSlider').value=0; marge=0;
   document.getElementById('mPct').textContent='0%';
-  cx();
+  poidsP=null;cx();
+  savedSnap=snap();updSt();
 }
+
+/* ════════ ENREGISTREMENT DES DEVIS ════════
+   Base de l'appli (collection « devis ») quand la page est dans l'appli,
+   sinon (ou base injoignable) : mémoire de cet appareil (localStorage). */
+const FIELDS=['clientName','prodName','devisDate','r-l','r-de','r-di','d-de','d-di','d-e','c-l','c-c','p-l','p-w','p-h','h-l','h-s',
+  'pKg','qte','tauxT','rTh','rTm','tpT','tauxF','rFh','rFm','tpF','ctrl','transp','embal','outils','divers','invest','mep','cName','cDens'];
+const LS_KEY='mcs-devis-local';
+let curId=null,curMeta=null,curNote='',savedSnap=null,busy=false,LIST=[],LSRC={},delAsk=null;
+function el(id){return document.getElementById(id);}
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function getState(){
+  const v={};FIELDS.forEach(id=>{v[id]=el(id).value;});
+  const c=document.querySelector('.chip.on');
+  return {v,shape,density,matNom,chip:c?c.dataset.n:null,marge:+el('mSlider').value};
+}
+function snap(){return JSON.stringify([getState(),el('devisNum').value.trim()]);}
+function setState(st){
+  const v=st.v||{};FIELDS.forEach(id=>{if(id in v)el(id).value=v[id]==null?'':v[id];});
+  const tb=document.querySelector('.tab[onclick*="\''+(st.shape||'rond')+'\'"]');
+  if(tb){shape=st.shape||'rond';document.querySelectorAll('.sf').forEach(x=>x.classList.remove('active'));el('f-'+shape).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tb.classList.add('active');}
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',!!st.chip&&c.dataset.n===st.chip));
+  density=(typeof st.density==='number')?st.density:null;matNom=st.matNom||null;ud();
+  el('mSlider').value=st.marge||0;marge=(+el('mSlider').value)/100;el('mPct').textContent=(marge*100).toFixed(0)+'%';
+  cp();
+}
+function fb(){try{const P=window.parent;if(P&&P!==window&&P.db&&P.fbCollection&&P.fbGetDocs&&P.fbSetDoc&&P.fbDoc&&P.fbDeleteDoc)return P;}catch(e){}return null;}
+function who(){const P=fb();try{const u=P&&P.mcsUser&&P.mcsUser();if(u)return u;}catch(e){}return {id:'',name:'—'};}
+function lim(p,ms){return Promise.race([p,new Promise((_,rj)=>setTimeout(()=>rj(new Error('pas de réponse de la base')),ms||10000))]);}
+function lsAll(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}')||{};}catch(e){return {};}}
+function lsPut(rec){try{const o=lsAll();o[rec.id]=rec;localStorage.setItem(LS_KEY,JSON.stringify(o));return true;}catch(e){return false;}}
+function lsDel(id){try{const o=lsAll();if(id in o){delete o[id];localStorage.setItem(LS_KEY,JSON.stringify(o));}}catch(e){}}
+async function loadAll(){
+  const P=fb();let base=[],baseOk=false,err='';
+  if(P){try{const sn=await lim(P.fbGetDocs(P.fbCollection(P.db,'devis')));base=sn.docs.map(d=>Object.assign({},d.data(),{id:d.id,_src:'base'}));baseOk=true;}catch(e){err=e&&e.message||String(e);}}
+  const ids=new Set(base.map(d=>d.id));
+  const loc=Object.values(lsAll()).filter(d=>d&&d.id&&!ids.has(d.id)).map(d=>Object.assign({},d,{_src:'local'}));
+  return {list:base.concat(loc),hasBase:!!P,baseOk,err};
+}
+function nextNum(list){
+  const y=new Date().getFullYear(),re=new RegExp('^D-'+y+'-(\\d+)$','i');let mx=0;
+  list.forEach(d=>{const m=re.exec(d.numero||'');if(m)mx=Math.max(mx,+m[1]);});
+  return 'D-'+y+'-'+String(mx+1).padStart(4,'0');
+}
+function sameNum(a,b){return String(a||'').trim().toLowerCase()===String(b||'').trim().toLowerCase();}
+function fd(iso){if(!iso)return '—';const d=new Date(iso);return isNaN(d)?'—':d.toLocaleDateString('fr-FR')+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+function fdd(dd){return /^\d{4}-\d\d-\d\d$/.test(dd||'')?dd.split('-').reverse().join('/'):'—';}
+function note(t,k){const n=el('dvNote');if(!n)return;n.textContent=t;n.className='dv-note show'+(k&&k!=='ok'?' '+k:'');clearTimeout(note._t);note._t=setTimeout(()=>{n.className='dv-note';},k==='err'?6500:4000);}
+function isDirty(){return savedSnap!==null&&snap()!==savedSnap;}
+function updSt(){
+  const b=el('dvSt');if(!b||savedSnap===null)return;
+  const d=isDirty();let t;
+  if(!curId)t=curNote?(curNote+' — non enregistré'):(d?'● Nouveau devis, non enregistré':'Nouveau devis');
+  else if(d)t='● Modifié, non enregistré';
+  else t='Enregistré le '+fd(curMeta.updatedAt)+' par '+(curMeta.updatedBy||'—')+(curMeta._src==='local'?' · sur cet appareil seulement':'');
+  b.textContent=t;b.classList.toggle('mod',!curId?(d||!!curNote):d);
+}
+document.addEventListener('input',()=>setTimeout(updSt,0));
+document.addEventListener('click',()=>setTimeout(updSt,0));
+
+async function saveDevis(){
+  if(busy)return;busy=true;const btn=el('dvSaveBtn');btn.disabled=true;btn.style.opacity=.6;
+  try{
+    cx();
+    const P=fb(),u=who(),now=new Date().toISOString();
+    if(P&&P.canDo&&!P.canDo('accessDevis')){note('Accès au devis non autorisé pour ce compte','err');return;}
+    let {list,baseOk}=await loadAll();
+    const typed=el('devisNum').value.trim();
+    const auto=!typed||(curMeta&&curMeta.numAuto&&sameNum(typed,curMeta.numero));
+    let numero=typed;
+    const taken=(n,l)=>l.some(d=>d.id!==curId&&sameNum(d.numero,n));
+    if(!numero)numero=nextNum(list);
+    else if(taken(numero,list)){
+      if(!auto){note('Le n° '+numero+' existe déjà : change-le ou vide le champ pour un n° automatique','err');return;}
+      numero=nextNum(list);
+    }
+    const id=curId||('dv_'+Date.now().toString(36)+Math.random().toString(36).slice(2,7));
+    const st=getState(),Rr=R;
+    const rec={id,numero,numAuto:auto,
+      client:st.v.clientName.trim(),designation:st.v.prodName.trim(),date:st.v.devisDate||'',
+      quantite:Rr.qte,prixPiece:Rr.tP,total:Math.round(Rr.tC*100)/100,coutBrut:Math.round(Rr.brut*10000)/10000,marge:st.marge,matiere:matNom||'',
+      etat:st,
+      createdAt:(curMeta&&curMeta.createdAt)||now,createdBy:(curMeta&&curMeta.createdBy)||u.name,createdById:(curMeta&&curMeta.createdById)||u.id||'',
+      updatedAt:now,updatedBy:u.name,updatedById:u.id||''};
+    let src='local',why='';
+    if(P&&baseOk){
+      try{
+        await lim(P.fbSetDoc(P.fbDoc(P.db,'devis',id),rec));src='base';
+        if(auto){ // relecture : un autre poste a-t-il pris le même n° au même moment ?
+          for(let k=0;k<3;k++){
+            const sn=await lim(P.fbGetDocs(P.fbCollection(P.db,'devis')));
+            const all=sn.docs.map(d=>Object.assign({},d.data(),{id:d.id}));
+            const clash=all.find(d=>d.id!==id&&sameNum(d.numero,rec.numero)&&((d.createdAt||'')<rec.createdAt||((d.createdAt||'')===rec.createdAt&&d.id<id)));
+            if(!clash)break;
+            rec.numero=nextNum(all.concat(Object.values(lsAll())));
+            await lim(P.fbSetDoc(P.fbDoc(P.db,'devis',id),rec));
+          }
+        }
+        lsDel(id);
+      }catch(e){why=e&&e.message||String(e);}
+    }else if(P)why='base injoignable';
+    if(src==='local'&&!lsPut(rec)){note('Échec de l\'enregistrement'+(why?' ('+why+')':''),'err');return;}
+    curId=id;curMeta=Object.assign({},rec,{_src:src});curNote='';
+    el('devisNum').value=rec.numero;syncPrint();savedSnap=snap();updSt();
+    if(src==='base')note('Devis '+rec.numero+' enregistré');
+    else note('Enregistré sur cet appareil seulement'+(P?' — base injoignable, réessaie plus tard':''),'warn');
+  }catch(e){note('Échec de l\'enregistrement : '+(e&&e.message||e),'err');}
+  finally{busy=false;btn.disabled=false;btn.style.opacity='';}
+}
+
+async function openList(){
+  el('listOv').classList.add('show');delAsk=null;
+  el('dvList').innerHTML='<div class="dv-empty">Chargement…</div>';el('dvSrc').textContent='';el('dvSrc').className='dv-src';
+  const r=await loadAll();LIST=r.list;LSRC=r;drawList();
+  setTimeout(()=>{try{el('dvQ').focus({preventScroll:true});}catch(e){}},50);
+}
+function closeList(){el('listOv').classList.remove('show');delAsk=null;}
+function drawList(){
+  const q=el('dvQ').value.trim().toLowerCase(),asc=el('dvSort').value==='asc';
+  const src=el('dvSrc'),nLoc=LIST.filter(d=>d._src==='local').length;
+  if(!LSRC.hasBase){src.textContent='Hors de l\'appli : devis gardés sur cet appareil seulement.';src.className='dv-src warn';}
+  else if(!LSRC.baseOk){src.textContent='Base injoignable : seuls les devis gardés sur cet appareil sont affichés.';src.className='dv-src warn';}
+  else{src.textContent=(LIST.length-nLoc)+' devis dans la base'+(nLoc?' · '+nLoc+' sur cet appareil seulement':'');src.className='dv-src';}
+  let l=LIST.filter(d=>!q||[d.numero,d.client,d.designation].some(x=>String(x||'').toLowerCase().includes(q)));
+  l.sort((a,b)=>{const k=(a.date||'').localeCompare(b.date||'')||(a.updatedAt||'').localeCompare(b.updatedAt||'')||String(a.numero||'').localeCompare(String(b.numero||''));return asc?k:-k;});
+  if(!l.length){el('dvList').innerHTML='<div class="dv-empty">'+(LIST.length?'Aucun devis ne correspond.':'Aucun devis enregistré.')+'</div>';return;}
+  el('dvList').innerHTML=l.map(d=>{
+    const cur=d.id===curId,mod=cur&&isDirty();
+    const tags=(d._src==='local'?'<span class="dv-tag">cet appareil</span>':'')+(cur?'<span class="dv-tag">'+(mod?'ouvert · modifié non enregistré':'ouvert')+'</span>':'');
+    const btns=delAsk===d.id
+      ?'<span class="dv-q">Supprimer '+esc(d.numero)+' ?</span><button class="btn bg dv-del" onclick="delDevis(\''+d.id+'\')">Oui, supprimer</button><button class="btn bg" onclick="delAsk=null;drawList()">Non</button>'
+      :'<button class="btn bb" onclick="openDevis(\''+d.id+'\')">Ouvrir</button><button class="btn bg" onclick="dupDevis(\''+d.id+'\')">Dupliquer</button><button class="btn bg dv-del" title="Supprimer" onclick="delAsk=\''+d.id+'\';drawList()">🗑</button>';
+    return '<div class="dv-row'+(cur?' cur':'')+'"><div class="dv-i"><b>'+esc(d.numero||'—')+'</b> · '+esc(d.client||'Sans client')+(d.designation?' · '+esc(d.designation):'')+tags+
+      '<div class="dv-m">'+fdd(d.date)+' · '+esc(d.quantite==null?'—':nf(d.quantite))+' pce'+(d.quantite>1?'s':'')+' · '+f(d.prixPiece)+' / pce · total '+f(d.total)+' · '+esc(d.updatedBy||d.createdBy||'—')+'</div></div><div class="dv-b">'+btns+'</div></div>';
+  }).join('');
+}
+function findRec(id){return LIST.find(d=>d.id===id);}
+function openDevis(id,force){
+  const d=findRec(id);if(!d)return;
+  if(!force&&isDirty()&&id!==curId){askC('Le devis en cours n\'est pas enregistré. L\'abandonner et ouvrir '+(d.numero||'ce devis')+' ?','Ouvrir quand même',()=>openDevis(id,true));return;}
+  setState(d.etat||{});el('devisNum').value=d.numero||'';
+  curId=d.id;curMeta=d;curNote='';syncPrint();savedSnap=snap();updSt();closeList();
+  note('Devis '+(d.numero||'')+' ouvert');
+}
+function dupDevis(id,force){
+  const d=findRec(id);if(!d)return;
+  if(!force&&isDirty()){askC('Le devis en cours n\'est pas enregistré. L\'abandonner et dupliquer '+(d.numero||'ce devis')+' ?','Dupliquer quand même',()=>dupDevis(id,true));return;}
+  setState(d.etat||{});el('devisDate').value=todayISO();el('devisNum').value='';
+  curId=null;curMeta=null;curNote='● Copie de '+(d.numero||'devis');syncPrint();savedSnap='';updSt();closeList();
+  note('Copie de '+(d.numero||'')+' : nouveau n° à l\'enregistrement');
+}
+async function delDevis(id){
+  const d=findRec(id);if(!d)return;
+  try{
+    if(d._src==='base'){const P=fb();if(!P)throw new Error('base injoignable');await lim(P.fbDeleteDoc(P.fbDoc(P.db,'devis',id)));}
+    lsDel(id);
+    LIST=LIST.filter(x=>x.id!==id);delAsk=null;
+    if(curId===id){curId=null;curMeta=null;curNote='';el('devisNum').value='';savedSnap='';syncPrint();updSt();}
+    drawList();note('Devis '+(d.numero||'')+' supprimé');
+  }catch(e){note('Suppression impossible : '+(e&&e.message||e),'err');}
+}
+let cfCb=null;
+function askC(msg,ok,cb){el('cfMsg').textContent=msg;el('cfOk').textContent=ok||'OK';cfCb=cb;el('cfOv').classList.add('show');setTimeout(()=>{try{el('cfOk').focus();}catch(e){}},30);}
+function cfClose(){el('cfOv').classList.remove('show');cfCb=null;}
+document.addEventListener('DOMContentLoaded',()=>{
+  if(PRINT_COPY)return;
+  el('cfOk').addEventListener('click',()=>{const c=cfCb;cfClose();if(c)c();});
+  el('cfOv').addEventListener('click',function(e){if(e.target===this)cfClose();});
+  el('listOv').addEventListener('click',function(e){if(e.target===this)closeList();});
+  document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(el('cfOv').classList.contains('show'))cfClose();else if(el('listOv').classList.contains('show'))closeList();});
+  cx();savedSnap=snap();updSt();
+});
 
 function s(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
 function ps(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
-function f(n){return(isNaN(n)||!isFinite(n))?'—':n.toFixed(2).replace('.',',')+' €';}
+function f(n){if(typeof n!=='number'||isNaN(n)||!isFinite(n))return '—';if(Math.abs(n)<0.005)n=0;return n.toFixed(2).replace('.',',')+' €';}
 </script>
 
 </body>

@@ -767,6 +767,8 @@ async function calcStorageSize(){
 function canDo(perm){if(!currentUser)return false;if(currentUser.role==='admin')return true;return !!(currentUser.perms&&currentUser.perms[perm]);}
 // Accès aux onglets : Statistiques reste ouvert tant que l'admin ne l'a pas décoché, Usinage est fermé tant qu'il ne l'a pas coché
 window.mcsIsAdmin=()=>!!currentUser&&currentUser.role==='admin';
+// Devis Pièce (iframe) : nom de l'auteur des devis enregistrés
+window.mcsUser=()=>currentUser?{id:currentUser.id,name:currentUser.name||currentUser.id}:null;
 function canTab(perm){if(!currentUser)return false;if(currentUser.role==='admin')return true;const p=currentUser.perms||{};return perm==='accessStats'?p[perm]!==false:!!p[perm];}
 function applyTabAccess(){[['nav-usinage','accessUsinage'],['nav-stats','accessStats'],['bn-stats','accessStats']].forEach(([id,p])=>{const b=document.getElementById(id);if(b)b.classList.toggle('hidden',!canTab(p));});}
 
@@ -1350,7 +1352,7 @@ function renderHome(){
         ${localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair'}
       </button>
     </div>
-    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 22</div>
+    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 23</div>
   </div>`;
 }
 
@@ -3691,9 +3693,11 @@ function renderStorageCard(){
     +'</div>';
 }
 
-function exportData(){
+async function exportData(){
   try{
-    const data={version:1,exportDate:new Date().toISOString(),fiches,machines,users:USERS};
+    let devis=[];
+    if(canDo('accessDevis')){try{const sn=await Promise.race([window.fbGetDocs(window.fbCollection(window.db,'devis')),new Promise((_,rj)=>setTimeout(()=>rj(new Error('délai')),5000))]);devis=sn.docs.map(d=>({...d.data(),id:d.id}));}catch(e){toast('Devis non exportés (base injoignable)','error');}}
+    const data={version:1,exportDate:new Date().toISOString(),fiches,machines,users:USERS,devis};
     const json=JSON.stringify(data,null,2);
     const blob=new Blob([json],{type:'application/json'});
     const url=URL.createObjectURL(blob);
@@ -3702,7 +3706,7 @@ function exportData(){
     a.href=url;a.download=`MCS_backup_${date}.json`;
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     setTimeout(()=>URL.revokeObjectURL(url),5000);
-    toast(`Export réussi — ${fiches.length} fiches, ${machines.length} machines`);
+    toast(`Export réussi — ${fiches.length} fiches, ${machines.length} machines, ${devis.length} devis`);
   }catch(e){toast('Erreur export : '+e.message,'error');}
 }
 
@@ -3721,6 +3725,9 @@ async function importData(file){
     }
     for(const m of data.machines){
       await window.fbSetDoc(window.fbDoc(window.db,'machines',m.id),m);
+    }
+    if(Array.isArray(data.devis)&&canDo('accessDevis')){
+      for(const d of data.devis){if(d&&d.id)await window.fbSetDoc(window.fbDoc(window.db,'devis',d.id),d);}
     }
     await loadAllData();
     toast(`Import réussi — ${data.fiches.length} fiches importées`);
