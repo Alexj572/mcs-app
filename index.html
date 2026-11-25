@@ -174,6 +174,12 @@ label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.05em;tex
 #scan-bar .scan-seg button.on{background:#4a90e8;border-color:#4a90e8}
 #scan-bar .scan-grp{display:contents}
 #cam-bar button#cam-scan{background:#2952b3;border-color:transparent}
+#scan-msg{white-space:pre-line}
+#scan-refl ellipse,#cam-refl ellipse{fill:rgba(255,176,32,.16);stroke:#ffb020;stroke-width:3;stroke-dasharray:8 6}
+#cam-refl{position:absolute;pointer-events:none;overflow:visible}
+#cam-warn{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);max-width:calc(100% - 24px);background:rgba(120,70,0,.88);border:1px solid #ffb020;color:#fff;padding:8px 14px;border-radius:12px;font-size:14px;font-weight:600;text-align:center}
+#scan-bar .scan-ink{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;text-transform:none;letter-spacing:0;margin:0}
+#scan-bar .scan-ink input{width:120px;accent-color:#4a90e8;min-height:32px}
 @media(max-width:600px){#scan-bar{gap:8px;padding:10px 8px max(10px,env(safe-area-inset-bottom))}#scan-bar button{font-size:14px;padding:10px 12px;min-height:46px}#scan-bar .scan-seg button{padding:10px 10px}}
 #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:flex;align-items:center;justify-content:center;cursor:zoom-out}
 #lightbox img{max-width:92vw;max-height:88vh;border-radius:8px;box-shadow:0 0 60px rgba(0,0,0,.8);cursor:default}
@@ -483,6 +489,8 @@ document.dispatchEvent(new Event('firebaseReady'));
     <video id="cam-video" autoplay playsinline muted></video>
     <img id="cam-still" class="hidden" alt="">
     <div id="cam-count" class="hidden"></div>
+    <svg id="cam-refl" class="hidden" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"></svg>
+    <div id="cam-warn" class="hidden"></div>
   </div>
   <div id="cam-bar">
     <button type="button" id="cam-switch" class="hidden" onclick="camSwitch()">🔄 Changer de caméra</button>
@@ -499,7 +507,7 @@ document.dispatchEvent(new Event('firebaseReady'));
 <div id="scan-modal" class="hidden" role="dialog" aria-label="Scanner le plan">
   <div id="scan-stage">
     <canvas id="scan-src"></canvas>
-    <svg id="scan-svg" aria-hidden="true"><polygon points=""></polygon></svg>
+    <svg id="scan-svg" aria-hidden="true"><polygon points=""></polygon><g id="scan-refl"></g></svg>
     <div class="scan-h" data-i="0" aria-label="Coin haut gauche"></div><div class="scan-h" data-i="1" aria-label="Coin haut droit"></div><div class="scan-h" data-i="2" aria-label="Coin bas droit"></div><div class="scan-h" data-i="3" aria-label="Coin bas gauche"></div>
     <canvas id="scan-loupe" class="hidden" width="132" height="132"></canvas>
     <canvas id="scan-out" class="hidden"></canvas>
@@ -515,7 +523,8 @@ document.dispatchEvent(new Event('firebaseReady'));
     <div class="scan-grp hidden" id="scan-g2">
       <button type="button" onclick="scanRot(-90)" title="Tourner à gauche" aria-label="Tourner à gauche">↺</button>
       <button type="button" onclick="scanRot(90)" title="Tourner à droite" aria-label="Tourner à droite">↻</button>
-      <div class="scan-seg" role="group" aria-label="Rendu"><button type="button" data-m="bw" onclick="scanSetMode('bw')">Noir et blanc</button><button type="button" data-m="gray" onclick="scanSetMode('gray')">Gris</button><button type="button" data-m="color" onclick="scanSetMode('color')">Couleur</button></div>
+      <div class="scan-seg" role="group" aria-label="Rendu"><button type="button" data-m="net" onclick="scanSetMode('net')">Net</button><button type="button" data-m="bw" onclick="scanSetMode('bw')">N&amp;B</button><button type="button" data-m="gray" onclick="scanSetMode('gray')">Gris</button><button type="button" data-m="color" onclick="scanSetMode('color')">Couleur</button></div>
+      <label class="scan-ink" title="Intensité de l'encre">Plus clair<input type="range" id="scan-ink" min="-2" max="2" step="1" value="0" oninput="scanSetInk(this.value)" aria-label="Intensité de l'encre">Plus foncé</label>
       <button type="button" onclick="scanBack()">← Coins</button>
       <button type="button" onclick="scanCancel()">Annuler</button>
       <button type="button" class="scan-ok" id="scan-valid" onclick="scanValidate()">✓ Valider</button>
@@ -1304,7 +1313,7 @@ function renderHome(){
         ${localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair'}
       </button>
     </div>
-    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 20</div>
+    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 21</div>
   </div>`;
 }
 
@@ -2206,11 +2215,17 @@ function warp(src,w,h,C,ow,oh){
 }
 // ---------- estimation du fond (éclairage) ----------
 function background(Lm,w,h){
-  const B=Math.max(3,Math.round(Math.max(w,h)/320)),bw=Math.ceil(w/B),bh=Math.ceil(h/B),sm=new Float32Array(bw*bh);
+  const B=Math.max(3,Math.round(Math.max(w,h)/320)),bw=Math.ceil(w/B),bh=Math.ceil(h/B),sm=new Float32Array(bw*bh),gr=new Float32Array(bw*bh);
   for(let by=0;by<bh;by++)for(let bx=0;bx<bw;bx++){
     let m=0;const y1=Math.min(h-1,(by+1)*B),x1=Math.min(w-1,(bx+1)*B);
     for(let y=by*B;y<y1;y+=2)for(let x=bx*B;x<x1;x+=2){const i=y*w+x;const v=(Lm[i]+Lm[i+1]+Lm[i+w]+Lm[i+w+1])*0.25;if(v>m)m=v}
     sm[by*bw+bx]=m;
+    // pente maximale (sur l'image moyennée 2x2, écart de 4 px) : bord net d'encre ou limite d'ombre douce ?
+    let gm=0;
+    for(let y=by*B;y<y1;y+=2)for(let x=bx*B;x<x1;x+=2){if(x<4||y<4||x>=w-5||y>=h-5)continue;const i=y*w+x;
+      const a=Lm[i-4]+Lm[i-3]+Lm[i-4+w]+Lm[i-3+w],b=Lm[i+4]+Lm[i+5]+Lm[i+4+w]+Lm[i+5+w],c=Lm[i-4*w]+Lm[i-4*w+1]+Lm[i-3*w]+Lm[i-3*w+1],d=Lm[i+4*w]+Lm[i+4*w+1]+Lm[i+5*w]+Lm[i+5*w+1];
+      const g=Math.max(Math.abs(a-b),Math.abs(c-d))*0.25;if(g>gm)gm=g}
+    gr[by*bw+bx]=gm;
   }
   // cases hors photo (feuille sortie du cadre) : remplies par les voisines
   for(let it=0;it<bw+bh;it++){let left=0;const c2=sm.slice();
@@ -2223,6 +2238,32 @@ function background(Lm,w,h){
     for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){let m=isMax?-1:1e9;for(let k=-r;k<=r;k++){const yy=y+k;if(yy<0||yy>=bh)continue;const v=t[yy*bw+x];if(isMax?v>m:v<m)m=v}o[y*bw+x]=m}
     return o};
   let s2=filt(filt(sm,2,true),2,false);
+  // grandes zones d'encre (aplats, bandeaux, texte gras serré) : la fermeture fine les prendrait pour du fond.
+  // Zone sombre par rapport au fond à grande échelle + bord NET => encre : on la remplit par les voisines.
+  // Zone sombre à bord DOUX => ombre : on la garde (elle doit être corrigée).
+  const RL=Math.max(6,Math.round(Math.min(bw,bh)/6)),Lg=filt(filt(s2,RL,true),RL,false);
+  const N2=bw*bh;
+  for(const thr of [0.55,0.8]){
+  const dark=new Uint8Array(N2);for(let i=0;i<N2;i++)if(s2[i]<thr*Lg[i]&&s2[i]>0)dark[i]=1;
+  const lab=new Int32Array(N2).fill(-1),stack=[];let fillAny=false;
+  for(let i0=0;i0<N2;i0++){if(!dark[i0]||lab[i0]>=0)continue;
+    const comp=[];stack.push(i0);lab[i0]=i0;
+    while(stack.length){const i=stack.pop();comp.push(i);const x=i%bw,y=(i/bw)|0;
+      for(const j of [x>0?i-1:-1,x<bw-1?i+1:-1,y>0?i-bw:-1,y<bh-1?i+bw:-1])if(j>=0&&dark[j]&&lab[j]<0){lab[j]=i0;stack.push(j)}}
+    // bord : cases sombres touchant une case claire (et leurs voisines claires, qui contiennent souvent le bord)
+    const gs=[];let step=0;
+    for(const i of comp){step+=Lg[i]-s2[i];const x=i%bw,y=(i/bw)|0;
+      for(const j of [x>0?i-1:-1,x<bw-1?i+1:-1,y>0?i-bw:-1,y<bh-1?i+bw:-1])if(j>=0&&!dark[j]){gs.push(Math.max(gr[i],gr[j]));}}
+    step/=comp.length;if(!gs.length)continue;
+    gs.sort((a,b)=>a-b);const gmed=gs[gs.length>>1];
+    if(gmed>Math.max(25,0.6*step)){for(const i of comp)s2[i]=0;fillAny=true}
+  }
+  if(fillAny)for(let it=0;it<bw+bh;it++){let left=0;const c2=s2.slice();
+    for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const i=y*bw+x;if(c2[i]>0)continue;let s=0,k=0;
+      if(x>0&&c2[i-1]>0){s+=c2[i-1];k++}if(x<bw-1&&c2[i+1]>0){s+=c2[i+1];k++}if(y>0&&c2[i-bw]>0){s+=c2[i-bw];k++}if(y<bh-1&&c2[i+bw]>0){s+=c2[i+bw];k++}
+      if(k)s2[i]=s/k;else left++}
+    if(!left)break}
+  }
   const box=(a,r)=>{const t=new Float32Array(a.length),o=new Float32Array(a.length);
     for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){let s=0,n=0;for(let k=-r;k<=r;k++){const xx=x+k;if(xx<0||xx>=bw)continue;s+=a[y*bw+xx];n++}t[y*bw+x]=s/n}
     for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){let s=0,n=0;for(let k=-r;k<=r;k++){const yy=y+k;if(yy<0||yy>=bh)continue;s+=t[yy*bw+x];n++}o[y*bw+x]=s/n}
@@ -2246,65 +2287,131 @@ function ratioMap(Lm,w,h,bg){
 }
 function percentile(a,p,step){const h=new Uint32Array(1025);let n=0;for(let i=0;i<a.length;i+=step){if(a[i]===0)continue;let v=Math.round(a[i]*512);if(v>1024)v=1024;h[v]++;n++}let t=n*p,c=0;for(let i=0;i<=1024;i++){c+=h[i];if(c>=t)return i/512}return 1}
 // ---------- nettoyage ----------
-function clean(rgba,w,h,mode){
-  const out=clean0(rgba,w,h,mode);
+function clean(rgba,w,h,mode,opt){
+  const out=clean0(rgba,w,h,mode,opt||{});
   for(let p=3;p<out.length;p+=4)if(!rgba[p]){out[p-3]=out[p-2]=out[p-1]=255;out[p]=255}
   return out;
 }
-function clean0(rgba,w,h,mode){
-  const n=w*h,Lm=new Uint8Array(n);
+// Rendus : 'net' (défaut : fond blanc, encre foncée, anticrénelé, netteté), 'bw' (noir et blanc strict), 'gray', 'color'
+// opt.ink : intensité de l'encre, -2 (plus clair) .. +2 (plus foncé)
+function clean0(rgba,w,h,mode,opt){
+  const n=w*h,Lm=new Uint8Array(n),ink=Math.max(-2,Math.min(2,+opt.ink||0));
   for(let i=0,p=0;i<n;i++,p+=4)Lm[i]=rgba[p+3]?Math.max(1,(rgba[p]*77+rgba[p+1]*150+rgba[p+2]*29)>>8):0;
   const bg=background(Lm,w,h),r=ratioMap(Lm,w,h,bg);
   const st=Math.max(1,Math.floor(n/400000));
   const pw=Math.max(0.3,percentile(r,0.6,st));
-  const out=new Uint8ClampedArray(n*4);
-  if(mode==='color'){
-    // balance des blancs sur le papier
-    let sr=0,sg=0,sb=0,cnt=0;
-    for(let i=0;i<n;i+=st){if(r[i]>pw*0.97){const p=i*4,l=Lm[i]||1;sr+=rgba[p]/l;sg+=rgba[p+1]/l;sb+=rgba[p+2]/l;cnt++}}
-    const kr=cnt?sr/cnt:1,kg=cnt?sg/cnt:1,kb=cnt?sb/cnt:1;
-    const lut=new Uint8ClampedArray(1025);for(let i=0;i<=1024;i++){const x=Math.min(1,i/1024/0.93);lut[i]=255*Math.pow(x,1.15)}
-    for(let i=0,p=0;i<n;i++,p+=4){const l=Lm[i]||1,f=r[i]/pw/l;
-      out[p]=lut[Math.min(1024,Math.round(rgba[p]/kr*f*1024))];out[p+1]=lut[Math.min(1024,Math.round(rgba[p+1]/kg*f*1024))];out[p+2]=lut[Math.min(1024,Math.round(rgba[p+2]/kb*f*1024))];out[p+3]=255}
-    return out;
-  }
   const Nn=new Uint8Array(n);for(let i=0;i<n;i++){const v=r[i]/pw*255;Nn[i]=v>255?255:v}
   const smooth=A=>{const S=new Uint8Array(n);
     for(let y=0;y<h;y++){const ym=y>0?y-1:0,yp=y<h-1?y+1:y;for(let x=0;x<w;x++){const xm=x>0?x-1:0,xp=x<w-1?x+1:x;
       S[y*w+x]=(A[ym*w+xm]+2*A[ym*w+x]+A[ym*w+xp]+2*A[y*w+xm]+4*A[y*w+x]+2*A[y*w+xp]+A[yp*w+xm]+2*A[yp*w+x]+A[yp*w+xp]+8)>>4}}
     return S};
-  if(mode==='gray'){
-    const Sg=smooth(Nn);
-    let lo=percentile(r,0.004,st)/pw;lo=Math.min(0.45,Math.max(0,lo))*255;
-    const lut=new Uint8ClampedArray(256);for(let i=0;i<256;i++){const x=Math.max(0,Math.min(1,(i-lo)/(240-lo)));lut[i]=255*Math.pow(x,1.35)}
-    for(let i=0,p=0;i<n;i++,p+=4){const v=lut[Sg[i]];out[p]=out[p+1]=out[p+2]=v;out[p+3]=255}
+  const S=smooth(Nn);
+  opt_hi=opt.hi||225;if(opt.kmax!==0)localStretch(S,w,h,opt.kmax||2,opt.kr||4,bg);
+  let Bl=S;for(let k=0;k<(opt.bp||4);k++)Bl=smooth(Bl);
+  // niveau de l'encre : les pixels nettement plus sombres que le papier (20e centile)
+  const hist=new Uint32Array(256);let ni=0;for(let i=0;i<n;i+=st){const v=S[i];if(v<200&&Lm[i]){hist[v]++;ni++}}
+  let ib=100;if(ni>50){let c=0;for(let v=0;v<256;v++){c+=hist[v];if(c>=ni*(opt.pct||0.2)){ib=v;break}}}
+  ib=Math.max(30,Math.min(150,ib));
+  const P={net:{A:2.5,g:2.3,wp:232},bw:{A:2.5,g:2.3,wp:232},gray:{A:1.5,g:1.8,wp:240},color:{A:1.5,g:1.8,wp:236}}[mode]||{A:2.5,g:2.3,wp:232};
+  if(opt.A!=null&&mode===(opt.m||'net'))P.A=opt.A;if(opt.g!=null&&mode===(opt.m||'net'))P.g=opt.g;if(opt.wp!=null&&mode===(opt.m||'net'))P.wp=opt.wp;
+  const g=P.g*Math.pow(1.22,ink),bk=Math.max(10,Math.min(190,ib*(1+0.12*ink)+(mode==='gray'?-20:0))),wp=P.wp,A=P.A;
+  const lut=new Uint8ClampedArray(512);for(let i=0;i<512;i++){const v=i-128;const x=Math.max(0,Math.min(1,(v-bk)/(wp-bk)));lut[i]=255*Math.pow(x,g)}
+  const CR=opt.core!=null?opt.core:0;const sh=d=>d>CR?d-CR:d<-CR?d+CR:0;
+  const L2=i=>{let u=S[i]+A*sh(S[i]-Bl[i]);u=Math.round(u)+128;return u<0?0:u>511?511:u};
+  const out=new Uint8ClampedArray(n*4);
+  if(mode==='color'){
+    let sr=0,sg=0,sb=0,cnt=0;
+    for(let i=0;i<n;i+=st){if(r[i]>pw*0.97){const p=i*4,l=Lm[i]||1;sr+=rgba[p]/l;sg+=rgba[p+1]/l;sb+=rgba[p+2]/l;cnt++}}
+    const kr=cnt?sr/cnt:1,kg=cnt?sg/cnt:1,kb=cnt?sb/cnt:1;
+    for(let i=0,p=0;i<n;i++,p+=4){const l=Lm[i]||1,f=r[i]/pw/l*255,d=A*sh(S[i]-Bl[i])+128;
+      for(let c=0;c<3;c++){let u=Math.round(rgba[p+c]/(c===0?kr:c===1?kg:kb)*f+d);out[p+c]=lut[u<0?0:u>511?511:u]}
+      out[p+3]=255}
+    const O=new Uint8Array(n);for(let i=0,p=0;i<n;i++,p+=4)O[i]=(out[p]*77+out[p+1]*150+out[p+2]*29)>>8;
+    const O2=O.slice();despeck(O2,w,h,opt.ds!=null?opt.ds:9);
+    for(let i=0,p=0;i<n;i++,p+=4)if(O2[i]!==O[i]){out[p]=out[p+1]=out[p+2]=255}
     return out;
   }
-  // noir et blanc : lissage 3x3 [1 2 1], puis seuil adaptatif (moyenne locale) doux
-  const S=smooth(Nn);
-  const ii=new Uint32Array((w+1)*(h+1));
-  for(let y=0;y<h;y++){let s=0;const o=(y+1)*(w+1),o0=y*(w+1);for(let x=0;x<w;x++){s+=S[y*w+x];ii[o+x+1]=ii[o0+x+1]+s}}
-  const R2=Math.max(7,Math.round(Math.max(w,h)/90));
-  for(let y=0;y<h;y++){const y0=Math.max(0,y-R2),y1=Math.min(h,y+R2+1);
-    for(let x=0;x<w;x++){const x0=Math.max(0,x-R2),x1=Math.min(w,x+R2+1);
-      const m=(ii[y1*(w+1)+x1]-ii[y0*(w+1)+x1]-ii[y1*(w+1)+x0]+ii[y0*(w+1)+x0])/((y1-y0)*(x1-x0));
-      const v=S[y*w+x],thr=Math.max(Math.min(m*(1-PT),m-PC),PG);
-      let o;
-      if(v<95)o=0;else{const dd=thr-v;o=dd<=0?255:dd>=24?0:255-dd*10.6}
-      const p=(y*w+x)*4;out[p]=out[p+1]=out[p+2]=o;out[p+3]=255}}
+  const O=new Uint8Array(n);for(let i=0;i<n;i++)O[i]=lut[L2(i)];
+  despeck(O,w,h,opt.ds!=null?opt.ds:9);
+  // noir et blanc strict : rendu net puis seuil (légèrement épaississant)
+  if(mode==='bw')for(let i=0;i<n;i++)O[i]=O[i]<165?0:255;
+  for(let i=0,p=0;i<n;i++,p+=4){const o=O[i];out[p]=out[p+1]=out[p+2]=o;out[p+3]=255}
   return out;
 }
-return{shrink,detect,defaultCorners,order,outSize,zhangRatio,warp,clean,homog};
+// Étirement local du contraste : là où l'encre la plus foncée du voisinage est plus claire qu'ailleurs
+// (reflet partiel, voile dans l'ombre), on l'assombrit jusqu'au niveau habituel de l'encre (jamais l'inverse).
+var opt_hi=225;
+function localStretch(S,w,h,kmax,kr,bgm){
+  const B=Math.max(6,Math.round(Math.max(w,h)/200)),bw=Math.ceil(w/B),bh=Math.ceil(h/B),N=bw*bh,mn=new Float32Array(N);
+  for(let by=0;by<bh;by++)for(let bx=0;bx<bw;bx++){let m=255;const y1=Math.min(h,(by+1)*B),x1=Math.min(w,(bx+1)*B);
+    for(let y=by*B;y<y1;y++)for(let x=bx*B;x<x1;x++){const v=S[y*w+x];if(v<m)m=v}mn[by*bw+bx]=m}
+  // encre la plus foncée dans un rayon de kr cases (cases sans encre ignorées)
+  const d=new Float32Array(N);
+  for(let by=0;by<bh;by++)for(let bx=0;bx<bw;bx++){let m=255;
+    for(let yy=Math.max(0,by-kr);yy<=Math.min(bh-1,by+kr);yy++)for(let xx=Math.max(0,bx-kr);xx<=Math.min(bw-1,bx+kr);xx++){const v=mn[yy*bw+xx];if(v<m)m=v}
+    d[by*bw+bx]=m<200?m:0}
+  const vals=[];for(let i=0;i<N;i++)if(d[i]>0)vals.push(d[i]);if(vals.length<20)return;
+  vals.sort((a,b)=>a-b);const ref=vals[Math.floor(vals.length*0.25)];
+  for(let it=0;it<bw+bh;it++){let left=0;const c2=d.slice();
+    for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const i=y*bw+x;if(c2[i]>0)continue;let s=0,k=0;
+      if(x>0&&c2[i-1]>0){s+=c2[i-1];k++}if(x<bw-1&&c2[i+1]>0){s+=c2[i+1];k++}if(y>0&&c2[i-bw]>0){s+=c2[i-bw];k++}if(y<bh-1&&c2[i+bw]>0){s+=c2[i+bw];k++}
+      if(k)d[i]=s/k;else left++}
+    if(!left)break}
+  // seulement là où l'éclairage est anormal (reflet : fond plus clair ; ombre : fond plus sombre)
+  const bv=new Float32Array(N),tmp=[];
+  for(let by=0;by<bh;by++)for(let bx=0;bx<bw;bx++){const gx=Math.min(bgm.bw-1,Math.floor((bx+0.5)*B/bgm.B)),gy=Math.min(bgm.bh-1,Math.floor((by+0.5)*B/bgm.B));const v=bgm.sm[gy*bgm.bw+gx];bv[by*bw+bx]=v;if(v>0)tmp.push(v)}
+  tmp.sort((a,b)=>a-b);const med=tmp[tmp.length>>1]||1;
+  const K=new Float32Array(N);for(let i=0;i<N;i++){const an=Math.abs(Math.log(Math.max(1,bv[i])/med)),cap=1+(kmax-1)*Math.max(0,Math.min(1,(an-0.06)/0.2));
+    K[i]=Math.max(1,Math.min(cap,(255-ref)/Math.max(1,255-d[i])))}
+  // lissage 3x3 x2
+  for(let p=0;p<2;p++){const c=K.slice();for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){let s=0,k=0;for(let yy=Math.max(0,y-1);yy<=Math.min(bh-1,y+1);yy++)for(let xx=Math.max(0,x-1);xx<=Math.min(bw-1,x+1);xx++){s+=c[yy*bw+xx];k++}K[y*bw+x]=s/k}}
+  for(let y=0;y<h;y++){let gy=(y+0.5)/B-0.5;gy=gy<0?0:gy>bh-1?bh-1:gy;const y0=Math.min(bh-2,gy|0),fy=bh<2?0:gy-y0;
+    for(let x=0;x<w;x++){let gx=(x+0.5)/B-0.5;gx=gx<0?0:gx>bw-1?bw-1:gx;const x0=Math.min(bw-2,gx|0),fx=bw<2?0:gx-x0;
+      const k=bw<2||bh<2?K[0]:(K[y0*bw+x0]*(1-fx)+K[y0*bw+x0+1]*fx)*(1-fy)+(K[(y0+1)*bw+x0]*(1-fx)+K[(y0+1)*bw+x0+1]*fx)*fy;
+      const i=y*w+x,s0=S[i],wt=Math.max(0,Math.min(1,((opt_hi||225)-s0)/40)),v=s0-wt*(k-1)*(255-s0);S[i]=v<0?0:v}}
 }
-
+// points isolés (bruit du capteur) : pixel gris/foncé avec moins de k voisins foncés dans une fenêtre 5x5 -> blanc
+function despeck(O,w,h,k){
+  if(!k)return;
+  const ii=new Uint32Array((w+1)*(h+1));
+  for(let y=0;y<h;y++){let s=0;const o=(y+1)*(w+1),o0=y*(w+1);for(let x=0;x<w;x++){s+=O[y*w+x]<200?1:0;ii[o+x+1]=ii[o0+x+1]+s}}
+  for(let y=0;y<h;y++){const y0=Math.max(0,y-2),y1=Math.min(h,y+3);
+    for(let x=0;x<w;x++){const i=y*w+x;if(O[i]===255)continue;const x0=Math.max(0,x-2),x1=Math.min(w,x+3);
+      const c=ii[y1*(w+1)+x1]-ii[y0*(w+1)+x1]-ii[y1*(w+1)+x0]+ii[y0*(w+1)+x0];
+      if(O[i]<200?c<k:c===0)O[i]=255}}
+}
+// Reflets saturés (néon, lampe) sur une image réduite (~480 px) : zones blanches brûlées plus claires que le papier autour.
+// Renvoie des ellipses en coordonnées relatives (0..1).
+function reflets(d,w,h){
+  const n=w*h,sat=new Uint8Array(n),Y=new Uint8Array(n);
+  for(let i=0,p=0;i<n;i++,p+=4){const r=d[p],g=d[p+1],b=d[p+2],y=(r*77+g*150+b*29)>>8;Y[i]=y;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(y>=246&&mx-mn<=22)sat[i]=1}
+  const lab=new Int32Array(n).fill(-1),out=[],st=[],minA=Math.max(20,n*0.0008);
+  for(let i0=0;i0<n;i0++){if(!sat[i0]||lab[i0]>=0)continue;
+    let cnt=0,sx=0,sy=0,x0=w,x1=0,y0=h,y1=0;st.push(i0);lab[i0]=i0;
+    while(st.length){const i=st.pop(),x=i%w,y=(i/w)|0;cnt++;sx+=x;sy+=y;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;
+      for(const j of [x>0?i-1:-1,x<w-1?i+1:-1,y>0?i-w:-1,y<h-1?i+w:-1])if(j>=0&&sat[j]&&lab[j]<0){lab[j]=i0;st.push(j)}}
+    if(cnt<minA)continue;
+    // pourtour (4 bandes) : un reflet est plus clair que le papier tout autour ; une feuille simplement surexposée
+    // à côté d'une ombre ne l'est que d'un côté
+    const mx=Math.max(3,Math.round((x1-x0)*1.0)),my=Math.max(3,Math.round((y1-y0)*1.0));
+    const strip=(ax,ay,bx,by)=>{const v=[];for(let y=Math.max(0,ay);y<=Math.min(h-1,by);y++)for(let x=Math.max(0,ax);x<=Math.min(w-1,bx);x++){const i=y*w+x;if(lab[i]===i0)continue;v.push(Y[i])}if(v.length<5)return -1;v.sort((a,b)=>a-b);return v[Math.floor(v.length*0.6)]};
+    const sides=[strip(x0-mx,y0-my,x1+mx,y0-1),strip(x0-mx,y1+1,x1+mx,y1+my),strip(x0-mx,y0,x0-1,y1),strip(x1+1,y0,x1+mx,y1)];
+    let darker=0,valid=0;for(const v of sides){if(v<150)continue;valid++;if(v<238)darker++}
+    if(valid<2||darker<Math.min(3,valid))continue;
+    out.push({x:(x0+x1+1)/2/w,y:(y0+y1+1)/2/h,rx:Math.max(0.02,(x1-x0+1)/2/w*1.25),ry:Math.max(0.02,(y1-y0+1)/2/h*1.25),a:cnt/n});
+  }
+  return out;
+}
+return{shrink,detect,reflets,defaultCorners,order,outSize,zhangRatio,warp,clean,homog};
+}
 function scanExec(st,m){
   const t0=Date.now();
   if(m.cmd==='load'){st.S={d:new Uint8ClampedArray(m.buf),w:m.w,h:m.h};st.Wp=null;const det=st.core.detect(st.S.d,m.w,m.h);return{det,ms:Date.now()-t0}}
   if(m.cmd==='render'){
     const S=st.S;if(!S)throw new Error('image absente');
     const key=m.corners.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(';');
-    if(!st.Wp||st.Wp.key!==key){st.Wp=null;const o=st.core.outSize(m.corners,3000,S.w,S.h);st.Wp={key,w:o.w,h:o.h,d:st.core.warp(S.d,S.w,S.h,m.corners,o.w,o.h)}}
-    const t1=Date.now(),out=st.core.clean(st.Wp.d,st.Wp.w,st.Wp.h,m.mode);
+    if(!st.Wp||st.Wp.key!==key){st.Wp=null;const o=st.core.outSize(m.corners,4000,S.w,S.h);st.Wp={key,w:o.w,h:o.h,d:st.core.warp(S.d,S.w,S.h,m.corners,o.w,o.h)}}
+    const t1=Date.now(),out=st.core.clean(st.Wp.d,st.Wp.w,st.Wp.h,m.mode,{ink:m.ink||0});
     return{w:st.Wp.w,h:st.Wp.h,buf:out.buffer,msWarp:t1-t0,msClean:Date.now()-t1};
   }
   if(m.cmd==='free'){st.S=null;st.Wp=null;return{}}
@@ -2344,9 +2451,28 @@ async function scanCall(msg){
   }
   return scanExec(st,msg);
 }
-function scanModePref(){try{const m=localStorage.getItem('mcs-scan-mode');if(m==='bw'||m==='gray'||m==='color')return m}catch(e){}return'bw'}
+function scanModePref(){try{const m=localStorage.getItem('mcs-scan-rendu');if(m==='net'||m==='bw'||m==='gray'||m==='color')return m}catch(e){}return'net'}
+function scanInkPref(){try{const v=parseInt(localStorage.getItem('mcs-scan-encre'),10);if(v>=-2&&v<=2)return v}catch(e){}return 0}
+let _scanCoreM=null;function scanCoreM(){return _scanCoreM||(_scanCoreM=mcsScanCore())}
+// reflets saturés sur une image réduite (~480 px)
+function refletZones(src,sw,sh){
+  try{const k=Math.min(1,480/Math.max(sw,sh)),w=Math.max(1,Math.round(sw*k)),h=Math.max(1,Math.round(sh*k));
+    const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(src,0,0,w,h);
+    return scanCoreM().reflets(x.getImageData(0,0,w,h).data,w,h);
+  }catch(e){return[]}
+}
+const SCAN_REFLET='Reflet sur le plan : inclinez un peu la tablette et reprenez';
 function scanBusy(t){const b=document.getElementById('scan-busy');b.classList.toggle('hidden',!t);if(t)document.getElementById('scan-busy-t').textContent=t;document.querySelectorAll('#scan-bar button').forEach(x=>x.disabled=!!t)}
 function scanMsg(t){const m=document.getElementById('scan-msg');m.classList.toggle('hidden',!t);m.textContent=t||''}
+// message : coins non trouvés (tant qu'on n'a pas touché aux coins) + reflet dans le cadre
+function scanNotes(){
+  if(!_scan)return;const t=[];
+  if(_scan.step===1&&_scan.found===false&&!_scan.touched)t.push('Coins non trouvés : placez-les au doigt');
+  if(scanReflIn().length)t.push(SCAN_REFLET);
+  scanMsg(t.join('\n'));
+}
+function scanInQuad(x,y,C){let ins=false;for(let i=0,j=3;i<4;j=i++){const a=C[i],b=C[j];if(((a[1]>y)!==(b[1]>y))&&(x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]))ins=!ins}return ins}
+function scanReflIn(){if(!_scan||!_scan.refl||!_scan.C)return[];return _scan.refl.filter(z=>scanInQuad(z.x*_scan.W,z.y*_scan.H,_scan.C))}
 function scanUi(){
   const s1=_scan&&_scan.step===1,$=id=>document.getElementById(id);
   $('scan-g1').classList.toggle('hidden',!s1);$('scan-g2').classList.toggle('hidden',s1);
@@ -2367,14 +2493,15 @@ function scanLoadImg(src){
 async function scanOpen(src,opts){
   if(_scan)return;
   const tok={};
-  _scan={tok,opts:opts||{},step:1,mode:scanModePref(),rot:0,C:null,W:0,H:0,res:null,hist:false,drag:null,view:null};
+  _scan={tok,opts:opts||{},step:1,mode:scanModePref(),ink:scanInkPref(),rot:0,C:null,W:0,H:0,res:null,hist:false,drag:null,view:null,refl:[],touched:false};
+  document.getElementById('scan-ink').value=String(_scan.ink);
   document.getElementById('scan-modal').classList.remove('hidden');
   try{history.pushState({mcsScan:1},'');_scan.hist=true}catch(e){}
   scanMsg('');scanUi();scanBusy('Ouverture…');
   try{
     const img=await scanLoadImg(src);if(!_scan||_scan.tok!==tok)return;
     const r=(((_scan.opts.rot||0)%360)+360)%360,iw=img.naturalWidth,ih=img.naturalHeight;
-    const k=Math.min(1,3000/Math.max(iw,ih)),w=Math.max(1,Math.round(iw*k)),h=Math.max(1,Math.round(ih*k)),sw=r===90||r===270;
+    const k=Math.min(1,4000/Math.max(iw,ih)),w=Math.max(1,Math.round(iw*k)),h=Math.max(1,Math.round(ih*k)),sw=r===90||r===270;
     const cv=document.getElementById('scan-src');cv.width=sw?h:w;cv.height=sw?w:h;
     const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
     ctx.save();ctx.translate(cv.width/2,cv.height/2);ctx.rotate(r*Math.PI/180);ctx.drawImage(img,-w/2,-h/2,w,h);ctx.restore();
@@ -2383,8 +2510,8 @@ async function scanOpen(src,opts){
     if(!_scan||_scan.tok!==tok)return;
     _scan.msDetect=Math.round(performance.now()-t0);
     _scan.C=d.det.corners.map(p=>[p[0],p[1]]);_scan.found=!!d.det.ok;
-    scanBusy('');scanUi();scanLayout();
-    if(!d.det.ok)scanMsg('Coins non trouvés : placez-les au doigt');
+    _scan.refl=refletZones(cv,cv.width,cv.height);
+    scanBusy('');scanUi();scanLayout();scanNotes();
   }catch(e){
     if(!_scan||_scan.tok!==tok)return;
     console.warn('scanner',e);scanCancel();
@@ -2409,6 +2536,7 @@ function scanDraw(){
   const pts=_scan.C.map(p=>[v.ox+p[0]*v.k,v.oy+p[1]*v.k]);
   document.querySelectorAll('.scan-h').forEach(h=>{const p=pts[+h.dataset.i];h.style.transform=`translate(${p[0]}px,${p[1]}px)`});
   document.querySelector('#scan-svg polygon').setAttribute('points',pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '));
+  document.getElementById('scan-refl').innerHTML=scanReflIn().map(z=>`<ellipse cx="${(v.ox+z.x*_scan.W*v.k).toFixed(1)}" cy="${(v.oy+z.y*_scan.H*v.k).toFixed(1)}" rx="${(z.rx*_scan.W*v.k+6).toFixed(1)}" ry="${(z.ry*_scan.H*v.k+6).toFixed(1)}"></ellipse>`).join('');
 }
 function scanLoupe(i){
   const lp=document.getElementById('scan-loupe'),v=_scan.view,c=_scan.C[i],S=132;
@@ -2430,7 +2558,7 @@ function scanPDown(e){
   const h=e.currentTarget,i=+h.dataset.i,v=_scan.view,st=document.getElementById('scan-stage').getBoundingClientRect(),c=_scan.C[i];
   e.preventDefault();try{h.setPointerCapture(e.pointerId)}catch(x){}
   _scan.drag={i,id:e.pointerId,dx:e.clientX-(st.left+v.ox+c[0]*v.k),dy:e.clientY-(st.top+v.oy+c[1]*v.k),st};
-  h.classList.add('drag');scanMsg('');scanLoupe(i);
+  h.classList.add('drag');_scan.touched=true;scanNotes();scanLoupe(i);
 }
 function scanPMove(e){
   const d=_scan&&_scan.drag;if(!d||e.pointerId!==d.id)return;
@@ -2448,7 +2576,7 @@ document.querySelectorAll('.scan-h').forEach(h=>{
   h.addEventListener('pointerup',scanPUp);h.addEventListener('pointercancel',scanPUp);h.addEventListener('lostpointercapture',scanPUp);
 });
 window.addEventListener('resize',()=>{if(_scan&&_scan.step===1)scanLayout()});
-function scanWhole(){if(!_scan||!_scan.W)return;_scan.C=[[0,0],[_scan.W,0],[_scan.W,_scan.H],[0,_scan.H]];scanMsg('');scanDraw()}
+function scanWhole(){if(!_scan||!_scan.W)return;_scan.C=[[0,0],[_scan.W,0],[_scan.W,_scan.H],[0,_scan.H]];_scan.touched=true;scanNotes();scanDraw()}
 function scanQuadOk(C){
   let sg=0;for(let k=0;k<4;k++){const o=C[k],u=C[(k+1)%4],w=C[(k+2)%4],cr=(u[0]-o[0])*(w[1]-u[1])-(u[1]-o[1])*(w[0]-u[0]);if(Math.abs(cr)<1)return false;const s=cr>0?1:-1;if(!sg)sg=s;else if(s!==sg)return false}
   return true;
@@ -2456,7 +2584,7 @@ function scanQuadOk(C){
 async function scanRender(){
   const tok=_scan.tok;scanBusy('Traitement…');
   try{
-    const t0=performance.now(),r=await scanCall({cmd:'render',corners:_scan.C.map(p=>[p[0],p[1]]),mode:_scan.mode});
+    const t0=performance.now(),r=await scanCall({cmd:'render',corners:_scan.C.map(p=>[p[0],p[1]]),mode:_scan.mode,ink:_scan.ink});
     if(!_scan||_scan.tok!==tok)return;
     _scan.msRender=Math.round(performance.now()-t0);
     const c=document.createElement('canvas');c.width=r.w;c.height=r.h;
@@ -2480,19 +2608,25 @@ function scanNext(){
   let Q=_scan.C.slice().sort((a,b)=>Math.atan2(a[1]-cy,a[0]-cx)-Math.atan2(b[1]-cy,b[0]-cx)),k=0,mn=1e18;
   for(let i=0;i<4;i++){const v=Q[i][0]+Q[i][1];if(v<mn){mn=v;k=i}}
   _scan.C=[Q[k],Q[(k+1)%4],Q[(k+2)%4],Q[(k+3)%4]];
-  _scan.step=2;scanMsg('');scanUi();scanRender();
+  _scan.step=2;scanNotes();scanUi();scanRender();
 }
-function scanBack(){if(!_scan)return;_scan.step=1;scanUi();scanLayout()}
+function scanBack(){if(!_scan)return;_scan.step=1;scanUi();scanLayout();scanNotes()}
 function scanSetMode(m){
-  if(!_scan||_scan.mode===m)return;_scan.mode=m;try{localStorage.setItem('mcs-scan-mode',m)}catch(e){}
+  if(!_scan||_scan.mode===m)return;_scan.mode=m;try{localStorage.setItem('mcs-scan-rendu',m)}catch(e){}
   scanUi();scanRender();
+}
+let _scanInkT=null;
+function scanSetInk(v){
+  if(!_scan)return;v=Math.max(-2,Math.min(2,parseInt(v,10)||0));if(v===_scan.ink)return;_scan.ink=v;
+  try{localStorage.setItem('mcs-scan-encre',String(v))}catch(e){}
+  clearTimeout(_scanInkT);_scanInkT=setTimeout(()=>{if(_scan&&_scan.step===2)scanRender()},250);
 }
 function scanRot(d){if(!_scan||!_scan.res)return;_scan.rot=(_scan.rot+d+360)%360;scanShowOut()}
 function scanBlob(c,type,q){return new Promise(res=>{try{c.toBlob(b=>res(b),type,q)}catch(e){res(null)}})}
 async function scanValidate(){
   if(!_scan||!_scan.res)return;
   const tok=_scan.tok,o=document.getElementById('scan-out');scanBusy('Enregistrement…');
-  let b=await scanBlob(o,'image/jpeg',0.9);
+  let b=await scanBlob(o,'image/jpeg',0.92);
   if(_scan&&_scan.mode==='bw'){const p=await scanBlob(o,'image/png');if(p&&(!b||p.size<b.size))b=p}
   if(!_scan||_scan.tok!==tok)return;
   if(!b){scanBusy('');toast('Enregistrement de l\'image impossible','error');return}
@@ -2651,13 +2785,22 @@ function camShoot(){
     if(!b||!_cam){return;}
     if(_cam.url)URL.revokeObjectURL(_cam.url);
     _cam.shot=b;_cam.url=URL.createObjectURL(b);
-    document.getElementById('cam-still').src=_cam.url;camUi('review');
+    document.getElementById('cam-still').src=_cam.url;camUi('review');camRefl(refletZones(c,c.width,c.height),c.width,c.height);
   },'image/jpeg',0.92);
+}
+// reflets entourés sur la photo de revue (image affichée en « contain »)
+function camRefl(z,iw,ih){
+  const sv=document.getElementById('cam-refl'),wn=document.getElementById('cam-warn');
+  if(!z||!z.length){sv.classList.add('hidden');sv.innerHTML='';wn.classList.add('hidden');return}
+  const st=document.getElementById('cam-stage').getBoundingClientRect(),k=Math.min(st.width/iw,st.height/ih),w=iw*k,h=ih*k;
+  sv.style.left=(st.width-w)/2+'px';sv.style.top=(st.height-h)/2+'px';sv.style.width=w+'px';sv.style.height=h+'px';
+  sv.innerHTML=z.map(q=>`<ellipse cx="${q.x}" cy="${q.y}" rx="${q.rx}" ry="${q.ry}" vector-effect="non-scaling-stroke"></ellipse>`).join('');
+  sv.classList.remove('hidden');wn.textContent=SCAN_REFLET;wn.classList.remove('hidden');
 }
 function camRetake(){
   if(!_cam)return;
   if(_cam.url){URL.revokeObjectURL(_cam.url);_cam.url=null}
-  _cam.shot=null;document.getElementById('cam-still').removeAttribute('src');camUi('live');
+  _cam.shot=null;document.getElementById('cam-still').removeAttribute('src');camUi('live');camRefl(null);
 }
 function camPhotoName(ext){
   const d=new Date(),p=n=>String(n).padStart(2,'0');
