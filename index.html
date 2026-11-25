@@ -175,6 +175,7 @@ label{font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.05em;tex
 #scan-bar .scan-grp{display:contents}
 #cam-bar button#cam-scan{background:#2952b3;border-color:transparent}
 #scan-msg{white-space:pre-line}
+#cam-res{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.6);color:rgba(255,255,255,.85);padding:4px 10px;border-radius:12px;font-size:12px;font-weight:600;white-space:nowrap}
 #scan-refl ellipse,#cam-refl ellipse{fill:rgba(255,176,32,.16);stroke:#ffb020;stroke-width:3;stroke-dasharray:8 6}
 #cam-refl{position:absolute;pointer-events:none;overflow:visible}
 #cam-warn{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);max-width:calc(100% - 24px);background:rgba(120,70,0,.88);border:1px solid #ffb020;color:#fff;padding:8px 14px;border-radius:12px;font-size:14px;font-weight:600;text-align:center}
@@ -471,7 +472,7 @@ document.dispatchEvent(new Event('firebaseReady'));
 <div id="mcs-print-div"></div>
 
 <!-- LIGHTBOX -->
-<div id="lightbox" class="hidden" onclick="closeLightbox()">
+<div id="lightbox" class="hidden" onclick="lbBackdrop()">
   <button id="lightbox-close" onclick="closeLightbox()">✕</button>
   <button type="button" id="lb-prev" class="lb-nav hidden" onclick="event.stopPropagation();lbNav(-1)" aria-label="Image précédente">‹</button>
   <img id="lightbox-img" src="" alt="" onclick="event.stopPropagation()">
@@ -479,6 +480,8 @@ document.dispatchEvent(new Event('firebaseReady'));
   <div id="lb-bar" onclick="event.stopPropagation()">
     <button type="button" onclick="rotatePhoto(-90)" title="Tourner à gauche">⟲ Gauche</button>
     <button type="button" onclick="rotatePhoto(90)" title="Tourner à droite">⟳ Droite</button>
+    <button type="button" onclick="lbZoomBtn(1.6)" aria-label="Agrandir" title="Agrandir">＋</button>
+    <button type="button" onclick="lbZoomBtn(1/1.6)" aria-label="Réduire" title="Réduire">－</button>
     <button type="button" onclick="printCurrentPhoto()">🖨️ Imprimer</button>
   </div>
 </div>
@@ -489,6 +492,7 @@ document.dispatchEvent(new Event('firebaseReady'));
     <video id="cam-video" autoplay playsinline muted></video>
     <img id="cam-still" class="hidden" alt="">
     <div id="cam-count" class="hidden"></div>
+    <div id="cam-res" class="hidden"></div>
     <svg id="cam-refl" class="hidden" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"></svg>
     <div id="cam-warn" class="hidden"></div>
   </div>
@@ -523,7 +527,7 @@ document.dispatchEvent(new Event('firebaseReady'));
     <div class="scan-grp hidden" id="scan-g2">
       <button type="button" onclick="scanRot(-90)" title="Tourner à gauche" aria-label="Tourner à gauche">↺</button>
       <button type="button" onclick="scanRot(90)" title="Tourner à droite" aria-label="Tourner à droite">↻</button>
-      <div class="scan-seg" role="group" aria-label="Rendu"><button type="button" data-m="net" onclick="scanSetMode('net')">Net</button><button type="button" data-m="bw" onclick="scanSetMode('bw')">N&amp;B</button><button type="button" data-m="gray" onclick="scanSetMode('gray')">Gris</button><button type="button" data-m="color" onclick="scanSetMode('color')">Couleur</button></div>
+      <div class="scan-seg" role="group" aria-label="Rendu"><button type="button" data-m="net" onclick="scanSetMode('net')">Net</button><button type="button" data-m="color" onclick="scanSetMode('color')">Couleur</button><button type="button" data-m="gray" onclick="scanSetMode('gray')">Gris</button><button type="button" data-m="bw" onclick="scanSetMode('bw')">N&amp;B</button></div>
       <label class="scan-ink" title="Intensité de l'encre">Plus clair<input type="range" id="scan-ink" min="-2" max="2" step="1" value="0" oninput="scanSetInk(this.value)" aria-label="Intensité de l'encre">Plus foncé</label>
       <button type="button" onclick="scanBack()">← Coins</button>
       <button type="button" onclick="scanCancel()">Annuler</button>
@@ -981,13 +985,46 @@ function getFiche(id){return fiches.find(f=>f.id===id)}
 // ── LIGHTBOX ──────────────────────────────────────────
 let _lb=null;
 function rotCss(r){return r?`transform:rotate(${r}deg)`:''}
+let _lbZ={s:1,x:0,y:0},_lbP=new Map(),_lbG=null,_lbMoved=0;
 function applyLbRot(){
-  const img=document.getElementById('lightbox-img'),r=(_lb&&_lb.rot)||0;
-  img.style.transform=r?`rotate(${r}deg)`:'';
+  const img=document.getElementById('lightbox-img'),r=(_lb&&_lb.rot)||0,z=_lbZ;
+  img.style.transform=(z.s!==1||z.x||z.y?`translate(${z.x}px,${z.y}px) scale(${z.s}) `:'')+(r?`rotate(${r}deg)`:'');
+  img.style.cursor=z.s>1?'grab':'zoom-in';
   img.style.maxWidth=r%180?'88vh':'';img.style.maxHeight=r%180?'92vw':'';
 }
+function lbClamp(){
+  const img=document.getElementById('lightbox-img'),z=_lbZ;if(z.s<=1){z.s=1;z.x=0;z.y=0;return}
+  const sw=((_lb&&_lb.rot)||0)%180?1:0,w=(sw?img.offsetHeight:img.offsetWidth)*z.s,h=(sw?img.offsetWidth:img.offsetHeight)*z.s;
+  const mx=Math.max(0,(w-innerWidth)/2+innerWidth*0.3),my=Math.max(0,(h-innerHeight)/2+innerHeight*0.3);
+  z.x=Math.max(-mx,Math.min(mx,z.x));z.y=Math.max(-my,Math.min(my,z.y));
+}
+function lbZoomAt(f,cx,cy){
+  const z=_lbZ,ns=Math.max(1,Math.min(10,z.s*f));if(ns===z.s)return;
+  const ox=innerWidth/2,oy=innerHeight/2,ux=(cx-ox-z.x)/z.s,uy=(cy-oy-z.y)/z.s;
+  z.x=cx-ox-ux*ns;z.y=cy-oy-uy*ns;z.s=ns;lbClamp();applyLbRot();
+}
+function lbZoomBtn(f){lbZoomAt(f,innerWidth/2,innerHeight/2)}
+function lbBackdrop(){if(Date.now()-_lbMoved<400)return;closeLightbox()}
+(function(){
+  const img=document.getElementById('lightbox-img'),lb=document.getElementById('lightbox');
+  img.style.touchAction='none';
+  img.addEventListener('pointerdown',e=>{e.preventDefault();try{img.setPointerCapture(e.pointerId)}catch(x){}_lbP.set(e.pointerId,{x:e.clientX,y:e.clientY});img.style.transition='none';_lbG=null});
+  img.addEventListener('pointermove',e=>{
+    const p=_lbP.get(e.pointerId);if(!p)return;const nx=e.clientX,ny=e.clientY;
+    if(_lbP.size>=2){
+      _lbP.set(e.pointerId,{x:nx,y:ny});const [a,b]=[..._lbP.values()],d=Math.hypot(a.x-b.x,a.y-b.y),mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+      if(_lbG&&_lbG.d>0){_lbZ.x+=mx-_lbG.mx;_lbZ.y+=my-_lbG.my;lbZoomAt(d/_lbG.d,mx,my);lbClamp();applyLbRot();_lbMoved=Date.now()}
+      _lbG={d,mx,my};
+    }else if(_lbZ.s>1){_lbZ.x+=nx-p.x;_lbZ.y+=ny-p.y;_lbP.set(e.pointerId,{x:nx,y:ny});lbClamp();applyLbRot();if(Math.abs(nx-p.x)+Math.abs(ny-p.y)>1)_lbMoved=Date.now()}
+    else _lbP.set(e.pointerId,{x:nx,y:ny});
+  });
+  const up=e=>{_lbP.delete(e.pointerId);if(_lbP.size<2)_lbG=null;if(!_lbP.size)img.style.transition=''};
+  img.addEventListener('pointerup',up);img.addEventListener('pointercancel',up);
+  img.addEventListener('dblclick',e=>{e.stopPropagation();if(_lbZ.s>1){_lbZ={s:1,x:0,y:0};applyLbRot()}else lbZoomAt(3,e.clientX,e.clientY)});
+  lb.addEventListener('wheel',e=>{if(lb.classList.contains('hidden'))return;e.preventDefault();lbZoomAt(Math.exp(-e.deltaY*0.0015),e.clientX,e.clientY)},{passive:false});
+})();
 function openLightbox(src,rot){
-  _lb={src,rot:rot||0,ficheId:null,idx:-1,name:''};
+  _lb={src,rot:rot||0,ficheId:null,idx:-1,name:''};_lbZ={s:1,x:0,y:0};
   document.getElementById('lightbox-img').src=src;applyLbRot();
   document.getElementById('lightbox').classList.remove('hidden');
   updateLbNav();
@@ -1313,7 +1350,7 @@ function renderHome(){
         ${localStorage.getItem('mcs-theme')==='light'?'🌙 Mode sombre':'☀️ Mode clair'}
       </button>
     </div>
-    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 21</div>
+    <div class="home-ver" style="margin-top:16px;color:rgba(255,255,255,.2);font-size:11px;font-weight:600;letter-spacing:.08em">version 22</div>
   </div>`;
 }
 
@@ -1936,6 +1973,8 @@ function compressImage(file,maxW,maxH,quality){
       const img=new Image();
       img.onload=()=>{
         let w=img.width,h=img.height;
+        // JPEG déjà assez petit : gardé tel quel (pas de 2e compression)
+        if(file.type==='image/jpeg'&&w<=maxW&&h<=maxH&&file.size<=8*1024*1024){resolve(e.target.result);return}
         if(w>maxW||h>maxH){const ratio=Math.min(maxW/w,maxH/h);w=Math.round(w*ratio);h=Math.round(h*ratio);}
         const canvas=document.createElement('canvas');
         canvas.width=w;canvas.height=h;
@@ -2319,22 +2358,40 @@ function clean0(rgba,w,h,mode,opt){
   const CR=opt.core!=null?opt.core:0;const sh=d=>d>CR?d-CR:d<-CR?d+CR:0;
   const L2=i=>{let u=S[i]+A*sh(S[i]-Bl[i]);u=Math.round(u)+128;return u<0?0:u>511?511:u};
   const out=new Uint8ClampedArray(n*4);
-  if(mode==='color'){
+  // couleurs : balance des blancs sur le papier, écart de chaque canal à la luminance (lissé : moins de bruit de chroma)
+  let DC=null,colored=null;
+  if(mode==='color'||mode==='net'){
     let sr=0,sg=0,sb=0,cnt=0;
     for(let i=0;i<n;i+=st){if(r[i]>pw*0.97){const p=i*4,l=Lm[i]||1;sr+=rgba[p]/l;sg+=rgba[p+1]/l;sb+=rgba[p+2]/l;cnt++}}
     const kr=cnt?sr/cnt:1,kg=cnt?sg/cnt:1,kb=cnt?sb/cnt:1;
-    for(let i=0,p=0;i<n;i++,p+=4){const l=Lm[i]||1,f=r[i]/pw/l*255,d=A*sh(S[i]-Bl[i])+128;
-      for(let c=0;c<3;c++){let u=Math.round(rgba[p+c]/(c===0?kr:c===1?kg:kb)*f+d);out[p+c]=lut[u<0?0:u>511?511:u]}
-      out[p+3]=255}
-    const O=new Uint8Array(n);for(let i=0,p=0;i<n;i++,p+=4)O[i]=(out[p]*77+out[p+1]*150+out[p+2]*29)>>8;
-    const O2=O.slice();despeck(O2,w,h,opt.ds!=null?opt.ds:9);
-    for(let i=0,p=0;i<n;i++,p+=4)if(O2[i]!==O[i]){out[p]=out[p+1]=out[p+2]=255}
-    return out;
+    const d0=[new Int16Array(n),new Int16Array(n),new Int16Array(n)];
+    for(let i=0,p=0;i<n;i++,p+=4){const l=Lm[i]||1,f=r[i]/pw/l*255,cr=rgba[p]/kr*f,cg=rgba[p+1]/kg*f,cb=rgba[p+2]/kb*f,y=(cr*77+cg*150+cb*29)/256;
+      d0[0][i]=cr-y;d0[1][i]=cg-y;d0[2][i]=cb-y}
+    const sm=A0=>{const R=new Int16Array(n);
+      for(let y=0;y<h;y++){const ym=y>0?y-1:0,yp=y<h-1?y+1:y;for(let x=0;x<w;x++){const xm=x>0?x-1:0,xp=x<w-1?x+1:x;
+        R[y*w+x]=(A0[ym*w+xm]+2*A0[ym*w+x]+A0[ym*w+xp]+2*A0[y*w+xm]+4*A0[y*w+x]+2*A0[y*w+xp]+A0[yp*w+xm]+2*A0[yp*w+x]+A0[yp*w+xp])>>4}}
+      return R};
+    DC=[sm(d0[0]),sm(d0[1]),sm(d0[2])];
+    colored=new Uint8Array(n);for(let i=0;i<n;i++){const m=Math.max(Math.abs(DC[0][i]),Math.abs(DC[1][i]),Math.abs(DC[2][i]));if(m>18)colored[i]=1}
   }
   const O=new Uint8Array(n);for(let i=0;i<n;i++)O[i]=lut[L2(i)];
-  despeck(O,w,h,opt.ds!=null?opt.ds:9);
+  if(colored){
+    // aplats de couleur (surligneur, bandeau) : luminance lissée et douce (pas de grain), l'encre dessus reste nette
+    const ls=new Uint8ClampedArray(256);for(let v=0;v<256;v++){const x=Math.max(0,Math.min(1,(v-bk)/(248-bk)));ls[v]=255*Math.pow(x,1.15)}
+    for(let i=0;i<n;i++)if(colored[i]&&O[i]>=110){const v=ls[Bl[i]];O[i]=v}
+  }
+  despeck(O,w,h,opt.ds!=null?opt.ds:9,colored);
   // noir et blanc strict : rendu net puis seuil (légèrement épaississant)
   if(mode==='bw')for(let i=0;i<n;i++)O[i]=O[i]<165?0:255;
+  if(DC){
+    // luminance du rendu + couleur d'origine ravivée ; petits écarts (bruit) ignorés
+    const sat=(opt.sat||1)*(mode==='net'?2.0:1.7);
+    for(let i=0,p=0;i<n;i++,p+=4){
+      const m=Math.max(Math.abs(DC[0][i]),Math.abs(DC[1][i]),Math.abs(DC[2][i])),k=m<10?0:m<20?(m-10)/10*sat:sat,o=O[i];
+      const R=o+DC[0][i]*k,G=o+DC[1][i]*k,Bc=o+DC[2][i]*k;
+      out[p]=R<0?0:R>255?255:R;out[p+1]=G<0?0:G>255?255:G;out[p+2]=Bc<0?0:Bc>255?255:Bc;out[p+3]=255}
+    return out;
+  }
   for(let i=0,p=0;i<n;i++,p+=4){const o=O[i];out[p]=out[p+1]=out[p+2]=o;out[p+3]=255}
   return out;
 }
@@ -2371,14 +2428,14 @@ function localStretch(S,w,h,kmax,kr,bgm){
       const i=y*w+x,s0=S[i],wt=Math.max(0,Math.min(1,((opt_hi||225)-s0)/40)),v=s0-wt*(k-1)*(255-s0);S[i]=v<0?0:v}}
 }
 // points isolés (bruit du capteur) : pixel gris/foncé avec moins de k voisins foncés dans une fenêtre 5x5 -> blanc
-function despeck(O,w,h,k){
+function despeck(O,w,h,k,keep){
   if(!k)return;
   const ii=new Uint32Array((w+1)*(h+1));
   for(let y=0;y<h;y++){let s=0;const o=(y+1)*(w+1),o0=y*(w+1);for(let x=0;x<w;x++){s+=O[y*w+x]<200?1:0;ii[o+x+1]=ii[o0+x+1]+s}}
   for(let y=0;y<h;y++){const y0=Math.max(0,y-2),y1=Math.min(h,y+3);
     for(let x=0;x<w;x++){const i=y*w+x;if(O[i]===255)continue;const x0=Math.max(0,x-2),x1=Math.min(w,x+3);
       const c=ii[y1*(w+1)+x1]-ii[y0*(w+1)+x1]-ii[y1*(w+1)+x0]+ii[y0*(w+1)+x0];
-      if(O[i]<200?c<k:c===0)O[i]=255}}
+      if(keep&&keep[i])continue;if(O[i]<200?c<k:c===0)O[i]=255}}
 }
 // Reflets saturés (néon, lampe) sur une image réduite (~480 px) : zones blanches brûlées plus claires que le papier autour.
 // Renvoie des ellipses en coordonnées relatives (0..1).
@@ -2716,9 +2773,10 @@ function camUi(mode){ // 'live' | 'review'
   $('cam-cancel').classList.toggle('hidden',!live||n>0);$('cam-done').classList.toggle('hidden',!live||n===0);
   $('cam-count').classList.toggle('hidden',n===0);
   $('cam-count').textContent=n+(n>1?' photos ajoutées':' photo ajoutée');
+  $('cam-res').classList.toggle('hidden',live);
 }
 async function camGet(deviceId){
-  const base={width:{ideal:2560},height:{ideal:1920}};
+  const base={width:{ideal:4096},height:{ideal:3072}};
   const vid=deviceId?Object.assign({deviceId:{exact:deviceId}},base):Object.assign({facingMode:{ideal:'environment'}},base);
   try{return await navigator.mediaDevices.getUserMedia({video:vid});}
   catch(e){
@@ -2731,6 +2789,13 @@ async function camStart(deviceId,tok){
   const stream=await camGet(deviceId);
   if(!_cam||_cam.tok!==tok){stream.getTracks().forEach(t=>t.stop());return false;}
   _cam.stream=stream;
+  const track=stream.getVideoTracks()[0];
+  // vidéo : la plus grande taille que la caméra annonce
+  try{const c=track.getCapabilities&&track.getCapabilities();
+    if(c&&c.width&&c.height&&c.width.max&&c.height.max)await track.applyConstraints({width:{ideal:c.width.max},height:{ideal:c.height.max}});}catch(e){}
+  if(!_cam||_cam.tok!==tok){stream.getTracks().forEach(t=>t.stop());return false;}
+  // photo : capteur en pleine résolution quand le navigateur le permet (Chrome/Edge)
+  _cam.ic=null;try{if(window.ImageCapture)_cam.ic=new ImageCapture(track)}catch(e){_cam.ic=null}
   const v=document.getElementById('cam-video');v.srcObject=stream;
   try{await v.play()}catch(e){}
   return true;
@@ -2776,17 +2841,40 @@ async function camSwitch(){
   try{await camStart(nx.deviceId,tok);if(_cam&&_cam.tok===tok)_cam.cur=nx.deviceId;}
   catch(e){if(_cam&&_cam.tok===tok){toast('Cette caméra ne s\'ouvre pas','error');try{await camStart(_cam.cur,tok)}catch(e2){}}}
 }
-function camShoot(){
+async function camPhoto(ic,minPx){
+  // takePhoto() : image du capteur photo, souvent bien plus grande que la vidéo
+  let o={};
+  try{const pc=await ic.getPhotoCapabilities();if(pc&&pc.imageWidth&&pc.imageWidth.max&&pc.imageHeight&&pc.imageHeight.max)o={imageWidth:pc.imageWidth.max,imageHeight:pc.imageHeight.max}}catch(e){}
+  const blob=await Promise.race([ic.takePhoto(o),new Promise((_,rj)=>setTimeout(()=>rj(new Error('délai')),8000))]);
+  if(!blob||!blob.size)throw new Error('vide');
+  const bmp=await createImageBitmap(blob);
+  if(bmp.width*bmp.height<minPx){try{bmp.close()}catch(e){}throw new Error('plus petit que la vidéo')}
+  return{blob,bmp,w:bmp.width,h:bmp.height};
+}
+async function camShoot(){
   const v=document.getElementById('cam-video');
-  if(!_cam||!v.videoWidth)return;
-  const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;
-  c.getContext('2d').drawImage(v,0,0,c.width,c.height);
-  c.toBlob(b=>{
-    if(!b||!_cam){return;}
-    if(_cam.url)URL.revokeObjectURL(_cam.url);
-    _cam.shot=b;_cam.url=URL.createObjectURL(b);
-    document.getElementById('cam-still').src=_cam.url;camUi('review');camRefl(refletZones(c,c.width,c.height),c.width,c.height);
-  },'image/jpeg',0.92);
+  if(!_cam||!v.videoWidth||_cam.busy)return;
+  const tok=_cam.tok;_cam.busy=true;
+  const sh=document.getElementById('cam-shut');sh.disabled=true;
+  let r=null,src='photo';
+  if(_cam.ic){try{r=await camPhoto(_cam.ic,v.videoWidth*v.videoHeight)}catch(e){r=null}}
+  if(!_cam||_cam.tok!==tok){sh.disabled=false;return}
+  if(!r){
+    src='vidéo';
+    const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;
+    c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+    const blob=await new Promise(res=>c.toBlob(res,'image/jpeg',0.92));
+    r=blob?{blob,bmp:c,w:c.width,h:c.height}:null;
+  }
+  sh.disabled=false;
+  if(!_cam||_cam.tok!==tok)return;
+  _cam.busy=false;if(!r)return;
+  if(_cam.url)URL.revokeObjectURL(_cam.url);
+  _cam.shot=r.blob;_cam.url=URL.createObjectURL(r.blob);_cam.res=r.w+'×'+r.h;_cam.src=src;
+  document.getElementById('cam-still').src=_cam.url;
+  document.getElementById('cam-res').textContent=r.w+'×'+r.h+(src==='photo'?' · photo':' · vidéo');
+  camUi('review');camRefl(refletZones(r.bmp,r.w,r.h),r.w,r.h);
+  if(r.bmp&&r.bmp.close)try{r.bmp.close()}catch(e){}
 }
 // reflets entourés sur la photo de revue (image affichée en « contain »)
 function camRefl(z,iw,ih){
@@ -2829,7 +2917,7 @@ window.addEventListener('popstate',()=>{
 function handleFiles(files){
   for(const file of files){
     if(file.type.startsWith('image/')){
-      compressImage(file,2400,2400,0.92).then(compressed=>{
+      compressImage(file,4000,4000,0.92).then(compressed=>{
         // On garde la data en mémoire pour prévisualisation, upload se fait au save
         // (l'original reste en mémoire pour le scanner : redressement en pleine résolution)
         addFormImage(compressed,file.name,'image/jpeg',file);
